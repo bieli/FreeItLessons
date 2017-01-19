@@ -1,0 +1,300 @@
+{% extends 'mainapp/base.html' %}
+
+{% load bootstrap3 %}
+{% load static %}
+
+{% block title %}django-bootstrap3{% endblock %}
+
+
+{% block bootstrap3_content %}
+<style>
+.list-group-item.active-done {
+    z-index: 2;
+    color: #fff;
+    background-color: green;
+    border-color: lightgreen;
+}
+/*
+.bg-info {
+    background-color: #eeeeee;
+}
+*/
+.parallelogram {
+    width: 150px;
+    height: 15px;
+    background: green;
+    -webkit-transform: skew(30deg);
+    -moz-transform: skew(30deg);
+    -o-transform: skew(30deg);
+    transform: skew(30deg);
+    margin: 0px;
+}
+.right {
+    float: right;
+    width: 50px;
+    padding: 0px;
+    margin-right: 20px;
+}
+.active2 {
+    padding: 23px;
+}
+
+</style>
+
+
+
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-md-12">
+			<ul class="nav nav-pills bg-info">
+				<li>
+					<a href="/" class="modula-font">Start</a>
+				</li>
+				<li>
+					<a href="/faq.html" class="modula-font">Pytania i odpowiedzi</a>
+				</li>
+				<li>
+					<a href="/kursy.html" class="modula-font active">Kursy</a>
+				</li>
+				<li>
+					<a href="/mentorzy.html" class="modula-font">Mentorzy</a>
+				</li>
+			</ul>
+  </div>
+</div>
+
+
+
+<div class="container-fluid">
+
+	<div class="row">
+		<div class="col-md-8">
+			<div class="page-header">
+				<h1>
+					Zadania z programowania! <small>program mentorski</small>
+				</h1>
+			</div>
+
+        {% if not chapter_id %}
+			<h3>
+				Jak to działa ?
+			</h3>
+			<p>
+				Poniżej znajduje się lista scenariuszy zajęć. Wybierz aktywny scenariusz w celu rozpoczęcia nauki, praktyki lub utrwalenia materiału.
+      <br />
+      W tym kursie będziemy uczyć się pojęć z systemów operacyjnych, języków programowania i narzędzi ułatwiających wytwarzanie aplikacji.
+
+{% comment %}
+      <br />
+        W celu usprawnienia komunikacji związanej z etapami nauki stosujemy poniższe <a href="faq.html#ikony">symbole</a>, które pokazują ścieżkę edukacji.
+      <br />
+      <br />
+        <span>
+        <img alt="" src="{% static 'mainapp/img/new.png' %}" class="img-circle" width="60" height="60">
+        &nbsp;&nbsp;➜&nbsp;&nbsp;
+        <img alt="" src="{% static 'mainapp/img/doit.png' %}" class="img-circle" width="60" height="60">
+        &nbsp;&nbsp;➜&nbsp;&nbsp;
+        <img alt="" src="{% static 'mainapp/img/help.png' %}" class="img-circle" width="60" height="60">
+        &nbsp;&nbsp;➜&nbsp;&nbsp;
+        <img alt="" src="{% static 'mainapp/img/doit.png' %}" class="img-circle" width="60" height="60">
+        &nbsp;&nbsp;➜&nbsp;&nbsp;
+        <img alt="" src="{% static 'mainapp/img/done.png' %}" class="img-circle" width="60" height="60">
+      </span>      
+      <br /><br /><br />
+{% endcomment %}
+      </p>
+
+        <hr />
+
+			<h3>
+				Materiały do nauki
+			</h3>
+        {% endif%}
+
+<!-- module_id: {{ module_id }} -->
+<!-- chapter_id: {{ chapter_id }} -->
+{% for module in modules %}
+    <div class="list-group">
+        <div class="parallelogram"><div class="parallelogram"></div></div>
+        <a href="/kursy/{{ module.id }}.html" class="list-group-item active-done">
+            <strong class="done">{{ module.title }}</strong>
+            {% for icon_file_name in module.icons_list %}
+              <img class="card-img-top right" src="{% static 'mainapp/img/' %}{{ icon_file_name }}" height="50px" alt="" />
+            {% endfor %}
+        </a>
+
+        {% for chapter in module.chapters %}
+            <div class="list-group-item">
+                <h4 class="list-group-item-heading done">
+                    <img alt="" src="{% static 'mainapp/img/done.png' %}" class="img-circle" width="30" height="30">
+                    <a href="/kursy/{{ module.id }}/rozdzial/{{ chapter.id }}.html">{{ chapter.name }}</a>
+                </h4>
+
+                <p class="list-group-item-text">
+                    {{ chapter.note }}
+                </p>
+            </div>
+        {% endfor %}
+        {% if not chapter_id %}
+            <a class="list-group-item active2">
+                <i class="text-warning">Osiągnięcia:</i> <b class="text-warning">{{ module.achievements_desc }}</b>
+            </a>
+        {% else %}
+            {% for content in contents_list %}
+                <div class="list-group-item">
+                    <p class="list-group-item-text">
+                        <small style="color: #e6e6e6">
+                        {{ content.additional_text }} - {{ content.status }}
+                        </small><br />
+{% comment %}
+                        {{ content.status }} - {{ content.value }}
+{% endcomment %}
+                        <br />
+                        {% if content.status == 1 %}
+                            <blockquote>
+                            {{ content.value |safe }}
+                            </blockquote>
+                        {% elif content.status == 3 %}
+                            <iframe width="640" height="360" src="{{ content.value }}" frameborder="0" allowfullscreen></iframe>
+                        {% elif content.status == 4 %}
+                            <a class="btn btn-default" href="{{ content.value }}" target="_blank">{{ content.additional_text }}</a>
+                        {% endif %}
+                    </p>
+                </div>
+            {% endfor %}
+        {% endif%}
+        </div>
+        <br />
+        <br />
+
+{% endfor %}
+{% comment %}
+<div class="card" style="background-color: black">
+  <img class="card-img-top" src="{% static 'mainapp/img/done.png' %}" alt="Card image cap">
+  <div class="card-block">
+    <h4 class="card-title">Card title</h4>
+    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+    <a href="#" class="btn btn-primary">Go somewhere</a>
+  </div>
+</div>
+
+
+<div class="card" style="">
+  <img class="card-img-top" src="..." alt="Card image cap">
+  <div class="card-block">
+    <h4 class="card-title">Card title</h4>
+    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+  </div>
+  <ul class="list-group list-group-flush">
+    <li class="list-group-item">Cras justo odio</li>
+    <li class="list-group-item">Dapibus ac facilisis in</li>
+    <li class="list-group-item">Vestibulum at eros</li>
+  </ul>
+  <div class="card-block">
+    <a href="#" class="card-link">Card link</a>
+    <a href="#" class="card-link">Another link</a>
+  </div>
+</div>
+
+
+<div class="card">
+  <h3 class="card-header">Featured</h3>
+  <div class="card-block">
+    <h4 class="card-title">Special title treatment</h4>
+    <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+    <a href="#" class="btn btn-primary">Go somewhere</a>
+  </div>
+</div>{% endcomment %}
+
+        </div>
+
+		<div class="col-md-4">
+			<div class="page-header">
+				<h2 class="text-muted">
+                Propozycje zajęć
+				</h2>
+			</div>
+
+
+		<div class="col">
+            <div>
+				<h3 class="text-default">
+					IDE - narzędzie programisty
+				</h3>
+                <h5 class="text-muted">
+					2017-01-21 09:00 - 10:50
+				</h5>
+
+				<p class="text-muted">
+					Przyzwyczajenia do stosowania "właściwych" narzędzi warto wyrabiać sobie od początku w branży IT.
+                    <br />
+                    Płynąc dalej nurtem poznanego narzędzia jakim był <a href="http://127.0.0.1:8000/zadanie,2,0,powitanie-i-wprowadzenie-do-srodowiska--vagrant.html">system operacyjny Linux oraz terminal tekstowy</a>
+                    tym razem chcemy Wam zaprezentować środowisko pracy dla programistów <iIDE</i> posiadające więcej kolorów niżeli czarny i biały.
+
+				</p>
+				<p class="text-muted">
+					<a class="btn btn-success" href="/kursy/4.html">Czytaj więcej</a>
+				</p>
+			</div>
+		</div>
+
+		<div class="col">
+            <div>
+				<h3 class="text-default">
+					Linux i konsola tekstowa
+				</h3>
+                <h5 class="text-muted">
+					2016-12-17 09:00 - 10:50
+				</h5>
+
+				<p class="text-muted">
+					Czasami czarny ekran oznacza, że mamy do czynienia z magią w IT.<br />
+                    Często system Linux i terminal tekstowy jest tak utożsamiany, więc podczas tych zajęć przełamieny ten mit.
+                    Bo okazuje się, że praca programisty bez termianala byłaby bardzo niewygodna.
+				</p>
+				<p class="text-muted">
+					<a class="btn btn-success" href="/kursy/2.html">Czytaj więcej</a>
+				</p>
+			</div>
+		</div>
+
+{% comment %}
+		<div class="col">
+            <div>
+				<h2 class="text-muted">
+					Hello, world!
+				</h2>
+				<p class="text-muted">
+					Przywitanie świata jest typowym tekstem wyświetlany w pierwszej linijce każdego nowo poznawanego języka programowania.
+          <br />
+          Symbolizuje również aspekt języka programowania jako dialektu człowiek - maszyna, który informuje programistę oraz komputer jakie instrukcje będą wykonywane.  
+				</p>
+				<p class="text-muted">
+					<a class="btn btn-default" href="https://pl.wikipedia.org/wiki/Hello_world">Czytaj więcej</a>
+				</p>
+			</div>
+		</div>
+
+		<div class="col">
+            <div>
+				<h2 class="text-muted">
+					Project Bloks - dzieci też programują :-)
+				</h2>
+				<p class="text-muted">
+Giganci świata technologicznego dbają o to, by w przyszłości nie zabrakło im pracowników. Google jest jedną z firm, która chce uczyć dzieciaki programowania, a pomóc ma w tym nowa platforma Project Bloks.  
+				</p>
+				<p class="text-muted">
+					<a class="btn btn-default" href="http://www.spidersweb.pl/2016/06/project-bloks-programowanie-dla-dzieci.html">Czytaj więcej</a>
+				</p>
+			</div>
+		</div>
+{% endcomment %}
+
+		</div>
+
+	</div>
+</div>
+
+
+{% endblock %}
+

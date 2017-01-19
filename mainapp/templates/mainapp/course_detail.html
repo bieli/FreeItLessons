@@ -1,0 +1,252 @@
+{% extends 'mainapp/base.html' %}
+
+{% load bootstrap3 %}
+{% load static %}
+
+{% block title %}django-bootstrap3{% endblock %}
+
+
+{% block bootstrap3_content %}
+<style>
+.support-info {
+  color: #afafaf;
+  background-color: #fdfdfd;
+  padding: 0.4em;
+}
+
+.support-link {
+  color: #8aacb8;
+}
+</style>
+
+
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-md-12">
+			<ul class="nav nav-pills bg-info">
+				<li>
+					<a href="/" class="modula-font">Start</a>
+				</li>
+				<li>
+					<a href="/faq.html" class="modula-font">Pytania i odpowiedzi</a>
+				</li>
+				<li>
+					<a href="/kursy.html" class="modula-font active">Kursy</a>
+				</li>
+				<li>
+					<a href="/mentorzy.html" class="modula-font">Mentorzy</a>
+				</li>
+			</ul>
+  </div>
+</div>
+
+
+
+
+<div class="container-fluid">
+
+	<div class="row">
+		<div class="col-md-8">
+			<div class="page-header">
+				<h1>
+					Zadania z programowania! <small>program mentorski</small>
+				</h1>
+			</div>
+
+
+
+{% comment %}
+
+			<div class="list-group">
+        <h3><a href="#" class="list-group-item active">
+        <strong>2. Omówienie systemu Linux oraz podstawowych poleceń</strong>
+
+        <span class="badge glyphicon glyphicon glyphicon-calendar"> 2016-12-13</span>
+        </a></h3>
+				<div class="list-group-item">
+					<h4 class="list-group-item-heading">
+<img alt="" src="{% static 'mainapp/img/done.png' %}" class="img-circle" width="30" height="30">
+          <a href="/zadanie,2,1,co-to-jest-system-operacyjny-w-informatyce-i-dlaczego-wybralismy.html">2.1. Co to jest system operacyjny w informatyce i dlaczego wybraliśmy Linux</a>
+					</h4>
+					<p class="list-group-item-text">
+						Zapoznanie z głównymi blokami, z których zbudowane są systemy informatyczne. Omówienie typowego rozwarstwienia w systemach informatycznych:
+<img class="img-responsive center-block" src="{% static 'mainapp/img/os_layers.png' %}" />
+
+            Rola i rodzaje systemów operacyjnych. Omówienie, czym są terminale w systemach operacyjnych.
+            Budowa drzewa katalogów w Linux i przeznaczenie poszczególnych katalogów.
+					</p>
+          <br />
+			    <p class="list-group-item-text-more">
+				    <a href="https://pl.wikipedia.org/wiki/Linux"><strong>Linux</strong></a> to <a href="https://pl.wikipedia.org/wiki/System_operacyjny"><strong>system operacyjny</strong></a>, który jest <strong>za darmo</strong> i który posiada wiele uniwersalnych założeń w swojej budowie. Jest to ważny argument, który powoduje wykorzystanie go jako podstawy do budowy produktów t.j. <strong>serwery internetowe, system Android, systemy naukowe i bazodanowe</strong>. Coraz więcej komputerów osobistych i urządzeń przenośnych używa jądra systemu Linux jako części bazowej.
+ <br />
+Jądro Linuxa tzw. <a href="https://www.kernel.org/"><strong>kernel</strong></a> jest współtworzony przez fundację i jego źródła są otwarte. Autorem Linuxa jest <a href="https://en.wikipedia.org/wiki/Linus_Torvalds">Linus Torvalds</a>, który pokazał dziesiątki lat temu światu, że nie musimy być zależni od zamkniętych systemów operacyjnych i powszechnych wad z tymi systemami związanych (np: kosztowne licencje, wirusy, trojany, płatne oprogramowanie).
+          </p>
+          <p>
+          Użytkownicy Linuxa to obecnie nie tylko zaawansowani specjaliści, ale też osoby chętne: do nauki nowości z branży IT, do poznania alternatywnego oprogramowania a przede wszystkim ciekawe różnych wynalazków ze świata IT.
+          </p>
+
+				</div>
+
+				<div class="list-group-item">
+					<h4 class="list-group-item-heading">
+<img alt="" src="{% static 'mainapp/img/done.png' %}" class="img-circle" width="30" height="30">
+          <a href="/zadanie,2,2,uzywanie-terminala-tekstowego-systemu-linux.html">2.2. Używanie terminala tekstowego systemu Linux</a>
+					</h4>
+					<p class="list-group-item-text">
+						Logujemy się do systemu Linuxa działającego w Vagrant.
+            Ćwiczenie uzmysławia, że terminal może być tekstowy lub graficzny.
+            Jak otworzyć terminal tekstowy i jak działa wydawanie poleceń systemowi.
+            Używanie konsoli tekstowej systemu Linux to wymagany krok do uruchamiana pisanych programów.
+					</p>
+          <br />
+			    <p class="list-group-item-text-more">
+          Od wielu setek lat człowiek chciał sterować maszynami. W branży IT mógł w końcu tego dokonać poprzez stworznie <a href="https://pl.wikipedia.org/wiki/Terminal_komputerowy"><strong>terminala</strong></a>, czyli miejsca, które przyjmuje komendy w najprostszej postaci tzn. pisane tekstem. W odpowiedzi również tekstem wypisuje rezultat.
+<br />
+Pierwsze terminale kojarzą się z wynalazkiem jakim był <strong>dalkopis</strong> (np: <a href="https://en.wikipedia.org/wiki/Telex">Telex</a> z 1930 roku), czyli klawiatura w jednej lokalizacji geograficznej z drukarką umieszoną w innej. Służyły do przesyłania telegramów (krótkich wiadomości) na odległość poprzez pierwsze sieci kablowe. Przez taki dalekopis oprócz komend były przesyłane też dane informacyjne.
+<br />
+Czarny terminal Linuxa to coś magicznego dla większości użytkowników. Znajomość terminala tekstowego zwanego też konsolą tekstową znacząco przyspiesza zrozumienie oraz testowanie oprogramowania.
+<br />
+Terminal posiada z założenia prosty interfejs, którym komunikujemy się za pośrednictwem systemu operacyjnego z maszyną (komputerem) lub siecią maszyn (np: chmurą internetową). Terminal tekstowy systemu Linux posiada zasadnicze właściwości t.j. wejście (klawiatura) i wyjście (ekran).
+W terminalu podajemy komendę, wprowadzamy jej parametry i oczekujemy wykonania. Wykonanie to może być wynik obliczeń lub tzw. kod wyjścia. Standardowo wartość ujemna oznacza błąd w wykonywaniu programu a zero jest odpowiednikiem poprawnego wyjście z wykonanywania programu.
+<br />
+</p>
+          <p><a class="btn btn-default" href="http://www.ubuntu-pomoc.org/moc-zakleta-w-terminalu-cz-1/">Moc zaklęta w terminalu (tutorial 9-częściowy)</a>
+					</p>
+				</div>
+
+				<div class="list-group-item">
+					<h4 class="list-group-item-heading">
+<img alt="" src="{% static 'mainapp/img/done.png' %}" class="img-circle" width="30" height="30">
+          <a href="/zadanie,2,3,praktyczne-narzedzia-i-typowe-polecenia.html">2.3. Praktyczne narzędzia i typowe polecenia</a>
+					</h4>
+					<p class="list-group-item-text">
+						Prezentacja kilku praktycznych narzędzi działających w trybie tekstowym.
+            Jak możemy użyć PIPEs oraz przekierować wyjście programu do pliku i zapisać wyniki działania.
+					</p>
+          <br />
+          <p><a class="btn btn-default" href="http://linux-porady.info/strony/dla_bardziej_zaawansowanych/konsola_bash_i_terminal_dla_zielonych">konsola BASH i terminal dla zielonych</a>
+          </p>
+				</div>
+
+				<div class="list-group-item">
+					<h4 class="list-group-item-heading">
+<img alt="" src="{% static 'mainapp/img/done.png' %}" class="img-circle" width="30" height="30">
+          <a href="/zadanie,2,4,cwiczenia-z-wiersza-polecen-systemu-linux.html">2.4. Ćwiczenia z wiersza poleceń systemu Linux</a>
+					</h4>
+					<p class="list-group-item-text">
+						Tworzymy katalogi, zakładamy pliki tekstowe, edytujemy w plikach ustawienia.
+            Uruchamiamy manedżer plików w trybie tekstowym.
+            Edytujemy pliki systemowe. Przeglądamy logi (dzienniki) systemowe.
+            Instalujemy (dodajemy) wybrany pakiet oprogramowania z linii poleceń.
+					</p>
+          <br />
+          <p><a class="btn btn-default" href="https://pl.wikibooks.org/wiki/Ubuntu/Podstawowe_polecenia">Ubuntu - podstawowe polecenia</a>,
+<a class="btn btn-default" href="http://www.astrouw.edu.pl/~jskowron/pracownia/komendy/">Lista podstawowych komend</a>
+					</p>
+				</div>
+        <a class="list-group-item active2">
+        Osiągnięcia: zapoznanie z ideą systemu operacyjnego Linux i terminala tekstowego, poznanie podstawowych poleceń
+        </a>
+			</div>
+
+
+
+
+
+            {% endcomment %}
+
+<h3>chapter_id: {{ chapter_id }}</h3>
+<h3>contents_id: {{ contents_id }}</h3>
+
+{% for chapter in chapters %}
+    <div class="list-group">
+        <a href="/cwiczenie,{{ chapter.id }}.html" class="list-group-item active-done">
+            <strong class="done">{{ chapter.name }}</strong>
+        </a>
+
+        {% for content in chapter.contents_list %}
+            <div class="list-group-item">
+                <h4 class="list-group-item-heading done">
+                    <img alt="" src="{% static 'mainapp/img/done.png' %}" class="img-circle" width="30" height="30">
+                    <a href="/zadanie,{{ module.id }},{{ chapter.id }}.html">{{ content.name }}</a>
+                </h4>
+
+                <p class="list-group-item-text">
+                    {{ content.value }}
+                </p>
+            </div>
+        {% endfor %}
+
+        </div>
+{% endfor %}
+
+		</div>
+
+
+		<div class="col-md-4">
+			<div class="page-header">
+				<h2 class="text-muted">
+          Ciekawostki
+				</h2>
+			</div>
+
+
+		<div class="col">
+			<div class="text-muted">
+				<h2 class="text-muted">
+					Linux zwany jest Pingwinem!
+				</h2>
+				<p class="text-muted">
+Ten system operacyjny posiada maskotkę <a href="https://en.wikipedia.org/wiki/Tux">Tux</a> tzn. pingwina. Ludzie pracujący na s.o. Linux cenią sobie niezależność od jakiejkolwiek zamykanej w pudełku technologii. Czasami lubią zbudować od zera program, którego używają tzn. z dostępnych za darmo źródeł. Czasami ze względów wydajnościwych lub bezpieczeństwa ma to sens.<br />W większości dystrybucji Linuxa są setki tysięcy gotowych paczek z programami, grami, narzędziami i przeglądarkami.  
+				</p>
+				<p>
+					<a class="btn btn-default" href="http://www.linuxexpert.pl/posts/1598/dlaczego-akurat-pingwin/">Czytaj więcej</a>
+				</p>
+			</div>
+		</div>
+
+		<div class="col">
+			<div class="jumbotron-mini">
+				<h2 class="text-muted">
+					Jest wiele dystrybucji Linuxa
+				</h2>
+				<p class="text-muted">
+Na stronie <a href="https://distrowatch.com/">distrowatch.com</a> możecie odnaleźć wiele gotowych dystrybucji Linuxa. Niektóre zostały stworzone przez organizację t.j. np. Ubuntu, SuSE, RedHat a inne przez społeczności fanów Mint, Knoppix, Kali, itp.
+				</p>
+				<p class="text-muted">
+					<a class="btn btn-default" href="http://www.spidersweb.pl/2016/06/project-bloks-programowanie-dla-dzieci.html">Czytaj więcej</a>
+				</p>
+			</div>
+		</div>
+
+
+		<div class="col">
+			<div class="jumbotron-mini">
+				<h2 class="text-muted">
+					Gry w terminalu tekstowym
+				</h2>
+				<p class="text-muted">
+Jako ciekawostkę podamy, że wpisując poniższą komendę w terminalu
+zainstalujecie grę działającą w trybie tekstowym. 
+<br />Tak !!! to możliwe, wszak kiedyś gry tylko tak wyglądały i jest to okazja, aby na chwilę cofnąć się w czasie ;-)  
+<blockquote>
+$ sudo apt-get install ninvaders
+</blockquote>
+
+				</p>
+				<p>
+					<a class="btn btn-default" href="http://www.dobreprogramy.pl/mentorious/TOP-5-gier-w-Linuksowym-terminalu,30386.html">Czytaj więcej</a>
+				</p>
+			</div>
+		</div>
+
+
+
+		</div>
+
+	</div>
+</div>
+
+
+{% endblock %}
+

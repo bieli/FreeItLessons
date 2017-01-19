@@ -1,0 +1,136 @@
+{% extends 'mainapp/base.html' %}
+
+{% load bootstrap3 %}
+
+{% block title %}django-bootstrap3{% endblock %}
+
+
+{% block bootstrap3_content %}
+
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-md-12">
+			<ul class="nav nav-pills bg-info">
+				<li>
+					<a href="/" class="modula-font">Start</a>
+				</li>
+				<li>
+					<a href="/faq.html" class="modula-font">Pytania i odpowiedzi</a>
+				</li>
+				<li>
+					<a href="/kursy.html" class="modula-font">Kursy</a>
+				</li>
+				<li>
+					<a href="/mentorzy.html" class="modula-font active">Mentorzy</a>
+				</li>
+			</ul>
+  </div>
+</div>
+
+
+
+
+<div class="container-fluid">
+
+	<div class="row">
+		<div class="col-md-8">
+			<div class="page-header">
+				<h1>
+					Kim są nasi mentorzy
+				</h1>
+			</div>
+			<h3>
+				Z tymi osobami odbywać się będą zajęcia
+			</h3>
+
+
+
+			<div class="row">
+				<div class="col-md-4">
+					<div class="thumbnail">
+						<img alt="Bootstrap Thumbnail First" src="http://lorempixel.com/output/people-q-c-600-200-1.jpg">
+						<div class="caption">
+							<h3>
+								Mentor Mat
+							</h3>
+							<p>
+								Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus. Nullam id dolor id nibh ultricies vehicula ut id elit.
+							</p>
+							<p>
+								<a class="btn btn-primary" href="#">More</a> <a class="btn" href="#">Blog</a> <a class="btn" href="#">Homepage</a>
+							</p>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-4">
+					<div class="thumbnail">
+						<img alt="Bootstrap Thumbnail Second" src="http://lorempixel.com/output/city-q-c-600-200-1.jpg">
+						<div class="caption">
+							<h3>
+								Mentor John
+							</h3>
+							<p>
+								Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus. Nullam id dolor id nibh ultricies vehicula ut id elit.
+							</p>
+							<p>
+								<a class="btn btn-primary" href="#">More</a> <a class="btn" href="#">Blog</a> <a class="btn" href="#">Gallery</a>
+							</p>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-4">
+					<div class="thumbnail">
+						<img alt="Bootstrap Thumbnail Third" src="http://lorempixel.com/output/sports-q-c-600-200-1.jpg">
+						<div class="caption">
+							<h3>
+								Mentor Bogna
+							</h3>
+							<p>
+								Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus. Nullam id dolor id nibh ultricies vehicula ut id elit.
+							</p>
+							<p>
+								<a class="btn btn-primary" href="#">More</a> <a class="btn" href="#">Blog</a>
+							</p>
+						</div>
+					</div>
+				</div>
+			</div>
+
+
+
+
+		</div>
+		<div class="col-md-4">
+			<div class="page-header">
+				<h2 class="text-muted">
+          Program mentorski
+				</h2>
+			</div>
+			<h3 class="text-muted">
+				Cele ?
+			</h3>
+			<p class="text-muted">
+				Wsparcie grupy młodzieży szkolnej z LO w nauce programowania. Promowanie dobrych praktyk i wzorców w kodowaniu, testowaniu i tworzeniu systemów informatycznych.
+			</p>
+      <p class="text-muted">
+      Dostępność w określonych terminach dla grupy uczniów. Dyskusje o praktycznej stronie pracy w IT.
+      </p>
+			<h3 class="text-muted">
+				Kto może zostać mentorem ?
+			</h3>
+			<p class="text-muted">
+				Zasadniczo każda osoba, która wyraża chęć przekazywania wiedzy innym w sposób zrozumiały i znająca doskonale swoją dziedzinę.
+      </p>
+      <p class="text-muted">
+      Mentor jak każda rola umowna jest powoływany w celu kształcenia w uczniach patrzenia nie tylko na to co teraz, ale umiejętnej analizy konsekwencji w wyborach. W branży IT to będą przyszłe koszta tworzonych rozwiązań, ich skomplikowanie a co za tym idzie spełnianie standardów jakości, wydajność, rentowność.
+      </p>
+
+
+
+		</div>
+	</div>
+</div>
+
+
+{% endblock %}
+

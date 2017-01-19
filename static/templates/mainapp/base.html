@@ -1,0 +1,33 @@
+{% extends 'mainapp/bootstrap.html' %}
+{% include 'mainapp/menu.html' %}
+
+{% load bootstrap3 %}
+{% bootstrap_javascript jquery=1 %}
+
+
+
+
+{% block nav %}
+<ul id="nav">
+    <li>{% block nav-home %}<a href="{% url home %}">Home</a>{% endblock %}</li>
+    <li>{% block nav-about %}<a href="{% url about %}">About</a>{% endblock %}</li>
+    <li>{% block nav-contact %}<a href="{% url contact %}">Contact</a>{% endblock %}</li>
+</ul>
+{% endblock %}
+
+
+{% block navigation %}
+     <ul id="top">
+        <li><a class="{% block home %}{% endblock %}" href="/">Home</a></li>
+        <li><a class="{% block myaccount %}{% endblock %}" href="/profile/">My Account</a></li>
+        {% if perms.staffing.add_staffrequest %}
+         <li><a class="{% block createsr %}{% endblock %}" 
+          href="/create/staffrequest/">Staff Request</a></li>
+        {% endif %}
+     </ul>
+ {% endblock %}
+
+{% block bootstrap3_content %}
+aa
+{% endblock %}
+

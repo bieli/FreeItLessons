@@ -1,0 +1,232 @@
+{% extends 'mainapp/base.html' %}
+
+{% load bootstrap3 %}
+{% load static %}
+
+{% block title %}django-bootstrap3{% endblock %}
+
+
+{% block bootstrap3_content %}
+<style>
+.list-group-item.active-done {
+    z-index: 2;
+    color: #fff;
+    background-color: green;
+    border-color: lightgreen;
+}
+</style>
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-md-12">
+			<ul class="nav nav-pills bg-info">
+				<li>
+					<a href="/" class="modula-font">Start</a>
+				</li>
+				<li>
+					<a href="/faq.html" class="modula-font">Pytania i odpowiedzi</a>
+				</li>
+				<li>
+					<a href="/kursy.html" class="modula-font active">Kursy</a>
+				</li>
+				<li>
+					<a href="/mentorzy.html" class="modula-font">Mentorzy</a>
+				</li>
+			</ul>
+  </div>
+</div>
+
+
+
+<div class="container-fluid">
+
+	<div class="row">
+		<div class="col-md-8">
+			<div class="page-header">
+				<h1>
+					Zadania z programowania! <small>program mentorski</small>
+				</h1>
+			</div>
+
+			<h3>
+				Jak to działa ?
+			</h3>
+			<p>
+				Poniżej znajduje się lista scenariuszy zajęć. Wybierz aktywny scenariusz w celu rozpoczęcia nauki, praktyki lub utrwalenia materiału.
+      <br />
+      W tym kursie będziemy uczyć się pojęć z systemów operacyjnych oraz języków programowania. 
+      <br />
+        W celu usprawnienia komunikacji związanej z etapami nauki stosujemy poniższe <a href="faq.html#ikony">symbole</a>, które pokazują ścieżkę edukacji.
+      <br />
+      <br />
+        <span>
+        <img alt="" src="{% static 'mainapp/img/new.png' %}" class="img-circle" width="60" height="60">
+        &nbsp;&nbsp;➜&nbsp;&nbsp;
+        <img alt="" src="{% static 'mainapp/img/doit.png' %}" class="img-circle" width="60" height="60">
+        &nbsp;&nbsp;➜&nbsp;&nbsp;
+        <img alt="" src="{% static 'mainapp/img/help.png' %}" class="img-circle" width="60" height="60">
+        &nbsp;&nbsp;➜&nbsp;&nbsp;
+        <img alt="" src="{% static 'mainapp/img/doit.png' %}" class="img-circle" width="60" height="60">
+        &nbsp;&nbsp;➜&nbsp;&nbsp;
+        <img alt="" src="{% static 'mainapp/img/done.png' %}" class="img-circle" width="60" height="60">
+      </span>      
+      <br /><br /><br />
+      </p>
+
+
+			<h3>
+				Lista zagadnień w ramach zajęć
+			</h3>
+
+			<div class="list-group">
+        <a href="/zadanie,1,0,powitanie-i-wprowadzenie-do-srodowiska--vagrant.html" class="list-group-item active-done">
+        <strong class="done">1. Powitanie i wprowadzenie do środowiska ( Vagrant )</strong>
+        <span class="badge">{% bootstrap_icon "ok" %} 2016-12-06</span>
+        <span class="label label-success">kurs przeprowadzono</span>
+        </a>
+				<div class="list-group-item done">
+					<h4 class="list-group-item-heading">
+<img alt="" src="{% static 'mainapp/img/done.png' %}" class="img-circle" width="30" height="30">  						
+          <a href="/zadanie,1,1,Przebieg-zajec---sprawy-ogolne.html">1.1. Przebieg zajęć - sprawy ogólne</a>
+					</h4>
+					<p class="list-group-item-text">
+						Zajęcia prowadzone są poprzez telekonferencję on-line.
+					</p>
+				</div>
+
+				<div class="list-group-item">
+					<h4 class="list-group-item-heading done">
+<img alt="" src="{% static 'mainapp/img/done.png' %}" class="img-circle" width="30" height="30">  						
+          <a href="/zadanie,1,2,vagrant-jaka-podstawowe-srodowisko-pracy.html">1.2. Vagrant jako podstawowe środowisko pracy</a>
+					</h4>
+
+        <span class="badge">ukończone przez: 19 uczniów</span>
+        <span class="badge">potrzebne wsparcie dla: 11 uczniów</span>
+					<p class="list-group-item-text">
+						Wzmianka o wirtualizacji. Uruchomienie vagranta i zalogowanie do systemu Linux.
+            <br />
+            <span class="glyphicon glyphicon-facetime-video" aria-hidden="true"></span>            
+            <a href="https://www.youtube.com/watch?v=Jkf5g7L9dSE">
+            Film: jak uruchomić Virtualbox i Vagrant na Windows 
+            </a>
+					</p>
+				</div>
+        <a class="list-group-item active2">
+        Osiągnięcia: nauka uruchomiania środowiska pracy używanego na każdych zajęciach
+        </a>
+			</div>
+
+
+
+			<div class="list-group">
+        <a href="#" class="list-group-item active-done">
+        <strong>2. Omówienie systemu Linux oraz podstawowych poleceń</strong>
+
+        <span class="badge">{% bootstrap_icon "ok" %} 2016-12-13</span>
+        <span class="label label-success">kurs przeprowadzono</span>        
+        </a>
+				<div class="list-group-item done">
+					<h4 class="list-group-item-heading">
+<img alt="" src="{% static 'mainapp/img/done.png' %}" class="img-circle" width="30" height="30">  						
+          <a href="#">2.1. Co to jest system operacyjny w informatyce i dlaczego wybraliśmy Linux</a>
+					</h4>
+					<p class="list-group-item-text">
+						Zapoznanie z warstwami, z których zbudowane są systemy informatyczne.
+            Rola i rodzaje systemów operacyjnych. Omówienie, czym są terminale w systemach operacyjnych.
+            Budowa drzewa katalogów w Linux i przeznaczenie poszczególnych katalogów.
+					</p>
+				</div>
+
+				<div class="list-group-item done">
+					<h4 class="list-group-item-heading">
+<img alt="" src="{% static 'mainapp/img/done.png' %}" class="img-circle" width="30" height="30">  						
+          <a href="#">2.2. Używanie terminala tekstowego systemu Linux</a>
+					</h4>
+					<p class="list-group-item-text">
+						Logujemy się do systemu Linuxa działającego w Vagrant.
+            Ćwiczenie uzmysławia, że terminal może być tekstowy jak i graficzny.
+            Jak otworzyć terminal tekstowy i jak działa wydawanie poleceń systemowi.
+            Używanie konsoli tekstowej systemu Linux to wymagany krok do uruchamiana pisanych programów.
+					</p>
+				</div>
+
+				<div class="list-group-item done">
+					<h4 class="list-group-item-heading">
+<img alt="" src="{% static 'mainapp/img/done.png' %}" class="img-circle" width="30" height="30">  						
+          <a href="#">2.3. Praktyczne narzędzia i typowe polecenia</a>
+					</h4>
+					<p class="list-group-item-text">
+						Prezentacja kilku praktycznych narzędzi działających w trybie tekstowym.
+            Jak możemy użyć PIPEs oraz przekierować wyjście programu do pliku i zapisać wyniki działania.
+					</p>
+				</div>
+
+				<div class="list-group-item done">
+					<h4 class="list-group-item-heading">
+<img alt="" src="{% static 'mainapp/img/done.png' %}" class="img-circle" width="30" height="30">  						
+          <a href="#">2.4. Ćwiczenia z wiersza poleceń systemu Linux</a>
+					</h4>
+					<p class="list-group-item-text">
+						Tworzymy katalogi, zakładamy pliki tekstowe, edytujemy w plikach ustawienia.
+            Uruchamiamy manedżer plików w trybie tekstowym.
+            Edytujemy pliki systemowe. Przeglądamy logi (dzienniki) systemowe.
+            Instalujemy (dodajemy) wybrany pakiet oprogramowania z linii poleceń. 
+					</p>
+				</div>
+        <a class="list-group-item active2">
+        Osiągnięcia: zapoznanie z ideą systemu operacyjnego Linux i terminala tekstowego, poznanie podstawowych poleceń  
+        </a>
+			</div>
+
+
+		</div>
+
+
+		<div class="col-md-4">
+			<div class="page-header">
+				<h2 class="text-muted">
+          Ciekawostki
+				</h2>
+			</div>
+
+
+		<div class="col">
+			<!-- <div class="jumbotron"> -->
+      <div>
+				<h2 class="text-muted">
+					Hello, world!
+				</h2>
+				<p class="text-muted">
+					Przywitanie świata jest typowym tekstem wyświetlany w pierwszej linijce każdego nowo poznawanego języka programowania.
+          <br />
+          Symbolizuje również aspekt języka programowania jako dialektu człowiek - maszyna, który informuje programistę oraz komputer jakie instrukcje będą wykonywane.  
+				</p>
+				<p class="text-muted">
+					<a class="btn btn-default" href="https://pl.wikipedia.org/wiki/Hello_world">Czytaj więcej</a>
+				</p>
+			</div>
+		</div>
+
+		<div class="col">
+			<!-- <div class="jumbotron"> -->
+      <div>
+				<h2 class="text-muted">
+					Project Bloks - dzieci też programują :-)
+				</h2>
+				<p class="text-muted">
+Giganci świata technologicznego dbają o to, by w przyszłości nie zabrakło im pracowników. Google jest jedną z firm, która chce uczyć dzieciaki programowania, a pomóc ma w tym nowa platforma Project Bloks.  
+				</p>
+				<p class="text-muted">
+					<a class="btn btn-default" href="http://www.spidersweb.pl/2016/06/project-bloks-programowanie-dla-dzieci.html">Czytaj więcej</a>
+				</p>
+			</div>
+		</div>
+
+
+		</div>
+
+	</div>
+</div>
+
+
+{% endblock %}
+
