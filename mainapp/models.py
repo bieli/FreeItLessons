@@ -136,6 +136,7 @@ class ContentStatusType():
     NEW = 'new'
     DOIT = 'doit'
     HELP = 'help'
+    GOOD = 'good'
     DONE = 'done'
 
     @staticmethod
@@ -147,6 +148,7 @@ CONTENT_STATUS_TYPE_CHOICES = (
     (ContentStatusType.NEW, 'New'),
     (ContentStatusType.DOIT, 'Doit'),
     (ContentStatusType.HELP, 'Help'),
+    (ContentStatusType.GOOD, 'Good'),
     (ContentStatusType.DONE, 'Done'),
 )
 

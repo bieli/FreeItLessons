@@ -63,7 +63,7 @@
   border-bottom: 1px solid #ccc;
   margin: 5px;
 */
-  background: #fafafa url({% static 'mainapp/img/done.png' %}) repeat left;
+  background: #fafafa url({% static 'mainapp/img/new.png' %}) repeat left;
   background-size: 30px 30px;
   background-position: top 5px left 5px;
   background-repeat: no-repeat;
@@ -280,11 +280,22 @@ xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
 
 <div id="dialog-send-status" title="Ocena wskazanego konspektu">
   <p>Oto ikony jakimi może zostać oznaczony konspekt - zgodnie z Twoim wyborem:
+<!--
 <ul>
 <li><input type="radio" name="dialog-send-status-select" value="new" /> <img src="{% static 'mainapp/img/new.png' %}" height="35px" /> - nie przeczytałem</li>
 <li><input type="radio" name="dialog-send-status-select" value="doit" /> <img src="{% static 'mainapp/img/doit.png' %}" height="35px" /> - potrzebuję więcej czasu </li>
 <li><input type="radio" name="dialog-send-status-select" value="help" /> <img src="{% static 'mainapp/img/help.png' %}" height="35px" /> - nadal nie rozumiem o co chodzi, potrzebuję pomocy</li>
 <li><input type="radio" name="dialog-send-status-select" value="done" /> <img src="{% static 'mainapp/img/done.png' %}" height="35px" /> - zrozumiałem, hurraaa :-)</li>
+-->
+  <ul>
+      <li><input type="radio" name="dialog-send-status-select" value="new" /> <img alt="" src="{% static 'mainapp/img/new.png' %}" class="img-circle" width="40" height="40"> - nie przeczytałem</li>
+      <li><input type="radio" name="dialog-send-status-select" value="doit" /> <img alt="" src="{% static 'mainapp/img/doit.png' %}" class="img-circle" width="40" height="40"> - w trakcie nauki</li>
+      <li><input type="radio" name="dialog-send-status-select" value="help" /> <img alt="" src="{% static 'mainapp/img/help.png' %}" class="img-circle" width="40" height="40"> - potrzebuję czasu, trudno zrozumieć - pomocy !</li>
+      <li><input type="radio" name="dialog-send-status-select" value="good" /> <img alt="" src="{% static 'mainapp/img/good.png' %}" class="img-circle" width="40" height="40"> - ten wątek jest prowadzony ze zrozumieniem - nadążam</li>
+      <li><input type="radio" name="dialog-send-status-select" value="done" /> <img alt="" src="{% static 'mainapp/img/done.png' %}" class="img-circle" width="40" height="40"> - zrozumiałem, hurraaa :-)</li>
+  </ul>
+
+
 </ul>
 </p>
 </div>
