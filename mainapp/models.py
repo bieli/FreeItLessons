@@ -1,7 +1,14 @@
+import datetime
+import django
+
 from django.db import models
 from django.contrib.auth.models import User
 from django_enumfield import enum
 
+
+class AutoDateTimeField(models.DateTimeField):
+    def pre_save(self, model_instance, add):
+        return datetime.datetime.now()
 
 class Author(models.Model):
     name = models.CharField(max_length=64)
@@ -14,6 +21,8 @@ class Author(models.Model):
     linkedin_link = models.CharField(max_length=256, null=True, blank=True)
     external_link = models.CharField(max_length=256, null=True, blank=True)
     is_public_mentor = models.BooleanField(default=False)
+    #created_at = models.DateField(default=django.utils.timezone.now)
+    #updated_at = AutoDateTimeField(default=django.utils.timezone.now)
 
     def __str__(self):
         return "{} {}".format(self.name, self.surname)
@@ -39,6 +48,8 @@ class Content(models.Model):
     value = models.TextField(max_length=4000)
     additional_text = models.CharField(max_length=512)
     author = models.ForeignKey(Author, null=True, blank=True)
+    #created_at = models.DateField(default=django.utils.timezone.now)
+    #updated_at = AutoDateTimeField(default=django.utils.timezone.now)
 
     def __str__(self):
         return self.additional_text
@@ -72,6 +83,8 @@ class Chapter(models.Model):
     level = enum.EnumField(ChapterLevelType)
     note = models.TextField(max_length=256)
     author = models.ForeignKey(Author, null=True, blank=True)
+    #created_at = models.DateField(default=django.utils.timezone.now)
+    #updated_at = AutoDateTimeField(default=django.utils.timezone.now)
 
     def __str__(self):
         return self.name
@@ -94,6 +107,8 @@ class Module(models.Model):
     chapters = []
     contents_list = []
     icons_list = []
+    #created_at = models.DateField(default=django.utils.timezone.now)
+    #updated_at = AutoDateTimeField(default=django.utils.timezone.now)
 
     def __str__(self):
         return self.title
@@ -115,3 +130,32 @@ class Module(models.Model):
 
     def prepare_icons_list_from_comment(self):
         self.icons_list = self.comment.split(',')
+
+
+class ContentStatusType():
+    NEW = 'new'
+    DOIT = 'doit'
+    HELP = 'help'
+    DONE = 'done'
+
+    @staticmethod
+    def exists(type_name):
+        return hasattr(ContentStatusType, str(type_name).upper()) 
+
+
+CONTENT_STATUS_TYPE_CHOICES = (
+    (ContentStatusType.NEW, 'New'),
+    (ContentStatusType.DOIT, 'Doit'),
+    (ContentStatusType.HELP, 'Help'),
+    (ContentStatusType.DONE, 'Done'),
+)
+
+class ContentStatus(models.Model):
+    user = models.ForeignKey(User, null=False, blank=False)
+    content = models.ForeignKey(Content, null=False, blank=False)
+    status = models.CharField(max_length=4,
+                              choices=CONTENT_STATUS_TYPE_CHOICES,
+                              default=ContentStatusType.NEW)
+    created_at = models.DateTimeField(default=django.utils.timezone.now)
+    updated_at = AutoDateTimeField(default=django.utils.timezone.now)
+

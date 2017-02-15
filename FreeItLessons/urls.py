@@ -20,7 +20,8 @@ from django.contrib import admin
 from django.shortcuts import render
 
 from mainapp.views import HomePageView, FaqPageView, CoursesListPageView,\
-                          MentorsListPageView, CourseDetailPageView
+                          MentorsListPageView, CourseDetailPageView, \
+                          ContetUserStatusView, ContetUserView
 
 
 urlpatterns = [
@@ -32,5 +33,9 @@ urlpatterns = [
     # url(r'^zadanie,(?P<chapter_id>[0-9]+),(?P<contents_id>[0-9]+)\.html$', CourseDetailPageView.as_view(), name='course_detail'),
     url(r'^mentorzy\.html$', MentorsListPageView.as_view(), name='mentors_list'),
     url(r'^admin/', admin.site.urls),
+    #url(r'^content/(?P<content_id>[0-9]+)/user/(?P<user_id>[0-9]+)/status/(?P<status>[a-z]+)/$', ContetUserStatusAjaxView.as_view(), name='content_user_status'),
+    url(r'^content/user/status/$', ContetUserStatusView.as_view()),
+    url(r'^content/user/$', ContetUserView.as_view()),
+
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 

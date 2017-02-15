@@ -1,2 +1,3 @@
-django
+Django>=1.9,<1.10
+django-debug-toolbar>=1.4
 django-enumfield
