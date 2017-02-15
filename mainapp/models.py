@@ -159,3 +159,6 @@ class ContentStatus(models.Model):
     created_at = models.DateTimeField(default=django.utils.timezone.now)
     updated_at = AutoDateTimeField(default=django.utils.timezone.now)
 
+    def __str__(self):
+        return self.status
+

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from mainapp.models import Author, Module, Chapter, Content, Curiosity
+from mainapp.models import Author, Module, Chapter, Content, Curiosity, ContentStatus
 
 
 class AuthorAdmin(admin.ModelAdmin):
@@ -54,8 +54,21 @@ class CuriosityAdmin(admin.ModelAdmin):
         obj.save()
 
 
-admin.site.register(Author)
+class ContentStatusAdmin(admin.ModelAdmin):
+    list_filter = ('status', 'user')    
+    list_display = ('id', 'status', 'view_content_link', 'user', 'created_at', 'updated_at', )
+    ordering = ('-updated_at',)
+
+    def view_content_link(self, obj):
+        return '<a href="/admin/mainapp/content/%d/?_to_field=id&_popup=1" target="_blank">%s</a>' % (int(obj.content.id), obj.content,)
+    view_content_link.allow_tags = True
+    view_content_link.short_description = 'Content edit link' # Optional
+
+
+admin.site.register(Author, AuthorAdmin)
 admin.site.register(Module)
 admin.site.register(Chapter)
 admin.site.register(Content)
-admin.site.register(Curiosity)
+admin.site.register(Curiosity, CuriosityAdmin)
+admin.site.register(ContentStatus, ContentStatusAdmin)
+
