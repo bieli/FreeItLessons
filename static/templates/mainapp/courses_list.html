@@ -92,38 +92,6 @@ $.noConflict();
 jQuery( document ).ready(function( $ ) {
 
   console.log( "ready!" );
-/*
-  // using jQuery
-  function getCookie(name) {
-      var cookieValue = null;
-      if (document.cookie && document.cookie != '') {
-          var cookies = document.cookie.split(';');
-          for (var i = 0; i < cookies.length; i++) {
-              var cookie = jQuery.trim(cookies[i]);
-              // Does this cookie string begin with the name we want?
-              if (cookie.substring(0, name.length + 1) == (name + '=')) {
-                  cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                  break;
-              }
-          }
-      }
-      return cookieValue;
-  }
-
-  var csrftoken = getCookie('csrftoken');
-
-  function csrfSafeMethod(method) {
-      // these HTTP methods do not require CSRF protection
-      return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
-  }
-  $.ajaxSetup({
-      beforeSend: function(xhr, settings) {
-          if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
-              xhr.setRequestHeader("X-CSRFToken", csrftoken);
-          }
-      }
-  });
-*/
 
   $( "#dialog-send-status" ).dialog({
     autoOpen: false,
@@ -292,29 +260,8 @@ xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
 				Poniżej znajduje się lista scenariuszy zajęć. Wybierz aktywny scenariusz w celu rozpoczęcia nauki, praktyki lub utrwalenia materiału.
       <br />
       W tym kursie będziemy uczyć się pojęć z systemów operacyjnych, języków programowania i narzędzi ułatwiających wytwarzanie aplikacji.
-
-{% comment %}
-      <br />
-        W celu usprawnienia komunikacji związanej z etapami nauki stosujemy poniższe <a href="faq.html#ikony">symbole</a>, które pokazują ścieżkę edukacji.
-      <br />
-      <br />
-        <span>
-        <img alt="" src="{% static 'mainapp/img/new.png' %}" class="img-circle" width="60" height="60">
-        &nbsp;&nbsp;➜&nbsp;&nbsp;
-        <img alt="" src="{% static 'mainapp/img/doit.png' %}" class="img-circle" width="60" height="60">
-        &nbsp;&nbsp;➜&nbsp;&nbsp;
-        <img alt="" src="{% static 'mainapp/img/help.png' %}" class="img-circle" width="60" height="60">
-        &nbsp;&nbsp;➜&nbsp;&nbsp;
-        <img alt="" src="{% static 'mainapp/img/doit.png' %}" class="img-circle" width="60" height="60">
-        &nbsp;&nbsp;➜&nbsp;&nbsp;
-        <img alt="" src="{% static 'mainapp/img/done.png' %}" class="img-circle" width="60" height="60">
-      </span>      
-      <br /><br /><br />
-{% endcomment %}
       </p>
-
         <hr />
-
 			<h3>
 				Materiały do nauki
 			</h3>
@@ -355,16 +302,15 @@ xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
                         <small style="color: #e6e6e6">
                         {{ content.additional_text }} - {{ content.status }} # {{ content.id }}
                         </small><br />
-{% comment %}
-                        {{ content.status }} - {{ content.value }}
-{% endcomment %}
                         <br />
                         {% if content.status == 1 %}
                             <blockquote class="bq1" id="content_id__{{ content.id }}" data-id="{{ content.id }}">
                             {{ content.value |safe }}
                             </blockquote>
                         {% elif content.status == 3 %}
+{% comment %}
 <!--                            <iframe width="640" height="360" src="{{ content.value }}" frameborder="1" allowfullscreen></iframe> -->
+{% endcomment %}
                             <a class="btn btn-default" href="{{ content.value }}" target="_blank">{{ content.additional_text }}</a>
                         {% elif content.status == 4 %}
                             <a class="btn btn-default" href="{{ content.value }}" target="_blank">{{ content.additional_text }}</a>
@@ -378,54 +324,13 @@ xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
         <br />
 
 {% endfor %}
-{% comment %}
-<div class="card" style="background-color: black">
-  <img class="card-img-top" src="{% static 'mainapp/img/done.png' %}" alt="Card image cap">
-  <div class="card-block">
-    <h4 class="card-title">Card title</h4>
-    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-    <a href="#" class="btn btn-primary">Go somewhere</a>
-  </div>
-</div>
-
-
-<div class="card" style="">
-  <img class="card-img-top" src="..." alt="Card image cap">
-  <div class="card-block">
-    <h4 class="card-title">Card title</h4>
-    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-  </div>
-  <ul class="list-group list-group-flush">
-    <li class="list-group-item">Cras justo odio</li>
-    <li class="list-group-item">Dapibus ac facilisis in</li>
-    <li class="list-group-item">Vestibulum at eros</li>
-  </ul>
-  <div class="card-block">
-    <a href="#" class="card-link">Card link</a>
-    <a href="#" class="card-link">Another link</a>
-  </div>
-</div>
-
-
-<div class="card">
-  <h3 class="card-header">Featured</h3>
-  <div class="card-block">
-    <h4 class="card-title">Special title treatment</h4>
-    <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-    <a href="#" class="btn btn-primary">Go somewhere</a>
-  </div>
-</div>{% endcomment %}
-
         </div>
-
 		<div class="col-md-4">
 			<div class="page-header">
 				<h2 class="text-muted">
                 Propozycje zajęć
 				</h2>
 			</div>
-
-
 		<div class="col">
             <div>
 				<h3 class="text-default">
@@ -467,56 +372,13 @@ xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
 				</p>
 			</div>
 		</div>
-
-{% comment %}
-		<div class="col">
-            <div>
-				<h2 class="text-muted">
-					Hello, world!
-				</h2>
-				<p class="text-muted">
-					Przywitanie świata jest typowym tekstem wyświetlany w pierwszej linijce każdego nowo poznawanego języka programowania.
-          <br />
-          Symbolizuje również aspekt języka programowania jako dialektu człowiek - maszyna, który informuje programistę oraz komputer jakie instrukcje będą wykonywane.  
-				</p>
-				<p class="text-muted">
-					<a class="btn btn-default" href="https://pl.wikipedia.org/wiki/Hello_world">Czytaj więcej</a>
-				</p>
-			</div>
-		</div>
-
-		<div class="col">
-            <div>
-				<h2 class="text-muted">
-					Project Bloks - dzieci też programują :-)
-				</h2>
-				<p class="text-muted">
-Giganci świata technologicznego dbają o to, by w przyszłości nie zabrakło im pracowników. Google jest jedną z firm, która chce uczyć dzieciaki programowania, a pomóc ma w tym nowa platforma Project Bloks.  
-				</p>
-				<p class="text-muted">
-					<a class="btn btn-default" href="http://www.spidersweb.pl/2016/06/project-bloks-programowanie-dla-dzieci.html">Czytaj więcej</a>
-				</p>
-			</div>
-		</div>
-{% endcomment %}
-
 		</div>
 
 	</div>
 </div>
 
-
-
-
 <div id="dialog-send-status" title="Ocena wskazanego konspektu">
   <p>Oto ikony jakimi może zostać oznaczony konspekt - zgodnie z Twoim wyborem:
-<!--
-<ul>
-<li><input type="radio" name="dialog-send-status-select" value="new" /> <img src="{% static 'mainapp/img/new.png' %}" height="35px" /> - nie przeczytałem</li>
-<li><input type="radio" name="dialog-send-status-select" value="doit" /> <img src="{% static 'mainapp/img/doit.png' %}" height="35px" /> - potrzebuję więcej czasu </li>
-<li><input type="radio" name="dialog-send-status-select" value="help" /> <img src="{% static 'mainapp/img/help.png' %}" height="35px" /> - nadal nie rozumiem o co chodzi, potrzebuję pomocy</li>
-<li><input type="radio" name="dialog-send-status-select" value="done" /> <img src="{% static 'mainapp/img/done.png' %}" height="35px" /> - zrozumiałem, hurraaa :-)</li>
--->
   <ul>
       <li><input type="radio" name="dialog-send-status-select" value="new" /> <img alt="" src="{% static 'mainapp/img/new.png' %}" class="img-circle" width="40" height="40"> - nie przeczytałem</li>
       <li><input type="radio" name="dialog-send-status-select" value="doit" /> <img alt="" src="{% static 'mainapp/img/doit.png' %}" class="img-circle" width="40" height="40"> - w trakcie nauki</li>

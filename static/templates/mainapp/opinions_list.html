@@ -55,16 +55,6 @@
               <span class="glyphicon glyphicon-arrow-right"></span><b class="tech-font">{{ opinion.status_count }}</b></li>
             {% empty %}
                 <li>Nie oceniłeś jeszcze żadnego materiału z kursu<span class="glyphicon glyphicon-arrow-right"></span>Czekamy na Twoje opinie</li>
-{% comment %}
-<!--
-              <li><img id="img1" alt="" src="
-{% with 'mainapp/img/'|add:opinion.status|add:'.png' as image_static %}
-  {% static image_static %}
-{% endwith %}
-" class="img-circle" width="50" height="50">
-              <span class="glyphicon glyphicon-arrow-right"></span>{{ opinion.status_count }}</li>
--->
-{% endcomment %}
             {% endfor %}
           </ul>
           </p>
