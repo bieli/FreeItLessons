@@ -1,0 +1,122 @@
+
+<div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="/">Start</a>
+    </div>
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="/faq.html" class="modula-font active">Pytania i odpowiedzi</a></li>
+        <li><a href="/mentorzy.html" class="modula-font active">Mentorzy</a></li>
+        <li><a href="/kursy.html" class="modula-font active">Kursy</a></li>
+      <form class="navbar-form navbar-left" role="search">
+        <div class="form-group">
+          <input type="text" name="cs" class="form-control" placeholder="Szukam kursu na temat">
+        </div>
+      </form>
+{% comment %}
+
+<!--
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Dropdown <span class="caret"></span></a>
+          <ul class="dropdown-menu" role="menu">
+            <li><a href="/faq.html" class="modula-font active">Pytania i odpowiedzi</a></li>
+            <li><a href="#">Another action</a></li>
+            <li><a href="#">Something else here</a></li>
+            <li class="divider"></li>
+            <li><a href="#">Separated link</a></li>
+            <li class="divider"></li>
+            <li><a href="#">One more separated link</a></li>
+          </ul>
+        </li>
+-->
+{% endcomment %}
+
+      </ul>
+
+
+    <ul class="nav navbar-nav pull-right">
+{% comment %}
+
+<!--
+      <form class="navbar-form navbar-left" role="search">
+        <div class="form-group">
+          <button type="submit" class="btn btn-default">Szukaj kursu na temat:</button>
+          <input type="text" class="form-control" placeholder="Search">
+        </div>
+      </form>
+-->
+{% endcomment %}
+
+{% if user.is_authenticated %}
+        <li class="dropdown">
+            <a href="#" class="dropdown-toggle active" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+Zalogowany <b>{{ user.get_username }}</b><span class="caret"></span></a>
+            <ul class="dropdown-menu">
+                <li><a href="/admin/password_change/">Zmień hasło</a></li>
+                <li><a href="/opinions/">Moje oceny kursu</a></li>
+{% comment %}
+TODO: zamiast pisać swoje forum lub moduł support można użyć gotowe forum http://djangobb.org/
+                <li><a href="/learner-support/">Wsparcie ucznia</a></li>
+{% endcomment %}
+            </ul>
+        </li>
+        <li class=""><a href="/admin/logout/">Wyloguj</a></li>
+  <input type="hidden" name="logged-user-id" value="{{ user.id }}" />
+  {% csrf_token %}
+{% else %}
+        <li class="">  <a href="/admin/login/?next=/">Zaloguj się</a></li>
+{% comment %}
+<!--
+      <form id="signin" class="navbar-form navbar-right" role="form" method="post" action="/login">
+          {% csrf_token %}
+          <div class="input-group">
+              <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+              <input id="email" type="email" class="form-control" name="email" value="" placeholder="address email" required autofocus>                                        
+          </div>
+
+          <div class="input-group">
+              <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+              <input id="password" type="password" class="form-control" name="password" value="" placeholder="Hasło" required>                                    
+          </div>
+
+          <button type="submit" class="btn btn-primary"><a href="/admin/login/?next=/">Login</a></button> 
+
+          <div class="input-group">
+              <span class="input-group-addon"><i class="glyphicon glyphicon-question-sign"></i></span>
+              <input id="password_reminder" type="checkbox" class="form-control" name="" value="" placeholder="Zaponiałem hasła!" >                                    
+          </div>
+     </form>  
+-->
+{% endcomment %}
+  <input type="hidden" name="logged-user-id" value="" />
+{% endif %}
+    </ul>
+
+    </div>
+  </div>
+
+
+{% comment %}
+<!--
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-md-12">
+			<ul class="nav nav-pills bg-info">
+				<li>
+					<a href="/" class="modula-font">Start</a>
+				</li>
+				<li>
+					<a href="/faq.html" class="modula-font active">Pytania i odpowiedzi</a>
+				</li>
+				<li>
+					<a href="/kursy.html" class="modula-font">Kursy</a>
+				</li>
+				<li>
+					<a href="/mentorzy.html" class="modula-font">Mentorzy</a>
+				</li>
+			</ul>
+  </div>
+</div>
+-->
+{% endcomment %}
+

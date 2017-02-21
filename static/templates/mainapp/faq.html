@@ -2,30 +2,13 @@
 
 {% load bootstrap3 %}
 {% load static %}
-{% block title %}django-bootstrap3{% endblock %}
+{% block title %}Pytania i odpowiedzi{% endblock %}
 
 
 {% block bootstrap3_content %}
 
-<div class="container-fluid">
-	<div class="row">
-		<div class="col-md-12">
-			<ul class="nav nav-pills bg-info">
-				<li>
-					<a href="/" class="modula-font">Start</a>
-				</li>
-				<li>
-					<a href="/faq.html" class="modula-font active">Pytania i odpowiedzi</a>
-				</li>
-				<li>
-					<a href="/kursy.html" class="modula-font">Kursy</a>
-				</li>
-				<li>
-					<a href="/mentorzy.html" class="modula-font">Mentorzy</a>
-				</li>
-			</ul>
-  </div>
-</div>
+{% include "header.html" %}
+
 
 <div class="container-fluid">
 
@@ -40,34 +23,83 @@
 				Jak wystartować z programowaniem ?
 			</h3>
 			<p>
-				Nauka programowania wspierana na tej stronie opiera się o <a href="kursy.html">zestaw zadań</a> odsłanianych w trakcie kolejnych zajęć. 
+				Nauka programowania wspierana na tej stronie opiera się o <a href="kursy.html">wprowadzenie oraz zestawy zadań</a> odsłanianych w trakcie kolejnych zajęć.
 <br />Przed każdymi zajęciami możliwe jest zapoznanie się z konspektem. 
-<br />Kolejne kroki oferowane w ramach zajęć odsłaniają tajniki systemów operacyjnych, języków programowania i <a href="https://pl.wikipedia.org/wiki/Kod_%C5%BAr%C3%B3d%C5%82owy">kodu źródłowego</a>.
+<br />Kolejne kroki oferowane w ramach zajęć odsłaniają tajniki systemów operacyjnych, języków programowania i <a href="https://pl.wikipedia.org/wiki/Kod_%C5%BAr%C3%B3d%C5%82owy" target="_blank">kodu źródłowego</a>.
 			</p>
+
+
+			<h3>
+				Jaki jest cel powstania tej strony ?
+			</h3>
+			<p>
+				Nauka programowania jest głównym celem tej strony. W parze idzie również mentoring młodych ludzi w poznawaniu technologii.
+                <br />
+                W trakcie prowadzenia zdalnych zajęć z młodzieżą okazało się, że praktycznie po zajęciach nie mają się do czego odnieść, aby lepiej przyswajać materiał z zajęć.
+                Ta strona jest odpowiednim miejscem do zaglądania w trakcie nauki programowania i wspiera różne formu e-learningu w rozwoju IT.
+			</p>
+
+			<h3>
+				Nic nie wiem o programowaniu - jak sprawdzić czy to jest dla mnie ?
+			</h3>
+			<p>
+				Programowania aplikacji to dość interdyscyplinarna dziedzina ze względu na zastosowanie programów w życiu, przemyśle i rozrywce.
+                Zasadniczo każdy znajdzie wśród aplikacji swoją ulubioną, czy inspirującą jak również bezużyteczną.
+                <br />
+                Nauka programowania otwiera oczy na to jak szybko w sposób powtarzalny stworzyć maszynę wykonującą powtarzalne czynności
+                lub program wspierający nas w obliczeniach, ew. robota, który serwuje nam herbatkę. Przykłady można by mnożyć i mnożyć, bo oprogramowanie
+                komputerowe zespoiło się z naszym życiem na dobre. Reasumując, jeśli chcemy zgłębić jakąś dziedzinę i przy okazji zrobić coś pożytecznego dla siebie - wówczas programowanie będzie dla nas wyzwaniem.
+                <br />
+                Nie martw się, że nic nie wiesz o programowaniiu teraz, myśl co możesz lub chesz zaprogramować dla siebie lub innych jutro.
+			</p>
+
+			<h3>
+				Jak długo trwa nauka programowania ?
+			</h3>
+			<p>
+                Programowanie komputerów to szeroka w zakresie materiału nauka. Są tacy, którzy przyrównują ją do medycyny.
+                To porównanie ma sens dlatego, że tematyka programowania jest niewyczerpana i stale powstają nowe języki prograwowania.
+                Często programiści uczą się i doskonalą stale swój warsztat. Oczywiście można specjalizować się w wąskiej dziedzinie t.j. gry komputerowe na telefony z systemem Android,
+                wówczas skupiamy się na konkretnych zjawiskach zachodzących w tego typu grach i szybciej osiągniemy oczekiwany efekt nauki.
+                <br />
+                Młodzi ludzie uczą się bardzo szybko, więc proste programy które liczą pole koła ew. z wieloma prostymi warunkami są w stanie zrobić w 1h.
+                <br />
+                W naszej branży zakładamy, że przy odpowiednich narzędziach, znajomości wzorców projektowych i umiejętnościach w 1h można stworzyć też prostą grę.
+                <br />
+                Dla przykładu napisanie od zera systemu typu sklep internetowy, w którym jest tysiące produktów i pozwala płacić kartą wymaga często wielu miesięcy lub lat praktyki w branży e-commerce.
+                <br />
+                Programiści są wygodni, więc istnieją tzw. frameworki, gdzie pisanie programów upraszcza się do określenia założeń modeli danych i z nich same generują się szablonowe formularze dodawania/zmiany danych.
+                Istnieje wiele takich rozwiązań i w aplikacjach, gdzie standardowo wprowadza się dane przez formularze świetnie się sprawdzają. Wspominam o tym dlatego, że jest sporo ułatwień dziedzinowych w programowaniu,
+                dzięki którym np: robienia formularzy z automatu można nauczyć się w kilka godzin.
+			</p>
+
+
+
+
 <!--
       <p>
 <small><i>Kod źródłowy, potocznie zwanym źródłem, zazwyczaj jest tekstem zawierającym różne polecenia języka programowania. Kody źródłowe są czytelne dla człowieka, programisty, który może je w dowolny sposób modyfikować.</i></small>
       </p>
 -->
-      <p><br /></p>
-      <h3 id="ikony">
-				Co oznaczają zastosowane symbole ?
-			</h3>
-      <p>
-      W związku z faktem, że lektorzy używają <a href="https://pl.wikipedia.org/wiki/Konferencja_internetowa">konferencji internetowej</a>, sprawdzoną praktyką jest użycie opcji wspierających komunikację w trakcie wykonywanych ćwiczeń. Z pomocą przychodzą ikony graficzne, z którymi spotkacie się w trakcie rozwiązywania <a href="kursy.html">zadań</a>. Oto objaśnienia do nich:
-<ul>
-<li><img alt="" src="{% static 'mainapp/img/new.png' %}" class="img-circle" width="100" height="100"> - nierozwiązane zadanie lub czekające na aktywację</li>
 
-<li><img alt="" src="{% static 'mainapp/img/doit.png' %}" class="img-circle" width="100" height="100"> - zadanie jest w trakcie realizacji lub trwa sesja nauki</li>
+        <h3 id="ikony">
+        Co oznaczają zastosowane symbole ?
+        </h3>
+        <p>
+        W związku z faktem, że do prowadzenia zajęć używamy <a href="https://pl.wikipedia.org/wiki/Konferencja_internetowa" target="_blank">konferencji internetowej</a>, sprawdzoną praktyką jest użycie opcji wspierających komunikację w trakcie wykonywanych ćwiczeń. Z pomocą przychodzą ikony graficzne oraz możliwość oceniania konspektu zajęć on-line, z którymi spotkacie się w trakcie trwania <a href="kursy.html">kursu</a>. Klikając na tło kontekstu, który jest prezentowany w trakcie zajęć zobaczycie okno z wyborem, które umożliwia przesłanie oceny trwającego wykładu.
+<br />Oto ikony "sygnalizacyjne" wraz z objaśnieniami do nich:
+        <ul>
+            <li><img alt="" src="{% static 'mainapp/img/new.png' %}" class="img-circle" width="100" height="100"> - nierozwiązane zadanie lub czekające na aktywację</li>
 
+            <li><img alt="" src="{% static 'mainapp/img/doit.png' %}" class="img-circle" width="100" height="100"> - zadanie jest w trakcie realizacji lub trwa sesja nauki</li>
 
-<li><img alt="" src="{% static 'mainapp/img/help.png' %}" class="img-circle" width="100" height="100"> - zasygnalizowanie prowadzącemu, że zadanie jest niezrozumiałe lub uczeń nie wie od czego zacząć realizację (wystarczy kliknąć na tą ikonę w trakcie zajęć)</li>
+            <li><img alt="" src="{% static 'mainapp/img/help.png' %}" class="img-circle" width="100" height="100"> - zasygnalizowanie prowadzącemu, że zadanie jest niezrozumiałe lub uczeń nie wie od czego zacząć realizację</li>
 
-<li><img alt="" src="{% static 'mainapp/img/done.png' %}" class="img-circle" width="100" height="100"> - potwierdzenie ukończenia zadania</li>
+            <li><img alt="" src="{% static 'mainapp/img/good.png' %}" class="img-circle" width="100" height="100"> - zasygnalizowanie prowadzącemu, że bieżąca prezentacja jest prowadzona ze zrozumieniem</li>
 
-</ul>
-      </p>
-
+            <li><img alt="" src="{% static 'mainapp/img/done.png' %}" class="img-circle" width="100" height="100"> - potwierdzenie ukończenia zadania</li>
+        </ul>
+        </p>
       <p>
       <br /><br />
       <a class="btn btn-primary btn-large" href="kursy.html">Rozpocznij naukę już teraz ➜</a>
@@ -86,7 +118,7 @@
 				Czym jest programowanie ?
 			</h3>
 			<p class="text-muted">
-				Programowanie jest sztuką ekpresji poprzez kod, zwaną kodowaniem. Jest umiejętnością czytania i pisania <A href="https://pl.wikipedia.org/wiki/Kod_%C5%BAr%C3%B3d%C5%82owy">kodu</a> źródłowego programu. Jest to zwinność w podejmowaniu decyzji projektowych i dobieraniu <a href="https://pl.wikipedia.org/wiki/Algorytm">algorytmów</a> do realizacji określonego zadania.
+				Programowanie jest sztuką ekpresji poprzez kod, zwaną kodowaniem. Jest umiejętnością czytania i pisania <a href="https://pl.wikipedia.org/wiki/Kod_%C5%BAr%C3%B3d%C5%82owy" target="_blank">kodu</a> źródłowego programu. Jest to zwinność w podejmowaniu decyzji projektowych i dobieraniu <a href="https://pl.wikipedia.org/wiki/Algorytm" target="_blank">algorytmów</a> do realizacji określonego zadania.
 			</p>
       <p class="text-muted">
       To ciągłe rozwiązywanie zagadek i problemów w kreatywny sposób. To też żmudna i pracochłonna praca wymagająca zaangażowania i ciągłej nauki.
@@ -109,7 +141,7 @@ Nie bez powodu piszę blog po polsku. Zależy mi na tym, żeby ludzie, którzy n
 
 Mówi się, że programista powinien charakteryzować się analitycznym myśleniem, rozumieć zagadnienia matematyczne. Oczywiście „ścisły umysł” to predyspozycja, która bardzo pomaga – sam znam architektów (tych od budownictwa) czy chemików, którzy samodzielnie nauczyli się programowania. Jednak mam wrażenie, że przy odpowiedniej ilości ciężkiej pracy i humanista też w programowaniu znajdzie coś dla siebie. Spróbuj, to na pewno nie zaszkodzi! 
 
-      <small class="text-muted">(źródło: http://www.samouczekprogramisty.pl/czym-wlasciwie-jest-programowanie/)</small>
+                <small class="text-muted">(źródło: <a href="http://www.samouczekprogramisty.pl/czym-wlasciwie-jest-programowanie/">czym właściwie jest programowanie</a>)</small>
 
 			</p>
       <h3 class="text-muted">
@@ -124,11 +156,10 @@ Języki programowania możemy podzielić na języki niskopoziomowe i wysokopozio
 
 Tego typu ograniczenia sprawiają, że języków niskiego poziomu nie używa się powszechnie a jedynie do bardzo specyficznych zastosowań, które są bardzo odległe od „podstaw i nauki programowania”. Dzięki tym samym ograniczeniom języki wysokiego poziomu zyskują na popularności.
 
-      <small class="text-muted">(źródło: http://www.samouczekprogramisty.pl/czym-wlasciwie-jest-programowanie/)</small>
+          <small class="text-muted">(źródła: <a href="http://www.kkiem.agh.edu.pl/dydakt/basic/pr-wprow.htm">Podstawy programowania komputerów</a>,
+              <a href="http://iiwz.univ.szczecin.pl/zszyjewski/progr1/">Programowanie komputerów - podstawy</a>)</small>
 
       </p>
-
-
 
 		</div>
 	</div>
@@ -137,4 +168,3 @@ Tego typu ograniczenia sprawiają, że języków niskiego poziomu nie używa si�
 
 
 {% endblock %}
-

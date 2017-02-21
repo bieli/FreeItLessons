@@ -2,31 +2,12 @@
 
 {% load bootstrap3 %}
 
-{% block title %}django-bootstrap3{% endblock %}
+{% block title %}Mentorzy{% endblock %}
 
 
 {% block bootstrap3_content %}
 
-<div class="container-fluid">
-	<div class="row">
-		<div class="col-md-12">
-			<ul class="nav nav-pills bg-info">
-				<li>
-					<a href="/" class="modula-font">Start</a>
-				</li>
-				<li>
-					<a href="/faq.html" class="modula-font">Pytania i odpowiedzi</a>
-				</li>
-				<li>
-					<a href="/kursy.html" class="modula-font">Kursy</a>
-				</li>
-				<li>
-					<a href="/mentorzy.html" class="modula-font active">Mentorzy</a>
-				</li>
-			</ul>
-  </div>
-</div>
-
+{% include "header.html" %}
 
 <div class="container-fluid">
 
@@ -43,7 +24,7 @@
             <hr />
 
 			<h3>
-				Z tymi osobami odbywać się będą zajęcia
+				Przedstawiamy osoby, z którymi spotkacie się podczas kursu
 			</h3>
 
             <div class="row">
@@ -59,11 +40,13 @@
                                     {{ mentor.additional_info }}
                                 </p>
                                 <p>
-                                    <a class="btn btn-primary" href="#">More</a> <a class="btn" href="#">Blog</a> <a class="btn" href="#">Homepage</a>
+                                    <a class="btn btn-primary" href="#">więcej...</a> <a class="btn" href="{{ mentor.blog_link }}" target="_blank">blog</a> <a class="btn" href="#">homepage</a>
                                 </p>
                             </div>
                         </div>
                     </div>
+                {% empty %}
+                    <div>Nie dodano żadnego mentora. Liczymy na Ciebie.</div>
                 {% endfor %}
             </div>
 		</div>

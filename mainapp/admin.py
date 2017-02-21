@@ -1,11 +1,13 @@
 from django.contrib import admin
-from mainapp.models import Author, Module, Chapter, Content, Curiosity, ContentStatus
+from mainapp.models import Author, Module, Chapter, \
+                           Content, Curiosity, ContentStatus, Faq
+from adminsortable2.admin import SortableAdminMixin, SortableInlineAdminMixin
 
 
 class AuthorAdmin(admin.ModelAdmin):
-    list_display = ('name', 'surname', 'author')
+    list_display = ('name', 'surname', 'author', 'is_public_mentor')
     fieldsets = [
-        (None, {'fields': [('name', 'surname')]}),
+        (None, {'fields': [('name', 'surname', 'blog_link', 'is_public_mentor')]}),
     ]
 
     def save_model(self, request, obj, form, change):
@@ -65,10 +67,15 @@ class ContentStatusAdmin(admin.ModelAdmin):
     view_content_link.short_description = 'Content edit link' # Optional
 
 
+@admin.register(Faq)
+class SortableFaqAdmin(SortableAdminMixin, admin.ModelAdmin):
+    list_display = ('question',)
+
 admin.site.register(Author, AuthorAdmin)
 admin.site.register(Module)
 admin.site.register(Chapter)
 admin.site.register(Content)
 admin.site.register(Curiosity, CuriosityAdmin)
 admin.site.register(ContentStatus, ContentStatusAdmin)
+#admin.site.register(Faq, FaqAdmin)
 

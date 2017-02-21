@@ -164,3 +164,24 @@ class ContentStatus(models.Model):
     def __str__(self):
         return self.status
 
+    @staticmethod
+    def get_opinions_by_user_id(user_id):
+        q = '''SELECT id, status, COUNT(status) AS status_count 
+               FROM mainapp_contentstatus
+               WHERE user_id=%s
+               GROUP BY status'''
+        return ContentStatus.objects.raw(q, [user_id])
+
+
+class Faq(models.Model):
+    question = models.CharField(max_length=128)
+    answer = models.TextField(max_length=4000)
+    is_visible = models.BooleanField(default=False)
+    my_order = models.PositiveIntegerField(default=0, blank=False, null=False)
+
+    class Meta(object):
+        ordering = ('my_order',)
+
+    def __str__(self):
+        return self.question
+

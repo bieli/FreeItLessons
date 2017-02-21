@@ -1,0 +1,77 @@
+{% extends 'mainapp/base.html' %}
+{% load static %}
+{% load lineage %}
+
+{% load bootstrap3 %}
+
+{% block title %}Moje oceny kursu{% endblock %}
+
+{% block bootstrap3_content %}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css">
+<link href="https://fonts.googleapis.com/css?family=Share+Tech" rel="stylesheet">
+<style>
+  body {
+    background: url({% static 'mainapp/img/bg1012.jpg' %});
+  }
+  .container { background: ; }
+  .tech-font {
+    font-family: 'Share Tech', sans-serif;
+    /* color: #5f58f6; */
+  }
+  ul.myul, ul.myul li, ul.myul li span {
+    margin: 0.3em;
+    padding: 0.2em;
+    list-style-type: none;
+  }
+  ul.myul li span {
+    padding: 1em;    
+    color: gray;
+  }
+  ul.myul li b {
+    color: black;
+    font-size: 2em;
+  }
+</style>
+
+
+{% include "header.html" %}
+
+<div class="container-fluid">
+
+	    <div class="row">
+		    <div style="text-align: center;" class="col-md-12">
+			    <h2 class="tech-font">
+				    Opienie o materiałach z kursu
+			    </h2>
+          <h3 class="tech-font">
+          wystawione przeze mnie
+          </h3>
+       
+			    <p>
+            <ul class="myul">
+            {% for opinion in opinions %}
+              <li><img id="img1" alt="" src='{% static "" %}mainapp/img/{{ opinion.status|lower }}.png' class="img-circle" width="50" height="50">
+              <span class="glyphicon glyphicon-arrow-right"></span><b class="tech-font">{{ opinion.status_count }}</b></li>
+            {% empty %}
+                <li>Nie oceniłeś jeszcze żadnego materiału z kursu<span class="glyphicon glyphicon-arrow-right"></span>Czekamy na Twoje opinie</li>
+{% comment %}
+<!--
+              <li><img id="img1" alt="" src="
+{% with 'mainapp/img/'|add:opinion.status|add:'.png' as image_static %}
+  {% static image_static %}
+{% endwith %}
+" class="img-circle" width="50" height="50">
+              <span class="glyphicon glyphicon-arrow-right"></span>{{ opinion.status_count }}</li>
+-->
+{% endcomment %}
+            {% endfor %}
+          </ul>
+          </p>
+      </div>
+    </div>
+
+</div>
+
+{% endblock %}
+

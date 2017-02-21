@@ -9,7 +9,7 @@ from django.db.models.fields.files import FieldFile
 from django.views.generic.base import View, TemplateView
 
 from mainapp.models import User, Author, Module, Chapter, Content, \
-                           ContentStatusType, ContentStatus
+                           ContentStatusType, ContentStatus, Faq
 
 from django.http import HttpResponse, HttpResponseBadRequest
 
@@ -33,6 +33,10 @@ class HomePageView(TemplateView):
 
 class FaqPageView(TemplateView):
     template_name = 'mainapp/faq.html'
+
+    def get_context_data(self, **kwargs):
+        faqs_list = Faq.objects.all()
+        return {'faqs': faqs_list}
 
 
 class CoursesListPageView(TemplateView):
@@ -91,9 +95,9 @@ class CourseDetailPageView(TemplateView):
         chapters_tmp = Chapter.objects.filter(id=chapter_id)
         # chapters_tmp = Chapter.objects.select_related().filter(module__id=module_id)
         for chapter in chapters_tmp:
-            print(chapter)
+            # print(chapter)
             contents = Content.objects.filter(id=contents_id)
-            print(contents)
+            # print(contents)
             chapter.add_contents_list(contents)
             chapters.append(chapter)
         return {'chapters': chapters,
@@ -113,55 +117,55 @@ class ContetUserStatusView(View):
         return HttpResponseBadRequest()
 
     user_id = request.GET.get('user_id', None)
-    print('user_id: {}'.format(user_id))
+    # print('user_id: {}'.format(user_id))
     content_id = request.GET.get('content_id', None)
-    print('content_id: {}'.format(content_id))
+    # print('content_id: {}'.format(content_id))
     status = request.GET.get('status', None)
-    print('status: {}'.format(status))
+    # print('status: {}'.format(status))
 
-    print('is_authenticated: {}'.format(request.user.is_authenticated()))
-    print('Raw Data: {}'.format(request.body))
-    print('Raw User Id: {}'.format(request.user.id))
-    print('request.is_ajax(): {}'.format(request.is_ajax()))
+    # print('is_authenticated: {}'.format(request.user.is_authenticated()))
+    # print('Raw Data: {}'.format(request.body))
+    # print('Raw User Id: {}'.format(request.user.id))
+    # print('request.is_ajax(): {}'.format(request.is_ajax()))
 
     if User.objects.filter(id__iexact=user_id).exists():
-        print('user EXISTS')
+        # print('user EXISTS')
 
         if int(request.user.id) != int(user_id):
-            print('request.user.id != user_id')
+            # print('request.user.id != user_id')
             return HttpResponseBadRequest('wrong auth user in request')
 
         if Content.objects.filter(id__iexact=content_id).exists():
-            print('content EXISTS')
+            # print('content EXISTS')
             if ContentStatusType.exists(status):
-                print('status EXISTS')
+                # print('status EXISTS')
                 user_instance = User.objects.filter(id=user_id).get()
                 content_instance = Content.objects.filter(id=content_id).get()
 
                 obj = ContentStatus.objects.filter(user=user_instance, content=content_instance)
                 if obj:                    
                     obj.update(status=str(status).lower(), updated_at=django.utils.timezone.now())
-                    print("update")
+                    # print("update")
                 else:
                     obj = ContentStatus(user=user_instance,
                                         content=content_instance,
                                         status=str(status).lower())
                     obj.save()
-                    print("created")
+                    # print("created")
 
                 #obj, created = ContentStatus.objects.update_or_create(user=user_instance,
                 #                                                      content=content_instance,
                 #                                                      status=str(status).lower())
-                #print('ContentStatus created: {}'.format(created))
+                ## print('ContentStatus created: {}'.format(created))
                 #cs.save()
             else:
-                print('status NOT EXISTS')
+                # print('status NOT EXISTS')
                 return HttpResponseBadRequest('status NOT EXISTS')
         else:
-            print('content NOT EXISTS')
+            # print('content NOT EXISTS')
             return HttpResponseBadRequest('content NOT EXISTS')
     else:
-        print('user NOT EXISTS')
+        # print('user NOT EXISTS')
         return HttpResponseBadRequest('user NOT EXISTS')
 
     return HttpResponse('OK')
@@ -177,20 +181,20 @@ class ContetUserView(View):
         return HttpResponseBadRequest()
 
     user_id = request.GET.get('user_id', None)
-    print('user_id: {}'.format(user_id))
+    # print('user_id: {}'.format(user_id))
     content_id = request.GET.get('content_id', None)
-    print('content_id: {}'.format(content_id))
+    # print('content_id: {}'.format(content_id))
 
-    print('is_authenticated: {}'.format(request.user.is_authenticated()))
-    print('Raw Data: {}'.format(request.body))
-    print('Raw User Id: {}'.format(request.user.id))
-    print('request.is_ajax(): {}'.format(request.is_ajax()))
+    # print('is_authenticated: {}'.format(request.user.is_authenticated()))
+    # print('Raw Data: {}'.format(request.body))
+    # print('Raw User Id: {}'.format(request.user.id))
+    # print('request.is_ajax(): {}'.format(request.is_ajax()))
 
     if User.objects.filter(id__iexact=user_id).exists():
-        print('user EXISTS')
+        # print('user EXISTS')
 
         if int(request.user.id) != int(user_id):
-            print('request.user.id != user_id')
+            # print('request.user.id != user_id')
             return HttpResponseBadRequest('wrong auth user in request')
 
         user_instance = User.objects.filter(id=user_id).get()
@@ -199,16 +203,39 @@ class ContetUserView(View):
         obj = ContentStatus.objects.filter(user=user_instance, content=content_instance)
         if obj:                    
             cs = obj.get()
-            print('content - id {}, data: {}'.format(content_id, cs))
-            print('status: {}'.format(cs.status))
+            # print('content - id {}, data: {}'.format(content_id, cs))
+            # print('status: {}'.format(cs.status))
             return HttpResponse(cs.status)
             #return HttpResponse('OK')
         else:
-            print('content NOT EXISTS')
+            # print('content NOT EXISTS')
             return HttpResponseBadRequest('content NOT EXISTS')
     else:
-        print('user NOT EXISTS')
+        # print('user NOT EXISTS')
         return HttpResponseBadRequest('user NOT EXISTS')
+
+
+class OpinionsView(TemplateView):
+    template_name = 'mainapp/opinions_list.html'
+
+    def get_context_data(self, **kwargs):
+        opinions = ContentStatus.get_opinions_by_user_id(self.request.user.id)
+        ## print("opinions: {}".format(opinions))
+        ## print("opinions.columns: {}".format(opinions.columns))
+        #for item in opinions:
+        #    # print("status: {}, status_count: {}".format(item.status, item.status_count))
+        return {'opinions': opinions}
+
+
+class LearnerSupportView(TemplateView):
+    template_name = 'mainapp/learner_support_list.html'
+
+    def get_context_data(self, **kwargs):
+        #items = LearnerSupport.get_all_by_user_id(self.request.user.id)
+        items = {}        
+        # print("items: {}".format(items))
+        return {'items': items}
+
 
 
 """
@@ -220,22 +247,22 @@ class ContetUserStatusAjaxView2(TemplateView):
 
 
   def get_context_data(self, **kwargs):
-      print('kwargs: {}'.format(kwargs))
+      # print('kwargs: {}'.format(kwargs))
 
       user_id = kwargs['user_id']
       if User.objects.filter(id__iexact=user_id).exists():
-          print('user EXISTS')
+          # print('user EXISTS')
       
           # request.user.is_authenticated():
 
           content_id = kwargs['content_id']
           if Content.objects.filter(id__iexact=content_id).exists():
-              print('content EXISTS')
+              # print('content EXISTS')
               status = kwargs['status']
           else:
-              print('content NOT EXISTS')
+              # print('content NOT EXISTS')
       else:
-          print('user NOT EXISTS')
+          # print('user NOT EXISTS')
 
       return {'respons': user_id}
 
@@ -251,15 +278,15 @@ class ContetUserStatusAjaxView2(TemplateView):
       #    return HttpResponse(status=401)
 
       user_id = request.GET.get('user_id', None)
-      print('user_id: "%d"' % user_id)
+      # print('user_id: "%d"' % user_id)
 
-      print('Raw Data: "%s"' % request.body)
+      # print('Raw Data: "%s"' % request.body)
 
       if request.is_ajax():
           if request.method == 'GET':
               user_id = request.GET.get('user_id', None)
 
-              print('Raw Data: "%s"' % request.body)
+              # print('Raw Data: "%s"' % request.body)
               #if user_id:
               #    if User.objects.filter(userid__iexact=user_id).exists():
               #        cs = ContentStatus(user=user_id, content=content_id, status=selected_status)
@@ -270,7 +297,7 @@ class ContetUserStatusAjaxView2(TemplateView):
 
   #def get_context_data(self, **kwargs):
   #    # module_id = kwargs['module_id']
-  #    print(kwargs)
+  #    # print(kwargs)
   #    return {'test_results': 123}
 """
 

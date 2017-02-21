@@ -2,32 +2,12 @@
 
 {% load bootstrap3 %}
 
-{% block title %}django-bootstrap3{% endblock %}
+{% block title %}Mentorzy{% endblock %}
 
 
 {% block bootstrap3_content %}
 
-<div class="container-fluid">
-	<div class="row">
-		<div class="col-md-12">
-			<ul class="nav nav-pills bg-info">
-				<li>
-					<a href="/" class="modula-font">Start</a>
-				</li>
-				<li>
-					<a href="/faq.html" class="modula-font">Pytania i odpowiedzi</a>
-				</li>
-				<li>
-					<a href="/kursy.html" class="modula-font">Kursy</a>
-				</li>
-				<li>
-					<a href="/mentorzy.html" class="modula-font active">Mentorzy</a>
-				</li>
-			</ul>
-  </div>
-</div>
-
-
+{% include "header.html" %}
 
 
 <div class="container-fluid">
@@ -39,71 +19,42 @@
 					Kim są nasi mentorzy
 				</h1>
 			</div>
+            <p>Są to osoby chętne do przekazywania wiedzy, nie obawiające się różnych wyzwań zawodowych a przede wszystkim otwarte na komunikację z innymi.</p>
+            <p>Reprezentują dośwadczonych ekspertów, którym możecie zaufać i śmiało czerpać podczas zajęć z nimi wiedzę branżową.</p>
+
+            <hr />
+
 			<h3>
 				Z tymi osobami odbywać się będą zajęcia
 			</h3>
 
-
-
-			<div class="row">
-				<div class="col-md-4">
-					<div class="thumbnail">
-						<img alt="Bootstrap Thumbnail First" src="http://lorempixel.com/output/people-q-c-600-200-1.jpg">
-						<div class="caption">
-							<h3>
-								Mentor Mat
-							</h3>
-							<p>
-								Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus. Nullam id dolor id nibh ultricies vehicula ut id elit.
-							</p>
-							<p>
-								<a class="btn btn-primary" href="#">More</a> <a class="btn" href="#">Blog</a> <a class="btn" href="#">Homepage</a>
-							</p>
-						</div>
-					</div>
-				</div>
-				<div class="col-md-4">
-					<div class="thumbnail">
-						<img alt="Bootstrap Thumbnail Second" src="http://lorempixel.com/output/city-q-c-600-200-1.jpg">
-						<div class="caption">
-							<h3>
-								Mentor John
-							</h3>
-							<p>
-								Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus. Nullam id dolor id nibh ultricies vehicula ut id elit.
-							</p>
-							<p>
-								<a class="btn btn-primary" href="#">More</a> <a class="btn" href="#">Blog</a> <a class="btn" href="#">Gallery</a>
-							</p>
-						</div>
-					</div>
-				</div>
-				<div class="col-md-4">
-					<div class="thumbnail">
-						<img alt="Bootstrap Thumbnail Third" src="http://lorempixel.com/output/sports-q-c-600-200-1.jpg">
-						<div class="caption">
-							<h3>
-								Mentor Bogna
-							</h3>
-							<p>
-								Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus. Nullam id dolor id nibh ultricies vehicula ut id elit.
-							</p>
-							<p>
-								<a class="btn btn-primary" href="#">More</a> <a class="btn" href="#">Blog</a>
-							</p>
-						</div>
-					</div>
-				</div>
-			</div>
-
-
-
-
+            <div class="row">
+                {% for mentor in mentors %}
+                    <div class="col-md-4">
+                        <div class="thumbnail">
+                            <img style="height: 100px;" alt="{{ mentor.name }}" src="{{ mentor.image_link }}" />
+                            <div class="caption">
+                                <h3>
+                                    {{ mentor.name }} {{ mentor.surname }}
+                                </h3>
+                                <p>
+                                    {{ mentor.additional_info }}
+                                </p>
+                                <p>
+                                    <a class="btn btn-primary" href="#">więcej...</a> <a class="btn" href="#">blog</a> <a class="btn" href="#">homepage</a>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div>Nie dodano żadnego mentora. Liczymy na Ciebie.</div>
+                {% endfor %}
+            </div>
 		</div>
 		<div class="col-md-4">
 			<div class="page-header">
 				<h2 class="text-muted">
-          Program mentorski
+                Program mentorski
 				</h2>
 			</div>
 			<h3 class="text-muted">

@@ -25,7 +25,7 @@ SECRET_KEY = '@j=t223ji9etm7a3xd1*n=ma@sfh##&$wl-z9%c#3-vqa%!%f41'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1', '137.74.43.98', 'vps337737.ovh.net']
 
 
 # Application definition
@@ -41,6 +41,10 @@ INSTALLED_APPS = [
     'mainapp',
     #'menu',
     'lineage',
+    #'crispy_forms',
+    #'contact_form_bootstrap',
+    'adminsortable2',
+    'newrelic.extras.framework_django',
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -83,6 +87,7 @@ DATABASES = {
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
+
 
 
 # Password validation
@@ -129,7 +134,8 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-STATIC_ROOT = '/home/mbielak/Pulpit/internal/itclasses_panel/FreeItLessons' + STATIC_URL
+#STATIC_ROOT = '/home/mbielak/Pulpit/internal/itclasses_panel/FreeItLessons' + STATIC_URL
+STATIC_ROOT = '/home/dev/webapps/FreeItLessons' + STATIC_URL
 
 # Location of folders that will be added to static folder
 STATICFILES_DIRS = (
@@ -142,4 +148,60 @@ STATICFILES_DIRS = (
 #    'required_css_class': 'bootstrap3-required',
 #    'javascript_in_head': True,
 #}
+
+SITE_ID = 1
+
+ADMINS = (
+    ('Pomoc mentorska', 'contact@yourdomain.com'),
+)
+
+COMPANY = {
+    'NAME': "my company",
+    'ADDRESS': "26 streets from here th there",
+    'ZIP': "1234",
+    'CITY': "Paris",
+    'LAT': 48.81484460000001,
+    'LNG': 2.0523723999999675,
+    'PHONE': "+336 1234 5678",
+    'EMAIL': 'contact@yourdomain.com',
+    'FACEBOOK': "https://www.facebook.com/highfeature",
+    'LINKEDIN': "http://www.linkedin.com/in/ivarsalain",
+    'TWITTER': "https://twitter.com/HighFeature",
+    'GOOGLEPLUS': "https://twitter.com/HighFeature",
+}
+
+CONTACT_FORM_SUBJECT_TEMPLATE_NAME = 'email_subject.txt'
+CONTACT_FORM_MESSAGE_TEMPLATE_NAME = 'email_message.txt'
+
+COMPANY_INFOS = {
+    'NAME': "my company",
+    'ADDRESS': "26 streets from here th there",
+    'ZIP': "1234",
+    'CITY': "Maybe-there",
+    'LAT': 48.81484460000001,
+    'LNG': 2.0523723999999675,
+    'PHONE': "+336 1234 5678",
+    'EMAIL': 'contact@mycompany.com',
+    'FACEBOOK': "http://fr-fr.facebook.com/people/Maybe-there",
+    'LINKEDIN': "http://www.linkedin.com/in/Maybe-there",
+    'TWITTER': "http://twitter.com/Maybe-there",
+    'GOOGLEPLUS': "https://plus.google.com/Maybe-there/posts",
+}
+
+
+CRISPY_TEMPLATE_PACK = 'bootstrap3'
+
+USE_RECAPTCHA = False
+RECAPTCHA_PUBLIC_KEY = 'your reCapcha public key'
+RECAPTCHA_PRIVATE_KEY = 'your reCapcha private key'
+
+EMAIL_HOST = ""
+EMAIL_PORT = ""
+EMAIL_HOST_USER = ""
+EMAIL_HOST_PASSWORD = ""
+
+
+#TEMPLATE_LOADERS = [
+#      'apptemplates.Loader',
+#  ]
 

@@ -14,14 +14,15 @@ Including another URLconf
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
 from django.conf import settings
-from django.conf.urls import url
+from django.conf.urls import url, include
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.shortcuts import render
 
 from mainapp.views import HomePageView, FaqPageView, CoursesListPageView,\
                           MentorsListPageView, CourseDetailPageView, \
-                          ContetUserStatusView, ContetUserView
+                          ContetUserStatusView, ContetUserView, OpinionsView, \
+                          LearnerSupportView
 
 
 urlpatterns = [
@@ -32,10 +33,15 @@ urlpatterns = [
     url(r'^kursy/(?P<module_id>[0-9]+)/rozdzial/(?P<chapter_id>[0-9]+)\.html$', CoursesListPageView.as_view(), name='course_detail'),
     # url(r'^zadanie,(?P<chapter_id>[0-9]+),(?P<contents_id>[0-9]+)\.html$', CourseDetailPageView.as_view(), name='course_detail'),
     url(r'^mentorzy\.html$', MentorsListPageView.as_view(), name='mentors_list'),
-    url(r'^admin/', admin.site.urls),
+    #url(r'^admin/', admin.site.urls),
+    url(r'^admin/', include(admin.site.urls)),    
     #url(r'^content/(?P<content_id>[0-9]+)/user/(?P<user_id>[0-9]+)/status/(?P<status>[a-z]+)/$', ContetUserStatusAjaxView.as_view(), name='content_user_status'),
     url(r'^content/user/status/$', ContetUserStatusView.as_view()),
     url(r'^content/user/$', ContetUserView.as_view()),
+    url(r'^opinions/$', OpinionsView.as_view(), name="opinions_list"),
+    url(r'^learner-support/$', LearnerSupportView.as_view(), name="learner_support_list"),
+    #url(r'^contact/', include('contact_form.urls')),
+    #url(r'^contact/', include("contact_form_bootstrap.urls", namespace="contact_form_bootstrap")),
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 

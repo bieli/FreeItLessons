@@ -5,7 +5,7 @@
 
 {% bootstrap_javascript jquery=0 %}
 
-{% block title %}django-bootstrap3{% endblock %}
+{% block title %}Kursy{% endblock %}
 
 
 {% block bootstrap3_content %}
@@ -86,13 +86,6 @@
 <script src="http://code.jquery.com/ui/1.11.1/jquery-ui.min.js"></script>
 
 <link rel="stylesheet" href="https://code.jquery.com/ui/1.11.1/themes/smoothness/jquery-ui.css" />
-
-{% if user.is_authenticated %}
-  <input type="hidden" name="logged-user-id" value="{{ user.id }}" />
-  {% csrf_token %}
-{% else %}
-  <input type="hidden" name="logged-user-id" value="" />
-{% endif %}
 
 <script>
 $.noConflict();
@@ -274,54 +267,12 @@ xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
 
   setupContentIcons();
 
+    var path = location.pathname;
+    $('ul.navbar a.nav[href$="' + path + '"]').addClass("active");
 });
 </script>
 
-
-<div id="dialog-send-status" title="Ocena wskazanego konspektu">
-  <p>Oto ikony jakimi może zostać oznaczony konspekt - zgodnie z Twoim wyborem:
-<!--
-<ul>
-<li><input type="radio" name="dialog-send-status-select" value="new" /> <img src="{% static 'mainapp/img/new.png' %}" height="35px" /> - nie przeczytałem</li>
-<li><input type="radio" name="dialog-send-status-select" value="doit" /> <img src="{% static 'mainapp/img/doit.png' %}" height="35px" /> - potrzebuję więcej czasu </li>
-<li><input type="radio" name="dialog-send-status-select" value="help" /> <img src="{% static 'mainapp/img/help.png' %}" height="35px" /> - nadal nie rozumiem o co chodzi, potrzebuję pomocy</li>
-<li><input type="radio" name="dialog-send-status-select" value="done" /> <img src="{% static 'mainapp/img/done.png' %}" height="35px" /> - zrozumiałem, hurraaa :-)</li>
--->
-  <ul>
-      <li><input type="radio" name="dialog-send-status-select" value="new" /> <img alt="" src="{% static 'mainapp/img/new.png' %}" class="img-circle" width="40" height="40"> - nie przeczytałem</li>
-      <li><input type="radio" name="dialog-send-status-select" value="doit" /> <img alt="" src="{% static 'mainapp/img/doit.png' %}" class="img-circle" width="40" height="40"> - w trakcie nauki</li>
-      <li><input type="radio" name="dialog-send-status-select" value="help" /> <img alt="" src="{% static 'mainapp/img/help.png' %}" class="img-circle" width="40" height="40"> - potrzebuję czasu, trudno zrozumieć - pomocy !</li>
-      <li><input type="radio" name="dialog-send-status-select" value="good" /> <img alt="" src="{% static 'mainapp/img/good.png' %}" class="img-circle" width="40" height="40"> - ten wątek jest prowadzony ze zrozumieniem - nadążam</li>
-      <li><input type="radio" name="dialog-send-status-select" value="done" /> <img alt="" src="{% static 'mainapp/img/done.png' %}" class="img-circle" width="40" height="40"> - zrozumiałem, hurraaa :-)</li>
-  </ul>
-
-
-</ul>
-</p>
-</div>
-
-
-<div class="container-fluid">
-	<div class="row">
-		<div class="col-md-12">
-			<ul class="nav nav-pills bg-info">
-				<li>
-					<a href="/" class="modula-font">Start</a>
-				</li>
-				<li>
-					<a href="/faq.html" class="modula-font">Pytania i odpowiedzi</a>
-				</li>
-				<li>
-					<a href="/kursy.html" class="modula-font active">Kursy</a>
-				</li>
-				<li>
-					<a href="/mentorzy.html" class="modula-font">Mentorzy</a>
-				</li>
-			</ul>
-  </div>
-</div>
-
-
+{% include "header.html" %}
 
 <div class="container-fluid">
 
@@ -329,7 +280,7 @@ xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
 		<div class="col-md-8">
 			<div class="page-header">
 				<h1>
-					Zadania z programowania! <small>program mentorski</small>
+					Kursy programowania! <small>program mentorski</small>
 				</h1>
 			</div>
 
@@ -384,7 +335,10 @@ xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
         {% for chapter in module.chapters %}
             <div class="list-group-item">
                 <h4 class="list-group-item-heading done">
+{% comment %}
+
                     <img alt="" src="{% static 'mainapp/img/done.png' %}" class="img-circle" width="30" height="30">
+{% endcomment %}
                     <a href="/kursy/{{ module.id }}/rozdzial/{{ chapter.id }}.html">{{ chapter.name }}</a>
                 </h4>
 
@@ -413,7 +367,8 @@ xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
                             {{ content.value |safe }}
                             </blockquote>
                         {% elif content.status == 3 %}
-                            <iframe width="640" height="360" src="{{ content.value }}" frameborder="0" allowfullscreen></iframe>
+<!--                            <iframe width="640" height="360" src="{{ content.value }}" frameborder="1" allowfullscreen></iframe> -->
+                            <a class="btn btn-default" href="{{ content.value }}" target="_blank">{{ content.additional_text }}</a>
                         {% elif content.status == 4 %}
                             <a class="btn btn-default" href="{{ content.value }}" target="_blank">{{ content.additional_text }}</a>
                         {% endif %}
@@ -472,6 +427,26 @@ xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
                 Propozycje zajęć
 				</h2>
 			</div>
+
+                <div class="col">
+            <div>
+                                <h3 class="text-default">
+                                        Testowanie oprogramowania
+                                </h3>
+                <h5 class="text-muted">
+                                        2017-02-21 09:00 - 10:50
+                                </h5>
+
+                                <p class="text-muted">
+                                        Co powoduje uśmiech na naszej twarzy, kiedy gramy w ulubioną grę lub używamy naszej aplikacji ...<br />
+					niewątpliwie to jest zadowolenie z wysokiej jakości używanego oprogramowania. Stablinego, szybkiego bez zawieszeń i bez błędów.<br />
+					O tym jak tworzyć kod, moduły i systemy "bez błędów" opowiemy niebawem.
+                                </p>
+                                <p class="text-muted">
+                                        <a class="btn btn-success" href="/kursy/5.html">Czytaj więcej</a>
+                                </p>
+                        </div>
+                </div>
 
 
 		<div class="col">
@@ -553,6 +528,30 @@ Giganci świata technologicznego dbają o to, by w przyszłości nie zabrakło i
 	</div>
 </div>
 
+
+
+
+<div id="dialog-send-status" title="Ocena wskazanego konspektu">
+  <p>Oto ikony jakimi może zostać oznaczony konspekt - zgodnie z Twoim wyborem:
+<!--
+<ul>
+<li><input type="radio" name="dialog-send-status-select" value="new" /> <img src="{% static 'mainapp/img/new.png' %}" height="35px" /> - nie przeczytałem</li>
+<li><input type="radio" name="dialog-send-status-select" value="doit" /> <img src="{% static 'mainapp/img/doit.png' %}" height="35px" /> - potrzebuję więcej czasu </li>
+<li><input type="radio" name="dialog-send-status-select" value="help" /> <img src="{% static 'mainapp/img/help.png' %}" height="35px" /> - nadal nie rozumiem o co chodzi, potrzebuję pomocy</li>
+<li><input type="radio" name="dialog-send-status-select" value="done" /> <img src="{% static 'mainapp/img/done.png' %}" height="35px" /> - zrozumiałem, hurraaa :-)</li>
+-->
+  <ul>
+      <li><input type="radio" name="dialog-send-status-select" value="new" /> <img alt="" src="{% static 'mainapp/img/new.png' %}" class="img-circle" width="40" height="40"> - nie przeczytałem</li>
+      <li><input type="radio" name="dialog-send-status-select" value="doit" /> <img alt="" src="{% static 'mainapp/img/doit.png' %}" class="img-circle" width="40" height="40"> - w trakcie nauki</li>
+      <li><input type="radio" name="dialog-send-status-select" value="help" /> <img alt="" src="{% static 'mainapp/img/help.png' %}" class="img-circle" width="40" height="40"> - potrzebuję czasu, trudno zrozumieć - pomocy !</li>
+      <li><input type="radio" name="dialog-send-status-select" value="good" /> <img alt="" src="{% static 'mainapp/img/good.png' %}" class="img-circle" width="40" height="40"> - ten wątek jest prowadzony ze zrozumieniem - nadążam</li>
+      <li><input type="radio" name="dialog-send-status-select" value="done" /> <img alt="" src="{% static 'mainapp/img/done.png' %}" class="img-circle" width="40" height="40"> - zrozumiałem, hurraaa :-)</li>
+  </ul>
+
+
+</ul>
+</p>
+</div>
 
 {% endblock %}
 
