@@ -65,7 +65,10 @@ class ContentStatusAdmin(admin.ModelAdmin):
         return '<a href="/admin/mainapp/content/%d/?_to_field=id&_popup=1" target="_blank">%s</a>' % (int(obj.content.id), obj.content,)
     view_content_link.allow_tags = True
     view_content_link.short_description = 'Content edit link' # Optional
-
+    class Media:
+        #from django.conf import settings
+        #media_url = getattr(settings, 'MEDIA_URL', '/media')
+        js = [ 'https://www.gstatic.com/charts/loader.js', '/static/admin/js/content_status_stats.js' ]
 
 @admin.register(Faq)
 class SortableFaqAdmin(SortableAdminMixin, admin.ModelAdmin):
