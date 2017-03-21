@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge" /><![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Kursy - </title>
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+	<script language="Javascript" type="text/javascript" src="/static/mainapp/js/edit_area/edit_area_full.js"></script>
+	<script language="Javascript" type="text/javascript">
+    editAreaLoader.init({
+        id: "source_code_block"	// id of the textarea to transform
+        //,start_highlight: true	// if start with highlight
+        //,font_size: "10"
+        ,allow_resize: "yes"
+        ,allow_toggle: false
+        ,language: "en"
+        ,font_size: 10
+        ,gecko_spellcheck: false
+        ,word_wrap: true
+        ,start_highlight: true
+        ,syntax: "python"
+        //,load_callback: "my_load"
+        //,save_callback: "my_save"
+        ,display: "onload"
+        ,replace_tab_by_spaces: 4
+        ,min_height: 650
+        //,toolbar: "search, go_to_line, fullscreen, |, undo, redo, |, select_font,|, change_smooth_selection, highlight, reset_highlight, word_wrap, |, help"
+        ,toolbar: "search, go_to_line, fullscreen, |, undo, redo, |, select_font,|, change_smooth_selection, highlight, reset_highlight, word_wrap, |, help"
+    });
+    </script>
+</head>
+
+<body style="background: lightgray;">
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-md-12">
+            <h2 class="text-info">
+				<strong>Zadanie #{{ task.id }} - <i>{{ task.name }}</i></strong>
+			</h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <h4 class="text-info">
+				Cel zadania:
+			</h4>
+            <blockquote class="text-warning">
+                {{ task.desc }}
+            </blockquote>
+            <hr />
+        </div>
+    </div>
+    <div class="row">
+		<div class="col-md-12">
+            <a href="#" class="btn btn-success btn-lg btn-block active" type="button">Uruchom program == testuj rozwiązanie</a>
+        </div>
+    </div>
+    <div class="row">
+		<div class="col-md-12">
+            <textarea id="source_code_block" style="height: 200px; width: 100%;" name="test_4">{{ task.code }}</textarea>
+        </div>
+
+    </div>
+    <hr />
+    <div class="row">
+		<div class="col-md-6">
+            <h4 class="text-info">
+				Wynik działania programu po uruchomieniu:
+			</h4>
+            <pre style="background: black; color: white; ">
+ASSERTS TESTS - OK.
+Traceback (most recent call last):
+  File "{{ task.name }}.py", line 26, in <module>
+    __run_tests()
+  File "{{ task.name }}.py", line 16, in __run_tests
+    assert 'X' == reverse_chars('X') # ✔
+AssertionError
+            </pre>
+            <br /><br /><br />
+        </div>
+		<div class="col-md-6">
+            <h4 class="text-info">
+				Wynik wykonania testów <small>( <i style="color: green;">3</i> z <i style="color: darkred;">3</i> | 50% )</small>:
+			</h4>
+            <blockquote style="background: green; color: white; ">
+                assert 'X' == reverse_chars('X') # ✔
+            </blockquote>
+
+            <blockquote style="background: green; color: white; ">
+                assert 'X' == reverse_chars('X') # ✔
+            </blockquote>
+
+            <blockquote style="background: green; color: white; ">
+                assert 'X' == reverse_chars('X') # ✔
+            </blockquote>
+                        <blockquote style="background: darkred; color: white; ">
+                assert 'X' == reverse_chars('X') # x
+            </blockquote>
+
+            <blockquote style="background: darkred; color: white; ">
+                assert 'X' == reverse_chars('X') # x
+            </blockquote>
+
+            <blockquote style="background: darkred; color: white; ">
+                assert 'X' == reverse_chars('X') # x
+            </blockquote>
+
+            <br /><br /><br />
+        </div>
+    </div>
+    <div class="row">
+		<div class="col-md-2">
+            <a href="#" class="btn btn-warning btn-lg btn-block" type="button">Poproszę o podpowiedź 1</a>
+        </div>
+		<div class="col-md-2">
+            <a href="#" class="btn btn-warning btn-lg btn-block" type="button">Poproszę o podpowiedź 2</a>
+        </div>
+		<div class="col-md-2">
+            <a href="#" class="btn btn-warning btn-lg btn-block" type="button">Poproszę o podpowiedź 3</a>
+        </div>
+		<div class="col-md-2">
+            <a href="#" class="btn btn-warning btn-lg btn-block" type="button">Poproszę o podpowiedź 4</a>
+        </div>
+		<div class="col-md-2">
+            <a href="#" class="btn btn-warning btn-lg btn-block" type="button">Poproszę o podpowiedź 5</a>
+        </div>
+		<div class="col-md-2">
+            <a href="#" class="btn btn-danger btn-lg btn-block inactive" type="button">Poddaje się !!!</a>
+        </div>
+        <br /><br /><br />
+    </div>
+</div>
+</body>
+</html>

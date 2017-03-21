@@ -22,7 +22,7 @@ from django.shortcuts import render
 from mainapp.views import HomePageView, FaqPageView, CoursesListPageView,\
                           MentorsListPageView, CourseDetailPageView, \
                           ContetUserStatusView, ContetUserView, OpinionsView, \
-                          LearnerSupportView
+                          LearnerSupportView, TasksPageView, TaskPageView
 
 
 urlpatterns = [
@@ -33,6 +33,8 @@ urlpatterns = [
     url(r'^kursy/(?P<module_id>[0-9]+)/rozdzial/(?P<chapter_id>[0-9]+)\.html$', CoursesListPageView.as_view(), name='course_detail'),
     # url(r'^zadanie,(?P<chapter_id>[0-9]+),(?P<contents_id>[0-9]+)\.html$', CourseDetailPageView.as_view(), name='course_detail'),
     url(r'^mentorzy\.html$', MentorsListPageView.as_view(), name='mentors_list'),
+    url(r'^zadania\.html$', TasksPageView.as_view(), name='tasks_list'),
+    url(r'^zadania/(?P<task_id>[0-9]+)\.html$', TaskPageView.as_view(), name='task_detail'),
     #url(r'^admin/', admin.site.urls),
     url(r'^admin/', include(admin.site.urls)),    
     #url(r'^content/(?P<content_id>[0-9]+)/user/(?P<user_id>[0-9]+)/status/(?P<status>[a-z]+)/$', ContetUserStatusAjaxView.as_view(), name='content_user_status'),
