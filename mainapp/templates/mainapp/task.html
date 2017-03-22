@@ -19,7 +19,7 @@
   function postDataIntoServiceEndpoint(task_id) {
     var logged_user_id = parseInt($("input[name='logged-user-id']").val());
     var myEvent = { user_id: logged_user_id, task_id: task_id, csrfmiddlewaretoken: '{{ csrf_token }}',
-                    code: $.base64.encode($("#source_code_block").val()),
+                    code: $.base64.encode($("#textarea").text()),
                     tests: $.base64.encode($("#source_tests_block pre code").text())
     };
     console.log("myEvent:", myEvent)
