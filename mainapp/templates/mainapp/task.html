@@ -1,17 +1,77 @@
-<!DOCTYPE html>
-<html>
+{% extends 'mainapp/base.html' %}
+
+{% load bootstrap3 %}
+
+{% block title %}Zadania{% endblock %}
+
+
+{% block bootstrap3_content %}
+
+<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+<script language="Javascript" type="text/javascript" src="/static/mainapp/js/jquery.base64.min.js"></script>
+<script>
+  $.noConflict();
+  jQuery( document ).ready(function( $ ) {
+
+  console.log( "ready!" );
+
+
+  function postDataIntoServiceEndpoint(task_id) {
+    var logged_user_id = parseInt($("input[name='logged-user-id']").val());
+    var myEvent = { user_id: logged_user_id, task_id: task_id, csrfmiddlewaretoken: '{{ csrf_token }}',
+                    code: $.base64.encode($("#source_code_block").val()),
+                    tests: $.base64.encode($("#source_tests_block pre code").text())
+    };
+    console.log("myEvent:", myEvent)
+    $.ajax({
+        url: 'task/code/run/',
+        type: 'POST',
+        data: myEvent,
+        success: function(result) {
+            console.log("postDataIntoServiceEndpoint: AJAX OK - result: ", result);
+            $('#program_output').text(result)
+        },
+        error: function(result) {
+            console.log("postDataIntoServiceEndpoint: AJAX ERROR - result: ", result);
+        }
+    });
+  }
+
+  postDataIntoServiceEndpoint(1, "status");
+    $('#program_run').click(function(event){
+      var target = $( event.target );
+      if (target.is("a")) {
+        postDataIntoServiceEndpoint("{{ task.id }}");
+      }
+    });
+
+});
+</script>
+
+{% include "header.html" %}
 <head>
-    <meta charset="utf-8">
-    <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge" /><![endif]-->
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Kursy - </title>
-    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
-    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
-    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-    <![endif]-->
+    <link class="codestyle" rel="prefetch alternate stylesheet" href="https://highlightjs.org/static/demo/styles/vs.css">
+    <link class="codestyle" rel="prefetch alternate stylesheet" href="https://highlightjs.org/static/demo/styles/github.css">
+
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.10.0/styles/default.min.css">
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.10.0/highlight.min.js"></script>
+<script>
+  function initTestsCode() {
+    var testsCode = document.querySelector('#source_tests_block pre code');
+    hljs.highlightBlock(testsCode);
+    var style = "github";
+    var links = "python";
+    testsCode.result.language = links;
+    Array.prototype.forEach.call(links, function(link) {
+      link.rel = 'stylesheet';
+      //link.disabled = !link.href.match(style + '\\.css$');
+    });
+    //document.getElementById('language-link').innerHTML = testsCode.result.language;
+  }
+
+  addEventListener('load', initTestsCode);
+</script>
+
 
 	<script language="Javascript" type="text/javascript" src="/static/mainapp/js/edit_area/edit_area_full.js"></script>
 	<script language="Javascript" type="text/javascript">
@@ -31,11 +91,12 @@
         //,save_callback: "my_save"
         ,display: "onload"
         ,replace_tab_by_spaces: 4
-        ,min_height: 650
+        ,min_height: 250
         //,toolbar: "search, go_to_line, fullscreen, |, undo, redo, |, select_font,|, change_smooth_selection, highlight, reset_highlight, word_wrap, |, help"
         ,toolbar: "search, go_to_line, fullscreen, |, undo, redo, |, select_font,|, change_smooth_selection, highlight, reset_highlight, word_wrap, |, help"
     });
     </script>
+
 </head>
 
 <body style="background: lightgray;">
@@ -60,7 +121,7 @@
     </div>
     <div class="row">
 		<div class="col-md-12">
-            <a href="#" class="btn btn-success btn-lg btn-block active" type="button">Uruchom program == testuj rozwiązanie</a>
+            <a id="program_run" href="#" class="btn btn-success btn-lg btn-block active" type="button">Uruchom program == testuj rozwiązanie</a>
         </div>
     </div>
     <div class="row">
@@ -69,13 +130,19 @@
         </div>
 
     </div>
+    <div class="row">
+		<div class="col-md-12">
+            <div id="source_tests_block">
+                <pre><code>{{ task.tests }}</code></pre>
+            </div>
+    </div>
     <hr />
     <div class="row">
 		<div class="col-md-6">
             <h4 class="text-info">
 				Wynik działania programu po uruchomieniu:
 			</h4>
-            <pre style="background: black; color: white; ">
+            <pre id="program_output" style="background: black; color: white; ">
 ASSERTS TESTS - OK.
 Traceback (most recent call last):
   File "{{ task.name }}.py", line 26, in <module>
@@ -139,4 +206,5 @@ AssertionError
     </div>
 </div>
 </body>
-</html>
+
+{% endblock %}

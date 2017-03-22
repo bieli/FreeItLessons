@@ -192,6 +192,7 @@ class Task(models.Model):
     desc = models.TextField(max_length=1024)
     intro = models.TextField(max_length=1024, null=True, blank=True)
     code = models.TextField(max_length=4000)
+    tests = models.TextField(max_length=4000)
     suggestion_1 = models.TextField(max_length=1024, null=True, blank=True)
     suggestion_2 = models.TextField(max_length=1024, null=True, blank=True)
     suggestion_3 = models.TextField(max_length=1024, null=True, blank=True)
