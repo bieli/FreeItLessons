@@ -7,6 +7,14 @@
 
 {% block bootstrap3_content %}
 
+<link class="codestyle" rel="prefetch alternate stylesheet" href="https://highlightjs.org/static/demo/styles/vs.css">
+<link class="codestyle" rel="prefetch alternate stylesheet" href="https://highlightjs.org/static/demo/styles/github.css">
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.10.0/styles/default.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.10.0/highlight.min.js"></script>
+
+<script language="Javascript" type="text/javascript" src="/static/mainapp/js/edit_area/edit_area_full.js"></script>
+
 <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
 <script language="Javascript" type="text/javascript" src="/static/mainapp/js/jquery.base64.min.js"></script>
 <script>
@@ -15,11 +23,88 @@
 
   console.log( "ready!" );
 
+    function codeEditorDestroy() {
+        if (editAreaLoader) {
+            delete editAreaLoader;
+        }
+    }
+
+    function codeEditorInit() {
+        editAreaLoader.init({
+            id: "source_code_block"	// id of the textarea to transform
+            //,start_highlight: true	// if start with highlight
+            //,font_size: "10"
+            ,allow_resize: "yes"
+            //,allow_toggle: true
+            ,language: "en"
+            ,font_size: 10
+            ,gecko_spellcheck: false
+            ,word_wrap: true
+            ,start_highlight: true
+            ,syntax: "python"
+            //,load_callback: "my_load"
+            //,save_callback: "my_save"
+            ,change_callback: "change_code"
+            ,display: "onload"
+            ,replace_tab_by_spaces: 4
+            ,min_height: 250
+            //,toolbar: "search, go_to_line, fullscreen, |, undo, redo, |, select_font,|, change_smooth_selection, highlight, reset_highlight, word_wrap, |, help"
+            ,toolbar: "search, go_to_line, fullscreen, |, undo, redo, |, select_font,|, change_smooth_selection, highlight, reset_highlight, word_wrap, |, help"
+            //,EA_toggle_on_callback: "toggle_on"
+            //,EA_toggle_off_callback: "toggle_off"
+        });
+
+        function toggle_on() {
+            alert('toggle_on');
+        }
+
+        function toggle_off() {
+            alert('toggle_off');
+        }
+
+        //function change_code() {
+        //    alert(editAreaLoader.getSelectedText("source_code_block"));
+        //}
+
+        //console.log(editAreaLoader.getValue());
+    }
+      function initTestsCode() {
+    var testsCode = document.querySelector('#source_tests_block pre code');
+    hljs.highlightBlock(testsCode);
+    var style = "github";
+    var links = "python";
+    testsCode.result.language = links;
+    Array.prototype.forEach.call(links, function(link) {
+      link.rel = 'stylesheet';
+      //link.disabled = !link.href.match(style + '\\.css$');
+    });
+    //document.getElementById('language-link').innerHTML = testsCode.result.language;
+  }
+
+  addEventListener('load', initTestsCode);
+
 
   function postDataIntoServiceEndpoint(task_id) {
     var logged_user_id = parseInt($("input[name='logged-user-id']").val());
+
+    var code = "";
+
+    //editAreaLoader.hide();
+    //editAreaLoader.toggle("#source_code_block", "off");
+    //editAreaLoader.toggle("source_code_block");
+    //editAreaLoader.toggle("source_code_block");
+
+    codeEditorDestroy();
+    $("#source_code_block").select()
+    code = $("#source_code_block").val();
+
+    //editAreaLoader.toggle("#source_code_block", "on");
+    //editAreaLoader.toggle("source_code_block");
+    //editAreaLoader.show();
+    codeEditorInit();
+
     var myEvent = { user_id: logged_user_id, task_id: task_id, csrfmiddlewaretoken: '{{ csrf_token }}',
-                    code: $.base64.encode($("#textarea").text()),
+                    code: $.base64.encode(code),
                     tests: $.base64.encode($("#source_tests_block pre code").text())
     };
     console.log("myEvent:", myEvent)
@@ -39,67 +124,25 @@
 
   postDataIntoServiceEndpoint(1, "status");
     $('#program_run').click(function(event){
+    event.preventDefault()
+    //$('#container').focus();
+    //$('#container').select();
+
       var target = $( event.target );
       if (target.is("a")) {
+        //TODO: warkaround for two click for result on editArea component
         postDataIntoServiceEndpoint("{{ task.id }}");
+        postDataIntoServiceEndpoint("{{ task.id }}");
+        //editAreaLoader.toggle("#source_code_block", "on");
       }
     });
+
 
 });
 </script>
 
 {% include "header.html" %}
-<head>
-    <link class="codestyle" rel="prefetch alternate stylesheet" href="https://highlightjs.org/static/demo/styles/vs.css">
-    <link class="codestyle" rel="prefetch alternate stylesheet" href="https://highlightjs.org/static/demo/styles/github.css">
 
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.10.0/styles/default.min.css">
-    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.10.0/highlight.min.js"></script>
-<script>
-  function initTestsCode() {
-    var testsCode = document.querySelector('#source_tests_block pre code');
-    hljs.highlightBlock(testsCode);
-    var style = "github";
-    var links = "python";
-    testsCode.result.language = links;
-    Array.prototype.forEach.call(links, function(link) {
-      link.rel = 'stylesheet';
-      //link.disabled = !link.href.match(style + '\\.css$');
-    });
-    //document.getElementById('language-link').innerHTML = testsCode.result.language;
-  }
-
-  addEventListener('load', initTestsCode);
-</script>
-
-
-	<script language="Javascript" type="text/javascript" src="/static/mainapp/js/edit_area/edit_area_full.js"></script>
-	<script language="Javascript" type="text/javascript">
-    editAreaLoader.init({
-        id: "source_code_block"	// id of the textarea to transform
-        //,start_highlight: true	// if start with highlight
-        //,font_size: "10"
-        ,allow_resize: "yes"
-        ,allow_toggle: false
-        ,language: "en"
-        ,font_size: 10
-        ,gecko_spellcheck: false
-        ,word_wrap: true
-        ,start_highlight: true
-        ,syntax: "python"
-        //,load_callback: "my_load"
-        //,save_callback: "my_save"
-        ,display: "onload"
-        ,replace_tab_by_spaces: 4
-        ,min_height: 250
-        //,toolbar: "search, go_to_line, fullscreen, |, undo, redo, |, select_font,|, change_smooth_selection, highlight, reset_highlight, word_wrap, |, help"
-        ,toolbar: "search, go_to_line, fullscreen, |, undo, redo, |, select_font,|, change_smooth_selection, highlight, reset_highlight, word_wrap, |, help"
-    });
-    </script>
-
-</head>
-
-<body style="background: lightgray;">
 <div class="container-fluid">
 	<div class="row">
 		<div class="col-md-12">
@@ -131,11 +174,31 @@
 
     </div>
     <div class="row">
-		<div class="col-md-12">
+		<div class="col-md-6">
+            <h4 class="text-info">
+				Funkcja testowa programu:
+			</h4>
             <div id="source_tests_block">
                 <pre><code>{{ task.tests }}</code></pre>
             </div>
-    </div>
+        </div>
+		<div class="col-md-6">
+            <h4 class="text-info">
+				Blok startowy programu:
+			</h4>
+            <div id="source_main_block">
+                <pre><code>
+
+
+# main
+if __name__ == '__main__':
+    __run_tests()
+# main
+
+
+                </code></pre>
+            </div>
+        </div>
     <hr />
     <div class="row">
 		<div class="col-md-6">
@@ -205,6 +268,5 @@ AssertionError
         <br /><br /><br />
     </div>
 </div>
-</body>
 
 {% endblock %}

@@ -11,6 +11,7 @@ from django.contrib.auth.decorators import login_required
 
 from django.db.models.fields.files import FieldFile
 from django.views.generic.base import View, TemplateView
+import time
 
 from mainapp.models import User, Author, Module, Chapter, Content, \
     ContentStatusType, ContentStatus, Faq, Task
@@ -205,10 +206,10 @@ class TaskCodeRunView(View):
         # print('task_id: {}'.format(task_id))
         codeb64 = request.POST.get('code', None)
         code = base64.decodebytes(bytes(codeb64.encode(content_type)))
-        # print('code: {}'.format(code))
+        print('code: {}'.format(code))
         testsb64 = request.POST.get('tests', None)
         tests = base64.decodebytes(bytes(testsb64.encode(content_type)))
-        # print('tests: {}'.format(tests))
+        print('tests: {}'.format(tests))
 
         from subprocess import Popen, PIPE
         # cmd = "python3.4 test003.py"
@@ -226,7 +227,7 @@ if __name__ == '__main__':
         """
 
         hash = hashlib.sha1(bytes(code)).hexdigest()
-        tmp_filename = "/tmp/{}-{}-{}".format(user_id, task_id, hash)
+        tmp_filename = "/tmp/{}-{}-{}-{}".format(user_id, task_id, time.time(), hash)
         with open(tmp_filename, 'w+') as tmpfile:
             tmpfile.write(code.decode('latin-1'))
             tmpfile.write("\n\n")
@@ -248,10 +249,10 @@ if __name__ == '__main__':
             except:
                 result = 'ERR: 2'
 
-            try:
-                os.unlink(tmp_filename)
-            except:
-                pass
+            # try:
+            #     os.unlink(tmp_filename)
+            # except:
+            #     pass
 
             def prepare_result(result, tmp_filename, replaced_filename='program.py'):
                 result = result.decode("utf-8")
