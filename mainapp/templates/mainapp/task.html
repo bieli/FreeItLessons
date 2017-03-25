@@ -114,10 +114,21 @@
         data: myEvent,
         success: function(result) {
             console.log("postDataIntoServiceEndpoint: AJAX OK - result: ", result);
-            $('#program_output').text(result)
+            $('#program_output').css({
+                'color': 'white',
+                'background': 'black'
+            });
+            $('#program_output').text(result);
         },
-        error: function(result) {
-            console.log("postDataIntoServiceEndpoint: AJAX ERROR - result: ", result);
+        error: function(jqXHR, textStatus, errorThrown) {
+            $('#program_output').css({
+                'color': 'white',
+                'background': 'darkred'
+            });
+
+            $('#program_output').text('ERROR IN SERVER RESPONSE -> status: "HTTP '
+            + jqXHR.status + '", text: "' + textStatus + '", errorThrown: "' + errorThrown + '"');
+            console.log("errorThrown:", errorThrown)
         }
     });
   }
@@ -188,17 +199,14 @@
 			</h4>
             <div id="source_main_block">
                 <pre><code>
-
-
 # main
 if __name__ == '__main__':
     __run_tests()
 # main
-
-
                 </code></pre>
             </div>
         </div>
+    </div>
     <hr />
     <div class="row">
 		<div class="col-md-6">
@@ -206,15 +214,7 @@ if __name__ == '__main__':
 				Wynik działania programu po uruchomieniu:
 			</h4>
             <pre id="program_output" style="background: black; color: white; ">
-ASSERTS TESTS - OK.
-Traceback (most recent call last):
-  File "{{ task.name }}.py", line 26, in <module>
-    __run_tests()
-  File "{{ task.name }}.py", line 16, in __run_tests
-    assert 'X' == reverse_chars('X') # ✔
-AssertionError
             </pre>
-            <br /><br /><br />
         </div>
 		<div class="col-md-6">
             <h4 class="text-info">
@@ -242,30 +242,28 @@ AssertionError
             <blockquote style="background: darkred; color: white; ">
                 assert 'X' == reverse_chars('X') # x
             </blockquote>
-
-            <br /><br /><br />
         </div>
     </div>
+    <hr />
     <div class="row">
 		<div class="col-md-2">
             <a href="#" class="btn btn-warning btn-lg btn-block" type="button">Poproszę o podpowiedź 1</a>
         </div>
 		<div class="col-md-2">
-            <a href="#" class="btn btn-warning btn-lg btn-block" type="button">Poproszę o podpowiedź 2</a>
+            <a href="#" class="btn btn-warning btn-lg btn-block disabled" type="button">Poproszę o podpowiedź 2</a>
         </div>
 		<div class="col-md-2">
-            <a href="#" class="btn btn-warning btn-lg btn-block" type="button">Poproszę o podpowiedź 3</a>
+            <a href="#" class="btn btn-warning btn-lg btn-block disabled" type="button">Poproszę o podpowiedź 3</a>
         </div>
 		<div class="col-md-2">
-            <a href="#" class="btn btn-warning btn-lg btn-block" type="button">Poproszę o podpowiedź 4</a>
+            <a href="#" class="btn btn-warning btn-lg btn-block disabled" type="button">Poproszę o podpowiedź 4</a>
         </div>
 		<div class="col-md-2">
-            <a href="#" class="btn btn-warning btn-lg btn-block" type="button">Poproszę o podpowiedź 5</a>
+            <a href="#" class="btn btn-warning btn-lg btn-block disabled" type="button">Poproszę o podpowiedź 5</a>
         </div>
 		<div class="col-md-2">
-            <a href="#" class="btn btn-danger btn-lg btn-block inactive" type="button">Poddaje się !!!</a>
+            <a href="#" class="btn btn-danger btn-lg btn-block disabled" type="button">Poddaje się !!!</a>
         </div>
-        <br /><br /><br />
     </div>
 </div>
 
