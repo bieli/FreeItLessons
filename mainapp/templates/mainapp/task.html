@@ -6,6 +6,7 @@
 
 
 {% block bootstrap3_content %}
+{% if user.is_authenticated %}
 
 <link class="codestyle" rel="prefetch alternate stylesheet" href="https://highlightjs.org/static/demo/styles/vs.css">
 <link class="codestyle" rel="prefetch alternate stylesheet" href="https://highlightjs.org/static/demo/styles/github.css">
@@ -287,4 +288,5 @@ if __name__ == '__main__':
     </div>
 </div>
 
+{% endif %}
 {% endblock %}

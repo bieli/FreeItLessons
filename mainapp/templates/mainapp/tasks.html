@@ -6,6 +6,7 @@
 
 
 {% block bootstrap3_content %}
+{% if user.is_authenticated %}
 
 {% include "header.html" %}
 
@@ -61,5 +62,5 @@
 	</div>
 </div>
 
-
+{% endif %}
 {% endblock %}
