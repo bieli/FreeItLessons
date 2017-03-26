@@ -119,6 +119,7 @@
                 'background': 'black'
             });
             $('#program_output').text(result);
+            displayAssertsBlocks();
         },
         error: function(jqXHR, textStatus, errorThrown) {
             $('#program_output').css({
@@ -148,7 +149,37 @@
       }
     });
 
+    function displayAssertsBlocks() {
+        var stderr = $('#program_output').text(),
+            assertion_obj = stderr.match(/assert .*/),
+            all_assert_accept = stderr === 'ASSERTS TESTS - OK.',
+            color = 'green';
 
+            //console.log("stderr:", stderr);
+            //console.log("assertion_obj:", assertion_obj);
+
+        if (all_assert_accept === true) {
+            $('#asserts_list blockquote').each(function() {
+                $(this).css({'background': color});
+            });
+        } else {
+            if (assertion_obj !== 'undefined') {
+                assertion = $.trim(assertion_obj[0]);
+                $('#asserts_list blockquote').each(function() {
+                    assertion_block = $.trim($(this).text());
+                    //console.log("assertion", assertion);
+                    //console.log("assertion_block", assertion_block);
+                    if (assertion == assertion_block) {
+                        //console.log("assertion == assertion_block")
+                        $(this).css({'background': color});
+                        color = 'darkred';
+                    }
+                    //console.log("color:", color);
+                    $(this).css({'background': color});
+                });
+            }
+        }
+    }
 });
 </script>
 
@@ -217,31 +248,20 @@ if __name__ == '__main__':
             </pre>
         </div>
 		<div class="col-md-6">
-            <h4 class="text-info">
-				Wynik wykonania testów <small>( <i style="color: green;">3</i> z <i style="color: darkred;">3</i> | 50% )</small>:
+            <h4 class="text-info" id="unit_tests_results_text">
+				Wynik wykonania testów <!-- <small>( <i style="color: green;" id="unit_tests_success">3</i> z <i style="color: darkred;" id="unit_tests_failure">3</i>
+                | <i id="unit_tests_percent">50%</i> )</small>-->:
 			</h4>
-            <blockquote style="background: green; color: white; ">
-                assert 'X' == reverse_chars('X') # ✔
-            </blockquote>
 
-            <blockquote style="background: green; color: white; ">
-                assert 'X' == reverse_chars('X') # ✔
-            </blockquote>
-
-            <blockquote style="background: green; color: white; ">
-                assert 'X' == reverse_chars('X') # ✔
-            </blockquote>
-                        <blockquote style="background: darkred; color: white; ">
-                assert 'X' == reverse_chars('X') # x
-            </blockquote>
-
-            <blockquote style="background: darkred; color: white; ">
-                assert 'X' == reverse_chars('X') # x
-            </blockquote>
-
-            <blockquote style="background: darkred; color: white; ">
-                assert 'X' == reverse_chars('X') # x
-            </blockquote>
+            <div id="asserts_list">
+            {% for assert in asserts %}
+                <blockquote style="background: darkred; color: white; " data-assert-status="false">
+                {{ assert }}
+                </blockquote>
+            {% empty %}
+                <div class="text-warning" style="padding: 20px;">Brak assercji.</div>
+            {% endfor %}
+            </div>
         </div>
     </div>
     <hr />

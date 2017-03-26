@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 import base64
 import hashlib
+import json
 import os
 import tempfile
 
@@ -32,7 +33,7 @@ class HomePageView(TemplateView):
 
 # def get_context_data(self, **kwargs):
 # context = super(HomePageView, self).get_context_data(**kwargs)
-#    messages.info(self.request, 'hello http://example.com')
+# messages.info(self.request, 'hello http://example.com')
 #    return context
 
 class FaqPageView(TemplateView):
@@ -120,10 +121,20 @@ class TasksPageView(TemplateView):
 class TaskPageView(TemplateView):
     template_name = 'mainapp/task.html'
 
+    def _get_asserts_from_tests_code(self, tests_code):
+        asserts = []
+        for assert_line in str(tests_code).split("\n"):
+            if 'assert ' in assert_line:
+                asserts.append(assert_line.strip())
+        print("asserts:", asserts)
+        return asserts
+
     def get_context_data(self, **kwargs):
         task_id = kwargs['task_id']
         task_instance = Task.objects.filter(id=task_id).get()
-        return {'task': task_instance}
+        return {'task': task_instance,
+                'asserts': self._get_asserts_from_tests_code(task_instance.tests)
+        }
 
 
 class ContetUserStatusView(View):
@@ -191,19 +202,41 @@ class ContetUserStatusView(View):
 
 class TaskCodeRunView(View):
     def _security_check(self, result):
-        print("result: ", result)
+        if 'input' in result:
+            return False
+
+        if 'bytes(' in result:
+            return False
+
+        if 'raw_input' in result:
+            return False
+
         if 'import ' in result:
-            print("AAAAAAa\n\n")
             return False
 
         if ' loader' in result:
             return False
 
-        # if 'os.' in result:
-        #     return False
-        #
-        # if 'sys.' in result:
-        #     return False
+        if 'open(' in result:
+            return False
+
+        if 'write(' in result:
+            return False
+
+        if '/proc/' in result:
+            return False
+
+        if 'process' in result:
+            return False
+
+        if 'subprocess' in result:
+            return False
+
+        if 'os.' in result:
+            return False
+
+        if 'sys.' in result:
+            return False
 
         return True
 
@@ -242,7 +275,6 @@ if __name__ == '__main__':
             # tmpfile.write("def __run_tests():\n  print('aaaa from TEMFILE !!!')")
             tmpfile.flush()
             tmpfile.close()
-
 
             result = ''
             if not self._security_check(str(code)):
@@ -301,7 +333,6 @@ if __name__ == '__main__':
             return HttpResponseBadRequest('user NOT EXISTS')
 
         return HttpResponse(result)
-
 
 
 class ContetUserView(View):
