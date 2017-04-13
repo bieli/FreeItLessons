@@ -21,6 +21,8 @@
 <script>
   $.noConflict();
   jQuery( document ).ready(function( $ ) {
+  var   logged_user_id = parseInt($("input[name='logged-user-id']").val()),
+        max_hint_no = 5;
 
   console.log( "ready!" );
 
@@ -86,8 +88,6 @@
 
 
   function postDataIntoServiceEndpoint(task_id) {
-    var logged_user_id = parseInt($("input[name='logged-user-id']").val());
-
     var code = "";
 
     //editAreaLoader.hide();
@@ -135,19 +135,18 @@
     });
   }
 
-  postDataIntoServiceEndpoint(1, "status");
     $('#program_run').click(function(event){
-    event.preventDefault()
-    //$('#container').focus();
-    //$('#container').select();
+        event.preventDefault()
+        //$('#container').focus();
+        //$('#container').select();
 
-      var target = $( event.target );
-      if (target.is("a")) {
-        //TODO: warkaround for two click for result on editArea component
-        postDataIntoServiceEndpoint("{{ task.id }}");
-        postDataIntoServiceEndpoint("{{ task.id }}");
-        //editAreaLoader.toggle("#source_code_block", "on");
-      }
+          var target = $( event.target );
+          if (target.is("a")) {
+            //TODO: warkaround for two click for result on editArea component
+            postDataIntoServiceEndpoint("{{ task.id }}");
+            postDataIntoServiceEndpoint("{{ task.id }}");
+            //editAreaLoader.toggle("#source_code_block", "on");
+          }
     });
 
     function displayAssertsBlocks() {
@@ -181,6 +180,43 @@
             }
         }
     }
+
+    $('a[id^="hint-"]').click(function(event){
+        event.preventDefault();
+        var hint_id = $(this).attr('data');
+        console.log('hint_id:', hint_id);
+
+        var myEvent = { user_id: logged_user_id, task_id: "{{ task.id }}", csrfmiddlewaretoken: '{{ csrf_token }}',
+                        hint_id: hint_id
+        };
+        console.log("myEvent:", myEvent)
+        $.ajax({
+            url: 'task/code/hint/',
+            type: 'POST',
+            data: myEvent,
+            success: function(result) {
+                console.log("CLICK HINT '" + hint_id + "': AJAX OK - result: ", result);
+                var last_hint_id = parseInt(hint_id),
+                    show_next_hint_id = last_hint_id + 1;
+
+                if (hint_id > 0 && show_next_hint_id > 0 && show_next_hint_id <= max_hint_no) {
+                    $('#hint-' + show_next_hint_id).removeClass('disabled');
+
+                    // TODO: add presentation layer for HINTs
+                    //var obj = jQuery.parseJSON(result);
+                    //console.log( obj);
+                    //['suggestion_' + show_next_hint_id]
+                    //$('#program_output').html(obj);
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.log('ERROR IN SERVER RESPONSE -> status: "HTTP '
+                + jqXHR.status + '", text: "' + textStatus + '", errorThrown: "' + errorThrown + '"');
+            }
+        });
+    });
+
+    postDataIntoServiceEndpoint("{{ task.id }}", "status");
 });
 </script>
 
@@ -216,29 +252,6 @@
         </div>
 
     </div>
-    <div class="row">
-		<div class="col-md-6">
-            <h4 class="text-info">
-				Funkcja testowa programu:
-			</h4>
-            <div id="source_tests_block">
-                <pre><code>{{ task.tests }}</code></pre>
-            </div>
-        </div>
-		<div class="col-md-6">
-            <h4 class="text-info">
-				Blok startowy programu:
-			</h4>
-            <div id="source_main_block">
-                <pre><code>
-# main
-if __name__ == '__main__':
-    __run_tests()
-# main
-                </code></pre>
-            </div>
-        </div>
-    </div>
     <hr />
     <div class="row">
 		<div class="col-md-6">
@@ -267,23 +280,50 @@ if __name__ == '__main__':
     </div>
     <hr />
     <div class="row">
-		<div class="col-md-2">
-            <a href="#" class="btn btn-warning btn-lg btn-block" type="button">Poproszę o podpowiedź 1</a>
+		<div class="col-md-6">
+            <h4 class="text-info">
+				Funkcja testowa programu:
+			</h4>
+            <div id="source_tests_block">
+                <pre><code>{{ task.tests }}</code></pre>
+            </div>
+        </div>
+		<div class="col-md-6">
+            <h4 class="text-info">
+				Blok startowy programu:
+			</h4>
+            <div id="source_main_block">
+                <pre><code>
+# main
+if __name__ == '__main__':
+    __run_tests()
+# main
+                </code></pre>
+            </div>
+        </div>
+    </div>
+    <hr />
+    <div class="row">
+		<div class="col-md-1">
+            &nbsp;
         </div>
 		<div class="col-md-2">
-            <a href="#" class="btn btn-warning btn-lg btn-block disabled" type="button">Poproszę o podpowiedź 2</a>
+            <a href="#" id="hint-1" data="1" class="btn btn-warning btn-lg btn-block" type="button">Poproszę o podpowiedź 1</a>
         </div>
 		<div class="col-md-2">
-            <a href="#" class="btn btn-warning btn-lg btn-block disabled" type="button">Poproszę o podpowiedź 3</a>
+            <a href="#" id="hint-2" data="2" class="btn btn-warning btn-lg btn-block disabled" type="button">Poproszę o podpowiedź 2</a>
         </div>
 		<div class="col-md-2">
-            <a href="#" class="btn btn-warning btn-lg btn-block disabled" type="button">Poproszę o podpowiedź 4</a>
+            <a href="#" id="hint-3" data="3" class="btn btn-warning btn-lg btn-block disabled" type="button">Poproszę o podpowiedź 3</a>
         </div>
 		<div class="col-md-2">
-            <a href="#" class="btn btn-warning btn-lg btn-block disabled" type="button">Poproszę o podpowiedź 5</a>
+            <a href="#" id="hint-4" data="4" class="btn btn-warning btn-lg btn-block disabled" type="button">Poproszę o podpowiedź 4</a>
         </div>
 		<div class="col-md-2">
-            <a href="#" class="btn btn-danger btn-lg btn-block disabled" type="button">Poddaje się !!!</a>
+            <a href="#" id="hint-5" data="5" class="btn btn-danger btn-lg btn-block disabled" type="button">Poddaje się !!!</a>
+        </div>
+		<div class="col-md-1">
+            &nbsp;
         </div>
     </div>
 </div>

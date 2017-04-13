@@ -15,7 +15,7 @@ from django.views.generic.base import View, TemplateView
 import time
 
 from mainapp.models import User, Author, Module, Chapter, Content, \
-    ContentStatusType, ContentStatus, Faq, Task
+    ContentStatusType, ContentStatus, Faq, Task, TaskSolution
 
 from django.http import HttpResponse, HttpResponseBadRequest
 
@@ -328,6 +328,48 @@ if __name__ == '__main__':
             print('tests: {}'.format(tests))
 
             result = self.run_python_code(code, task_id, tests, user_id)
+        else:
+            # print('user NOT EXISTS')
+            return HttpResponseBadRequest('user NOT EXISTS')
+
+        return HttpResponse(result)
+
+
+class TaskCodeHintView(View):
+    def post(self, request):
+        max_hint_no = 5
+
+        if not request.user.is_authenticated():
+            return HttpResponse(status=401)
+
+        if not request.is_ajax():
+            return HttpResponseBadRequest()
+
+        user_id = request.POST.get('user_id', None)
+        print('user_id: {}'.format(user_id))
+
+        if User.objects.filter(id__iexact=user_id).exists():
+            # print('user EXISTS')
+
+            if int(request.user.id) != int(user_id):
+                # print('request.user.id != user_id')
+                return HttpResponseBadRequest('wrong auth user in request')
+
+            content_type = request.META['CONTENT_TYPE'].replace('application/x-www-form-urlencoded; charset=', '')
+            print('content_type: {}'.format(content_type))
+            task_id = request.POST.get('task_id', None)
+            print('task_id: {}'.format(task_id))
+            hint_id = request.POST.get('hint_id', None)
+            print('hint_id: {}'.format(hint_id))
+
+            if int(hint_id) > int(max_hint_no):
+                return HttpResponseBadRequest('Unexpected (too high) hint_id !')
+
+            field_name = 'suggestion_' + str(hint_id)
+            # Employees.objects.only('eng_name')
+            result = Task.objects.filter(id__exact=task_id).values(field_name)
+            # ts = TaskSolution.objects.filter(task_id__exact=task_id).values('suggestion_' + str(hint_id))
+            print("result: {}".format(result))
         else:
             # print('user NOT EXISTS')
             return HttpResponseBadRequest('user NOT EXISTS')
