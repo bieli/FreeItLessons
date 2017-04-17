@@ -199,14 +199,21 @@
                 var last_hint_id = parseInt(hint_id),
                     show_next_hint_id = last_hint_id + 1;
 
-                if (hint_id > 0 && show_next_hint_id > 0 && show_next_hint_id <= max_hint_no) {
-                    $('#hint-' + show_next_hint_id).removeClass('disabled');
+                if (hint_id > 0 && show_next_hint_id > 0 && show_next_hint_id <= max_hint_no + 1) {
+                    var task_block = $('#source_task_code'),
+                        hint_content = $('#source_task_hint_content');
 
-                    // TODO: add presentation layer for HINTs
-                    //var obj = jQuery.parseJSON(result);
-                    //console.log( obj);
-                    //['suggestion_' + show_next_hint_id]
-                    //$('#program_output').html(obj);
+                    task_block.removeClass('col-md-12');
+                    task_block.addClass('col-md-6');
+                    $('#source_task_hint').addClass('col-md-6');
+
+                    if (result.indexOf("<p>") != -1) {
+                        hint_content.html("<strong>Podpowiedź</strong>" + result);
+                    } else {
+                        hint_content.text("### Podpowiedź\n### ----\n\n" + result);
+                    }
+
+                    $('#hint-' + show_next_hint_id).removeClass('disabled');
                 }
             },
             error: function(jqXHR, textStatus, errorThrown) {
@@ -247,10 +254,12 @@
         </div>
     </div>
     <div class="row">
-		<div class="col-md-12">
+		<div id="source_task_code" class="col-md-12">
             <textarea id="source_code_block" style="height: 200px; width: 100%;" name="test_4">{{ task.code }}</textarea>
         </div>
-
+		<div id="source_task_hint">
+            <pre id="source_task_hint_content"></pre>
+        </div>
     </div>
     <hr />
     <div class="row">

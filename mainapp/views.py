@@ -367,8 +367,12 @@ class TaskCodeHintView(View):
 
             field_name = 'suggestion_' + str(hint_id)
             # Employees.objects.only('eng_name')
-            result = Task.objects.filter(id__exact=task_id).values(field_name)
-            # ts = TaskSolution.objects.filter(task_id__exact=task_id).values('suggestion_' + str(hint_id))
+            result = Task.objects.filter(id__exact=task_id).values('suggestion_' + str(hint_id))
+            if result and len(result):
+                # print(result)
+                result = result[0]['suggestion_' + str(hint_id)]
+            # result = Task.objects.filter(id__exact=task_id).values(field_name)
+            # result = TaskSolution.objects.filter(task_id__exact=task_id).values('suggestion_' + str(hint_id))
             print("result: {}".format(result))
         else:
             # print('user NOT EXISTS')
