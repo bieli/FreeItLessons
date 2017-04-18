@@ -348,7 +348,8 @@ class TaskCodeHintView(View):
         user_id = request.POST.get('user_id', None)
         print('user_id: {}'.format(user_id))
 
-        if User.objects.filter(id__iexact=user_id).exists():
+        user_obj = User.objects.filter(id__iexact=user_id)
+        if user_obj.exists():
             # print('user EXISTS')
 
             if int(request.user.id) != int(user_id):
@@ -359,10 +360,10 @@ class TaskCodeHintView(View):
             print('content_type: {}'.format(content_type))
             task_id = request.POST.get('task_id', None)
             print('task_id: {}'.format(task_id))
-            hint_id = request.POST.get('hint_id', None)
+            hint_id = int(request.POST.get('hint_id', 0))
             print('hint_id: {}'.format(hint_id))
 
-            if int(hint_id) > int(max_hint_no):
+            if hint_id > max_hint_no:
                 return HttpResponseBadRequest('Unexpected (too high) hint_id !')
 
             field_name = 'suggestion_' + str(hint_id)
@@ -372,7 +373,27 @@ class TaskCodeHintView(View):
                 # print(result)
                 result = result[0]['suggestion_' + str(hint_id)]
             # result = Task.objects.filter(id__exact=task_id).values(field_name)
-            # result = TaskSolution.objects.filter(task_id__exact=task_id).values('suggestion_' + str(hint_id))
+            try:
+                ts = TaskSolution.objects.filter(task_id__exact=task_id, user_id__exact=user_id).get()
+            except:
+                ts = TaskSolution()
+                ts.user_id = int(user_id)
+                ts.task_id = int(task_id)
+                ts.hint_id = hint_id
+                ts.is_finished = False
+
+            if ts:
+                # TODO: what ifthere no record in DB
+                print("ts: {}".format(ts))
+                if hint_id > 0 and hint_id > ts.suggestions_count:
+                    ts.suggestions_count = hint_id
+                    if hint_id == max_hint_no:
+                        ts.is_surrender = True
+                    else:
+                        ts.is_surrender = False
+                    ts.save()
+                    # print("ts SAVE with hint {}".format(hint_id))
+
             print("result: {}".format(result))
         else:
             # print('user NOT EXISTS')
