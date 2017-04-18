@@ -385,8 +385,9 @@ class TaskCodeHintView(View):
             if ts:
                 # TODO: what ifthere no record in DB
                 print("ts: {}".format(ts))
-                if hint_id > 0 and hint_id > ts.suggestions_count:
-                    ts.suggestions_count = hint_id
+                if hint_id > 0:
+                    if hint_id > ts.suggestions_count:
+                        ts.suggestions_count = hint_id
                     if hint_id == max_hint_no:
                         ts.is_surrender = True
                     else:
