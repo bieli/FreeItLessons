@@ -7,7 +7,7 @@ from adminsortable2.admin import SortableAdminMixin, SortableInlineAdminMixin
 class AuthorAdmin(admin.ModelAdmin):
     list_display = ('name', 'surname', 'author', 'is_public_mentor')
     fieldsets = [
-        (None, {'fields': [('name', 'surname', 'blog_link', 'is_public_mentor')]}),
+        (None, {'fields': [('name', 'surname', 'blog_link', 'is_public_mentor', 'additional_info')]}),
     ]
 
     def save_model(self, request, obj, form, change):

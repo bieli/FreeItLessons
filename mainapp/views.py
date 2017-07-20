@@ -285,7 +285,7 @@ if __name__ == '__main__':
                     p = Popen(cmd, shell=True, stdout=PIPE, stderr=PIPE)
                     out, err = p.communicate()
                     print("Return code: ", p.returncode)
-                    print(out.rstrip(), err.rstrip())
+                    # print("Result from Python: ", out.rstrip(), err.rstrip())
                     result = out.rstrip() + err.rstrip()
                 except:
                     result = 'ERR: 2'
@@ -320,14 +320,20 @@ if __name__ == '__main__':
             # print('content_type: {}'.format(content_type))
             task_id = request.POST.get('task_id', None)
             # print('task_id: {}'.format(task_id))
+            hint_id = int(request.POST.get('hint_id', 0))
+            print('hint_id: {}'.format(hint_id))
             codeb64 = request.POST.get('code', None)
             code = base64.decodebytes(bytes(codeb64.encode(content_type)))
-            print('code: {}'.format(code))
+            # print('code: {}'.format(code))
             testsb64 = request.POST.get('tests', None)
             tests = base64.decodebytes(bytes(testsb64.encode(content_type)))
-            print('tests: {}'.format(tests))
+            # print('tests: {}'.format(tests))
 
             result = self.run_python_code(code, task_id, tests, user_id)
+            is_finished = False
+            if type(result) == int and result == 0:
+                is_finished = True
+            TaskSolution.save_or_update(task_id, user_id, is_finished, hint_id)
         else:
             # print('user NOT EXISTS')
             return HttpResponseBadRequest('user NOT EXISTS')
@@ -337,8 +343,6 @@ if __name__ == '__main__':
 
 class TaskCodeHintView(View):
     def post(self, request):
-        max_hint_no = 5
-
         if not request.user.is_authenticated():
             return HttpResponse(status=401)
 
@@ -363,7 +367,7 @@ class TaskCodeHintView(View):
             hint_id = int(request.POST.get('hint_id', 0))
             print('hint_id: {}'.format(hint_id))
 
-            if hint_id > max_hint_no:
+            if hint_id > TaskSolution.MAX_HINT_NO:
                 return HttpResponseBadRequest('Unexpected (too high) hint_id !')
 
             field_name = 'suggestion_' + str(hint_id)
@@ -373,28 +377,8 @@ class TaskCodeHintView(View):
                 # print(result)
                 result = result[0]['suggestion_' + str(hint_id)]
             # result = Task.objects.filter(id__exact=task_id).values(field_name)
-            try:
-                ts = TaskSolution.objects.filter(task_id__exact=task_id, user_id__exact=user_id).get()
-            except:
-                ts = TaskSolution()
-                ts.user_id = int(user_id)
-                ts.task_id = int(task_id)
-                ts.hint_id = hint_id
-                ts.is_finished = False
-
-            if ts:
-                # TODO: what ifthere no record in DB
-                print("ts: {}".format(ts))
-                if hint_id > 0:
-                    if hint_id > ts.suggestions_count:
-                        ts.suggestions_count = hint_id
-                    if hint_id == max_hint_no:
-                        ts.is_surrender = True
-                    else:
-                        ts.is_surrender = False
-                    ts.save()
-                    # print("ts SAVE with hint {}".format(hint_id))
-
+            is_finished = False
+            TaskSolution.save_or_update(task_id, user_id, is_finished, hint_id)
             print("result: {}".format(result))
         else:
             # print('user NOT EXISTS')
@@ -456,6 +440,42 @@ class OpinionsView(TemplateView):
         #for item in opinions:
         #    # print("status: {}, status_count: {}".format(item.status, item.status_count))
         return {'opinions': opinions}
+
+
+class AchievementsView(TemplateView):
+    template_name = 'mainapp/achievements_list.html'
+
+    def get_context_data(self, **kwargs):
+        tasks_achievements = []
+        tasks = Task.objects.select_related().filter(is_visible=True)
+        # print(tasks)
+        for task in tasks:
+            query = """
+            SELECT
+                ts.id as id,
+                t.name as task_name,
+                ts.user_id as user_id,
+                SUM(t.points - ts.suggestions_count) as summary,
+                t.points as max_points,
+                ts.suggestions_count,
+                ts.task_id as task_id
+            FROM mainapp_tasksolution as ts
+            JOIN mainapp_task as t
+            ON (t.id == ts.task_id)
+            WHERE ts.user_id=1 AND ts.task_id={};
+            """.format(task.id)
+            achievements = TaskSolution.objects.raw(query)
+            summary = achievements[0].summary
+            if summary is None:
+                continue
+            # print("achievements for task_id: {} - summary: {}".format(task.id, summary))
+            tasks_achievements.append({
+                "task_id": task.id,
+                "summary": summary,
+                "task_name": achievements[0].task_name,
+                "max_points": achievements[0].max_points
+            })
+        return {'tasks_achievements': tasks_achievements}
 
 
 class LearnerSupportView(TemplateView):

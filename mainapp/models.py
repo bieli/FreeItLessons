@@ -210,6 +210,8 @@ class Task(models.Model):
 
 
 class TaskSolution(models.Model):
+    MAX_HINT_NO = 5
+
     task = models.ForeignKey(Task, null=False, blank=False)
     user = models.ForeignKey(User, null=False, blank=False)
     is_finished = models.BooleanField(default=False)
@@ -218,4 +220,27 @@ class TaskSolution(models.Model):
     solution_additional_tests_code_block = models.TextField(max_length=4000, blank=False, null=False)
     student_comments = models.TextField(max_length=256, blank=False, null=False)
     is_surrender = models.BooleanField(default=False)
+
+    @staticmethod
+    def save_or_update(task_id, user_id, is_finished, hint_id):
+        try:
+            ts = TaskSolution.objects.filter(task_id__exact=task_id, user_id__exact=user_id).get()
+        except:
+            ts = TaskSolution()
+            ts.user_id = int(user_id)
+            ts.task_id = int(task_id)
+            ts.hint_id = hint_id
+            ts.is_finished = is_finished
+
+        if ts:
+            # TODO: what ifthere no record in DB
+            print("ts: {}".format(ts))
+            if hint_id > 0:
+                if hint_id > ts.suggestions_count:
+                    ts.suggestions_count = hint_id
+                if hint_id == TaskSolution.MAX_HINT_NO:
+                    ts.is_surrender = True
+                else:
+                    ts.is_surrender = False
+            ts.save()
 

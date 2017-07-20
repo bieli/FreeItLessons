@@ -22,9 +22,12 @@
   $.noConflict();
   jQuery( document ).ready(function( $ ) {
   var   logged_user_id = parseInt($("input[name='logged-user-id']").val()),
+        hint_id = $('#hints').attr('data'),
         max_hint_no = 5;
 
-  console.log( "ready!" );
+
+    console.log( "ready!" );
+    console.log('hint_id:', hint_id);
 
     function codeEditorDestroy() {
         if (editAreaLoader) {
@@ -65,9 +68,9 @@
             alert('toggle_off');
         }
 
-        //function change_code() {
+        function change_code() {
         //    alert(editAreaLoader.getSelectedText("source_code_block"));
-        //}
+        }
 
         //console.log(editAreaLoader.getValue());
     }
@@ -87,7 +90,7 @@
   addEventListener('load', initTestsCode);
 
 
-  function postDataIntoServiceEndpoint(task_id) {
+  function postDataIntoServiceEndpoint(task_id, status) {
     var code = "";
 
     //editAreaLoader.hide();
@@ -104,8 +107,11 @@
     //editAreaLoader.show();
     codeEditorInit();
 
+    var hint_id = $('#hints').attr('data')
+    console.log('hint_id:', hint_id);
+
     var myEvent = { user_id: logged_user_id, task_id: task_id, csrfmiddlewaretoken: '{{ csrf_token }}',
-                    code: $.base64.encode(code),
+                    code: $.base64.encode(code), hint_id: hint_id,
                     tests: $.base64.encode($("#source_tests_block pre code").text())
     };
     console.log("myEvent:", myEvent)
@@ -143,8 +149,8 @@
           var target = $( event.target );
           if (target.is("a")) {
             //TODO: warkaround for two click for result on editArea component
-            postDataIntoServiceEndpoint("{{ task.id }}");
-            postDataIntoServiceEndpoint("{{ task.id }}");
+            postDataIntoServiceEndpoint("{{ task.id }}", "");
+            postDataIntoServiceEndpoint("{{ task.id }}", "");
             //editAreaLoader.toggle("#source_code_block", "on");
           }
     });
@@ -184,6 +190,7 @@
     $('a[id^="hint-"]').click(function(event){
         event.preventDefault();
         var hint_id = $(this).attr('data');
+        $('#hints').attr('data', hint_id);
         console.log('hint_id:', hint_id);
 
         var myEvent = { user_id: logged_user_id, task_id: "{{ task.id }}", csrfmiddlewaretoken: '{{ csrf_token }}',
@@ -312,7 +319,7 @@ if __name__ == '__main__':
         </div>
     </div>
     <hr />
-    <div class="row">
+    <div class="row" id="hints" data="0">
 		<div class="col-md-1">
             &nbsp;
         </div>

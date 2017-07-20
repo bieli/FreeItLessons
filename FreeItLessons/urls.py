@@ -23,7 +23,7 @@ from mainapp.views import HomePageView, FaqPageView, CoursesListPageView,\
                           MentorsListPageView, CourseDetailPageView, \
                           ContetUserStatusView, ContetUserView, OpinionsView, \
                           LearnerSupportView, TasksPageView, TaskPageView, \
-                          TaskCodeRunView, TaskCodeHintView
+                          TaskCodeRunView, TaskCodeHintView, AchievementsView
 
 
 urlpatterns = [
@@ -42,6 +42,7 @@ urlpatterns = [
     url(r'^content/user/status/$', ContetUserStatusView.as_view()),
     url(r'^content/user/$', ContetUserView.as_view()),
     url(r'^opinions/$', OpinionsView.as_view(), name="opinions_list"),
+    url(r'^achievements/$', AchievementsView.as_view(), name="achievements_list"),
     url(r'^learner-support/$', LearnerSupportView.as_view(), name="learner_support_list"),
     url(r'^zadania/task/code/run/$', TaskCodeRunView.as_view()),
     url(r'^zadania/task/code/hint/$', TaskCodeHintView.as_view()),
