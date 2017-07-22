@@ -449,6 +449,8 @@ class AchievementsView(TemplateView):
         tasks_achievements = []
         tasks = Task.objects.select_related().filter(is_visible=True)
         # print(tasks)
+        points_summary = 0
+        max_points_summary = 0
         for task in tasks:
             query = """
             SELECT
@@ -475,7 +477,12 @@ class AchievementsView(TemplateView):
                 "task_name": achievements[0].task_name,
                 "max_points": achievements[0].max_points
             })
-        return {'tasks_achievements': tasks_achievements}
+            points_summary += summary
+            max_points_summary += achievements[0].max_points
+        return {'tasks_achievements': tasks_achievements,
+                "points_summary": points_summary,
+                "max_points_summary": max_points_summary,
+                "points_percents": "%d" % ((points_summary / max_points_summary) * 100)}
 
 
 class LearnerSupportView(TemplateView):
