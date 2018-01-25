@@ -1,12 +1,32 @@
-# Byte-compiled / optimized / DLL files
+*.*~
+*.pyc
+*/*.pyc
+*/*/*.pyc
+.idea
+.idea/*
+
+datadump.json
+newrelic.FreeItLessons.ini
+
+*/*.*~
+*/*/*.~
+*/*/*/*.~
+
+.idea
+.idea/*
+
+datadump.json
+newrelic.FreeItLessons.ini
+
+#Byte-compiled/optimized/DLLfiles
 __pycache__/
 *.py[cod]
 *$py.class
 
-# C extensions
+#Cextensions
 *.so
 
-# Distribution / packaging
+#Distribution/packaging
 .Python
 env/
 build/
@@ -24,17 +44,17 @@ var/
 .installed.cfg
 *.egg
 
-# PyInstaller
-#  Usually these files are written by a python script from a template
-#  before PyInstaller builds the exe, so as to inject date/other infos into it.
+#PyInstaller
+#Usuallythesefilesarewrittenbyapythonscriptfromatemplate
+#beforePyInstallerbuildstheexe,soastoinjectdate/otherinfosintoit.
 *.manifest
 *.spec
 
-# Installer logs
+#Installerlogs
 pip-log.txt
 pip-delete-this-directory.txt
 
-# Unit test / coverage reports
+#Unittest/coveragereports
 htmlcov/
 .tox/
 .coverage
@@ -45,45 +65,46 @@ coverage.xml
 *,cover
 .hypothesis/
 
-# Translations
+#Translations
 *.mo
 *.pot
 
-# Django stuff:
+#Djangostuff:
 *.log
 local_settings.py
 
-# Flask stuff:
+#Flaskstuff:
 instance/
 .webassets-cache
 
-# Scrapy stuff:
+#Scrapystuff:
 .scrapy
 
-# Sphinx documentation
+#Sphinxdocumentation
 docs/_build/
 
-# PyBuilder
+#PyBuilder
 target/
 
-# IPython Notebook
+#IPythonNotebook
 .ipynb_checkpoints
 
-# pyenv
+#pyenv
 .python-version
 
-# celery beat schedule file
+#celerybeatschedulefile
 celerybeat-schedule
 
-# dotenv
+#dotenv
 .env
 
-# virtualenv
+#virtualenv
 venv/
 ENV/
 
-# Spyder project settings
+#Spyderprojectsettings
 .spyderproject
 
-# Rope project settings
+#Ropeprojectsettings
 .ropeproject
+

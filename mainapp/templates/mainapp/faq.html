@@ -1,0 +1,111 @@
+{% extends 'mainapp/base.html' %}
+
+
+{% load bootstrap3 %}
+{% load static %}
+{% bootstrap_javascript jquery=0 %}
+
+{% block title %}Pytania i odpowiedzi{% endblock %}
+
+
+{% block bootstrap3_content %}
+
+{% include "header.html" %}
+
+<style>
+dd p {
+    color: #333;
+    font-weight: normal;
+}
+dt {
+    /* font-size: 1.8em; */
+    /* font-weight: bold; */
+    color: #333;
+}
+.list-group-item-paragraph {
+ margin: 1em;
+}
+</style>
+
+
+
+<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+
+
+<script>
+$.noConflict();
+jQuery( document ).ready(function( $ ) {
+
+  console.log( "ready!" );
+
+
+  $('dd').hide();
+
+  $('dt').click(function() {
+      var toggle = $(this).nextUntil('dt');
+      toggle.slideToggle();
+      $('dd').not(toggle).slideUp();
+  });
+
+  $('.list-group-item').on('click', function() {
+    $('.glyphiconRight', this)
+      .toggleClass('glyphicon-chevron-right')
+      .toggleClass('glyphicon-chevron-down');
+  });
+
+});
+</script>
+
+<div class="container-fluid">
+
+	<div class="row">
+		<div class="col-md-8">
+			<div class="page-header">
+        <h1>
+					Pytania i odpowiedzi
+		    </h1>
+			</div>
+      <dl>
+          {% for faq in faqs %}
+          <dt><h3 class="list-group-item" data-toggle="collapse"><i class="glyphicon glyphicon-chevron-right glyphiconRight"></i> 
+{{ faq.question }} ?<span id="slidedown" class="glyphicon glyphicon-plus pull-right"></span></h3></dt>
+            <dd><p class="list-group-item-paragraph">
+            {{ faq.answer|safe }}</a>.
+        		</p></dd>
+          {% endfor %}
+      </dl>
+      <p>
+      <hr />
+      <a class="btn btn-primary btn-large" href="kursy.html">Rozpocznij naukę już teraz ➜</a>
+      </p>
+		</div>
+		<div class="col-md-4">
+			<div class="page-header">
+				<h2 class="text-muted">
+          Tips & tricks
+				</h2>
+			</div>
+			<h3 class="text-muted">
+				Co oznaczają zastosowane symbole ?
+			</h3>
+			<p class="text-muted">
+W związku z faktem, że do prowadzenia zajęć używamy <a href="https://pl.wikipedia.org/wiki/Konferencja_internetowa" target="_blank">konferencji internetowej</a>, sprawdzoną praktyką jest użycie opcji wspierających komunikację w trakcie wykonywanych ćwiczeń. Z pomocą przychodzą ikony graficzne oraz możliwość oceniania konspektu zajęć on-line, z którymi spotkacie się w trakcie trwania <a href="kursy.html">kursu</a>. Klikając na tło kontekstu, który jest prezentowany w trakcie zajęć zobaczycie okno z wyborem, które umożliwia przesłanie oceny trwającego wykładu.
+<br />Oto ikony "sygnalizacyjne" wraz z objaśnieniami do nich:
+        <ul>
+            <li><img alt="" src="{% static 'mainapp/img/new.png' %}" class="img-circle" width="75"> - nierozwiązane zadanie lub czekające na aktywację</li>
+
+            <li><img alt="" src="{% static 'mainapp/img/doit.png' %}" class="img-circle" width="75"> - zadanie jest w trakcie realizacji lub trwa sesja nauki</li>
+
+            <li><img alt="" src="{% static 'mainapp/img/help.png' %}" class="img-circle" width="75"> - zasygnalizowanie prowadzącemu, że zadanie jest niezrozumiałe lub uczeń nie wie od czego zacząć realizację</li>
+
+            <li><img alt="" src="{% static 'mainapp/img/good.png' %}" class="img-circle" width="75"> - zasygnalizowanie prowadzącemu, że bieżąca prezentacja jest prowadzona ze zrozumieniem</li>
+
+            <li><img alt="" src="{% static 'mainapp/img/done.png' %}" class="img-circle" width="75"> - potwierdzenie ukończenia zadania</li>
+        </ul>
+      </p>
+		</div>
+	</div>
+</div>
+
+{% endblock %}
+

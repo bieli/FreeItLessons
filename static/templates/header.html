@@ -1,0 +1,40 @@
+
+<div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="/">Start</a>
+    </div>
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="/faq.html" class="modula-font active">Pytania i odpowiedzi</a></li>
+        <li><a href="/mentorzy.html" class="modula-font active">Mentorzy</a></li>
+        <li><a href="/kursy.html" class="modula-font active">Kursy</a></li>
+      <form class="navbar-form navbar-left" role="search">
+        <div class="form-group">
+          <input type="text" name="cs" class="form-control" placeholder="Szukam kursu na temat">
+        </div>
+      </form>
+      </ul>
+
+
+    <ul class="nav navbar-nav pull-right">
+{% if user.is_authenticated %}
+        <li class="dropdown">
+            <a href="#" class="dropdown-toggle active" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+Zalogowany <b>{{ user.get_username }}</b><span class="caret"></span></a>
+            <ul class="dropdown-menu">
+                <li><a href="/admin/password_change/">Zmień hasło</a></li>
+                <li><a href="/opinions/">Moje oceny kursu</a></li>
+            </ul>
+        </li>
+        <li class=""><a href="/admin/logout/">Wyloguj</a></li>
+  <input type="hidden" name="logged-user-id" value="{{ user.id }}" />
+  {% csrf_token %}
+{% else %}
+        <li class="">  <a href="/admin/login/?next=/">Zaloguj się</a></li>
+  <input type="hidden" name="logged-user-id" value="" />
+{% endif %}
+    </ul>
+
+    </div>
+  </div>
+

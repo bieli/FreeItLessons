@@ -1,0 +1,150 @@
+{% extends 'mainapp/base.html' %}
+
+{% load bootstrap3 %}
+{% load static %}
+
+{% block title %}django-bootstrap3{% endblock %}
+
+
+{% block bootstrap3_content %}
+<style>
+.support-info {
+  color: #afafaf;
+  background-color: #fdfdfd;
+  padding: 0.4em;
+}
+
+.support-link {
+  color: #8aacb8;
+}
+</style>
+
+
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-md-12">
+			<ul class="nav nav-pills bg-info">
+				<li>
+					<a href="/" class="modula-font">Start</a>
+				</li>
+				<li>
+					<a href="/faq.html" class="modula-font">Pytania i odpowiedzi</a>
+				</li>
+				<li>
+					<a href="/kursy.html" class="modula-font active">Kursy</a>
+				</li>
+				<li>
+					<a href="/mentorzy.html" class="modula-font">Mentorzy</a>
+				</li>
+			</ul>
+  </div>
+</div>
+
+
+
+
+<div class="container-fluid">
+
+	<div class="row">
+		<div class="col-md-8">
+			<div class="page-header">
+				<h1>
+					Zadania z programowania! <small>program mentorski</small>
+				</h1>
+			</div>
+
+<h3>chapter_id: {{ chapter_id }}</h3>
+<h3>contents_id: {{ contents_id }}</h3>
+
+{% for chapter in chapters %}
+    <div class="list-group">
+        <a href="/cwiczenie,{{ chapter.id }}.html" class="list-group-item active-done">
+            <strong class="done">{{ chapter.name }}</strong>
+        </a>
+
+        {% for content in chapter.contents_list %}
+            <div class="list-group-item">
+                <h4 class="list-group-item-heading done">
+                    <img alt="" src="{% static 'mainapp/img/done.png' %}" class="img-circle" width="30" height="30">
+                    <a href="/zadanie,{{ module.id }},{{ chapter.id }}.html">{{ content.name }}</a>
+                </h4>
+
+                <p class="list-group-item-text">
+                    {{ content.value }}
+                </p>
+            </div>
+        {% endfor %}
+
+        </div>
+{% endfor %}
+
+		</div>
+
+
+		<div class="col-md-4">
+			<div class="page-header">
+				<h2 class="text-muted">
+          Ciekawostki
+				</h2>
+			</div>
+
+
+		<div class="col">
+			<div class="text-muted">
+				<h2 class="text-muted">
+					Linux zwany jest Pingwinem!
+				</h2>
+				<p class="text-muted">
+Ten system operacyjny posiada maskotkę <a href="https://en.wikipedia.org/wiki/Tux">Tux</a> tzn. pingwina. Ludzie pracujący na s.o. Linux cenią sobie niezależność od jakiejkolwiek zamykanej w pudełku technologii. Czasami lubią zbudować od zera program, którego używają tzn. z dostępnych za darmo źródeł. Czasami ze względów wydajnościwych lub bezpieczeństwa ma to sens.<br />W większości dystrybucji Linuxa są setki tysięcy gotowych paczek z programami, grami, narzędziami i przeglądarkami.  
+				</p>
+				<p>
+					<a class="btn btn-default" href="http://www.linuxexpert.pl/posts/1598/dlaczego-akurat-pingwin/">Czytaj więcej</a>
+				</p>
+			</div>
+		</div>
+
+		<div class="col">
+			<div class="jumbotron-mini">
+				<h2 class="text-muted">
+					Jest wiele dystrybucji Linuxa
+				</h2>
+				<p class="text-muted">
+Na stronie <a href="https://distrowatch.com/">distrowatch.com</a> możecie odnaleźć wiele gotowych dystrybucji Linuxa. Niektóre zostały stworzone przez organizację t.j. np. Ubuntu, SuSE, RedHat a inne przez społeczności fanów Mint, Knoppix, Kali, itp.
+				</p>
+				<p class="text-muted">
+					<a class="btn btn-default" href="http://www.spidersweb.pl/2016/06/project-bloks-programowanie-dla-dzieci.html">Czytaj więcej</a>
+				</p>
+			</div>
+		</div>
+
+
+		<div class="col">
+			<div class="jumbotron-mini">
+				<h2 class="text-muted">
+					Gry w terminalu tekstowym
+				</h2>
+				<p class="text-muted">
+Jako ciekawostkę podamy, że wpisując poniższą komendę w terminalu
+zainstalujecie grę działającą w trybie tekstowym. 
+<br />Tak !!! to możliwe, wszak kiedyś gry tylko tak wyglądały i jest to okazja, aby na chwilę cofnąć się w czasie ;-)  
+<blockquote>
+$ sudo apt-get install ninvaders
+</blockquote>
+
+				</p>
+				<p>
+					<a class="btn btn-default" href="http://www.dobreprogramy.pl/mentorious/TOP-5-gier-w-Linuksowym-terminalu,30386.html">Czytaj więcej</a>
+				</p>
+			</div>
+		</div>
+
+
+
+		</div>
+
+	</div>
+</div>
+
+
+{% endblock %}
+

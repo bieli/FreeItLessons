@@ -1,0 +1,57 @@
+
+<link href="https://fonts.googleapis.com/css?family=Share+Tech" rel="stylesheet">
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-92238762-1', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+
+<style>
+h1, h2, h3, h4, h5 {
+  font-family: 'Share Tech', sans-serif;
+  color: #5f58f6;
+}
+ul.nav a, a,navbar-brand {
+  font-family: 'Share Tech', sans-serif;
+  color: #5f58f6;
+}
+</style>
+
+<div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="/">Start</a>
+    </div>
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="/faq.html" class="modula-font active">Pytania i odpowiedzi</a></li>
+        <li><a href="/mentorzy.html" class="modula-font active">Mentorzy</a></li>
+        <li><a href="/kursy.html" class="modula-font active">Kursy</a></li>
+      </ul>
+    <ul class="nav navbar-nav pull-right">
+{% if user.is_authenticated %}
+        <li class="dropdown">
+            <a href="#" class="dropdown-toggle active" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+Zalogowany <b>{{ user.get_username }}</b><span class="caret"></span></a>
+            <ul class="dropdown-menu">
+                <li><a href="/admin/password_change/">Zmień hasło</a></li>
+                <li><a href="/opinions/">Moje oceny kursu</a></li>
+            </ul>
+        </li>
+        <li class=""><a href="/admin/logout/">Wyloguj</a></li>
+  <input type="hidden" name="logged-user-id" value="{{ user.id }}" />
+  {% csrf_token %}
+{% else %}
+        <li class="">  <a href="/admin/login/?next=/">Zaloguj się</a></li>
+  <input type="hidden" name="logged-user-id" value="" />
+{% endif %}
+    </ul>
+
+    </div>
+  </div>
+

@@ -1,0 +1,39 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+
+require 'time'
+
+VAGRANTFILE_API_VERSION = "2"
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+  config.vm.box = "ubuntu/xenial64"
+  vm_name = "free-it-lessons"
+
+  config.vm.provider "virtualbox" do |vb|
+    vb.gui = false
+    #vb.name = "free-it-lessons.local"
+    vb.name = vm_name + "." + Time.now.strftime("%y%m%d%H%M")
+  end
+  
+  config.vm.network "private_network", ip: "192.168.10.20"
+
+  # allow for symlinks in the app folder
+  # config.vm.customize ["setextradata", :id, "VBoxInternal2/SharedFoldersEnableSymlinksCreate/app", "1"]
+
+  # provision
+  config.vm.provision "shell", :inline => <<-SHELL
+          sudo apt-get update
+          sudo apt-get upgrade -y
+          sudo apt-get install python3-pip python3-setuptools build-essential -y
+          sudo pip3 install --upgrade pip
+          sudo pip3 install virtualenv
+          mkdir ~/.virtualenvs
+          sudo pip3 install virtualenvwrapper
+  SHELL
+
+  config.vm.provision :shell, :path => "vagrant/provision.sh"
+
+  config.vm.synced_folder "vagrant/", "/home/ubuntu/vagrant", create: true
+end
+
