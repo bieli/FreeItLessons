@@ -1,0 +1,69 @@
+{% extends 'mainapp/base.html' %}
+{% load static %}
+{% load lineage %}
+
+{% load bootstrap3 %}
+
+{% block title %}Moje osiągnięcia{% endblock %}
+
+{% block bootstrap3_content %}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css">
+<link href="https://fonts.googleapis.com/css?family=Share+Tech" rel="stylesheet">
+<style>
+  body {
+    background: url({% static 'mainapp/img/bg1012.jpg' %});
+  }
+  .container { background: ; }
+  .tech-font {
+    font-family: 'Share Tech', sans-serif;
+    /* color: #5f58f6; */
+  }
+  ul.myul, ul.myul li, ul.myul li span {
+    margin: 0.3em;
+    padding: 0.2em;
+    list-style-type: none;
+  }
+  ul.myul li span {
+    padding: 1em;
+    color: gray;
+  }
+  ul.myul li b {
+    color: black;
+    font-size: 2em;
+  }
+</style>
+
+
+{% include "header.html" %}
+
+<div class="container-fluid">
+
+	    <div class="row">
+		    <div style="text-align: center;" class="col-md-12">
+			    <h2 class="tech-font">
+				    Odznaki i punkty
+			    </h2>
+          <h3 class="tech-font">
+            Lista zadań oraz punktów przyznanych za ich rozwiązanie
+          </h3>
+            <p>
+                <ul class="myul">
+                {% for ta in tasks_achievements %}
+                    <li>
+                        <a href="/zadania/{{ ta.task_id }}.html">{{ ta.task_name }}</a> <span class="glyphicon"></span> <b>{{ ta.summary }}</b> <small>(max. {{ ta.max_points }})</small>
+                    </li>
+                {% empty %}
+                    <div class="text-warning" style="padding: 20px;">Nie dodano żadnego zadania. Opublikujemy niebawem :-)</div>
+                {% endfor %}
+                </ul>
+            </p>
+                <p>
+                    Liczba zdobytych punktów: {{ points_summary }} (max. {{ max_points_summary }}) - {{ points_percents }} %
+                </p>
+         </div>
+    </div>
+</div>
+
+{% endblock %}
+

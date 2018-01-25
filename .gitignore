@@ -108,3 +108,13 @@ ENV/
 #Ropeprojectsettings
 .ropeproject
 
+bin
+materials
+cherrypy/
+include/
+lib64
+man/
+pip-selfcheck.json
+pyvenv.cfg
+share/
+twisted/

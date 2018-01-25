@@ -185,3 +185,62 @@ class Faq(models.Model):
     def __str__(self):
         return self.question
 
+
+class Task(models.Model):
+    name = models.CharField(max_length=128)
+    is_visible = models.BooleanField(default=False)
+    desc = models.TextField(max_length=1024)
+    intro = models.TextField(max_length=1024, null=True, blank=True)
+    code = models.TextField(max_length=4000)
+    tests = models.TextField(max_length=4000)
+    suggestion_1 = models.TextField(max_length=1024, null=True, blank=True)
+    suggestion_2 = models.TextField(max_length=1024, null=True, blank=True)
+    suggestion_3 = models.TextField(max_length=1024, null=True, blank=True)
+    suggestion_4 = models.TextField(max_length=1024, null=True, blank=True)
+    suggestion_5 = models.TextField(max_length=1024, null=True, blank=True)
+    level = models.PositiveIntegerField(default=0, blank=False, null=False)
+    points = models.PositiveIntegerField(default=5, blank=False, null=False)
+    #created_at: datetime
+    #created_by: relatet to User
+    #reviewd_at: datetime
+    #reviewd_by: relatet to User
+
+    def __str__(self):
+        return "[{}] {}".format(self.id, self.name)
+
+
+class TaskSolution(models.Model):
+    MAX_HINT_NO = 5
+
+    task = models.ForeignKey(Task, null=False, blank=False)
+    user = models.ForeignKey(User, null=False, blank=False)
+    is_finished = models.BooleanField(default=False)
+    suggestions_count = models.PositiveIntegerField(default=0, blank=False, null=False)
+    solution_code_block = models.TextField(max_length=4000)
+    solution_additional_tests_code_block = models.TextField(max_length=4000, blank=False, null=False)
+    student_comments = models.TextField(max_length=256, blank=False, null=False)
+    is_surrender = models.BooleanField(default=False)
+
+    @staticmethod
+    def save_or_update(task_id, user_id, is_finished, hint_id):
+        try:
+            ts = TaskSolution.objects.filter(task_id__exact=task_id, user_id__exact=user_id).get()
+        except:
+            ts = TaskSolution()
+            ts.user_id = int(user_id)
+            ts.task_id = int(task_id)
+            ts.hint_id = hint_id
+            ts.is_finished = is_finished
+
+        if ts:
+            # TODO: what ifthere no record in DB
+            print("ts: {}".format(ts))
+            if hint_id > 0:
+                if hint_id > ts.suggestions_count:
+                    ts.suggestions_count = hint_id
+                if hint_id == TaskSolution.MAX_HINT_NO:
+                    ts.is_surrender = True
+                else:
+                    ts.is_surrender = False
+            ts.save()
+

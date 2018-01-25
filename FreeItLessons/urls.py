@@ -22,7 +22,8 @@ from django.shortcuts import render
 from mainapp.views import HomePageView, FaqPageView, CoursesListPageView,\
                           MentorsListPageView, CourseDetailPageView, \
                           ContetUserStatusView, ContetUserView, OpinionsView, \
-                          LearnerSupportView
+                          LearnerSupportView, TasksPageView, TaskPageView, \
+                          TaskCodeRunView, TaskCodeHintView, AchievementsView
 
 
 urlpatterns = [
@@ -33,13 +34,18 @@ urlpatterns = [
     url(r'^kursy/(?P<module_id>[0-9]+)/rozdzial/(?P<chapter_id>[0-9]+)\.html$', CoursesListPageView.as_view(), name='course_detail'),
     # url(r'^zadanie,(?P<chapter_id>[0-9]+),(?P<contents_id>[0-9]+)\.html$', CourseDetailPageView.as_view(), name='course_detail'),
     url(r'^mentorzy\.html$', MentorsListPageView.as_view(), name='mentors_list'),
+    url(r'^zadania\.html$', TasksPageView.as_view(), name='tasks_list'),
+    url(r'^zadania/(?P<task_id>[0-9]+)\.html$', TaskPageView.as_view(), name='task_detail'),
     #url(r'^admin/', admin.site.urls),
     url(r'^admin/', include(admin.site.urls)),    
     #url(r'^content/(?P<content_id>[0-9]+)/user/(?P<user_id>[0-9]+)/status/(?P<status>[a-z]+)/$', ContetUserStatusAjaxView.as_view(), name='content_user_status'),
     url(r'^content/user/status/$', ContetUserStatusView.as_view()),
     url(r'^content/user/$', ContetUserView.as_view()),
     url(r'^opinions/$', OpinionsView.as_view(), name="opinions_list"),
+    url(r'^achievements/$', AchievementsView.as_view(), name="achievements_list"),
     url(r'^learner-support/$', LearnerSupportView.as_view(), name="learner_support_list"),
+    url(r'^zadania/task/code/run/$', TaskCodeRunView.as_view()),
+    url(r'^zadania/task/code/hint/$', TaskCodeHintView.as_view()),
     #url(r'^contact/', include('contact_form.urls')),
     #url(r'^contact/', include("contact_form_bootstrap.urls", namespace="contact_form_bootstrap")),
 

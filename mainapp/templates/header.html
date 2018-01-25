@@ -32,6 +32,9 @@ ul.nav a, a,navbar-brand {
         <li><a href="/faq.html" class="modula-font active">Pytania i odpowiedzi</a></li>
         <li><a href="/mentorzy.html" class="modula-font active">Mentorzy</a></li>
         <li><a href="/kursy.html" class="modula-font active">Kursy</a></li>
+{% if user.is_authenticated %}
+        <li><a href="/zadania.html" class="modula-font active">Zadania</a></li>
+{% endif %}
       </ul>
     <ul class="nav navbar-nav pull-right">
 {% if user.is_authenticated %}
@@ -41,6 +44,7 @@ Zalogowany <b>{{ user.get_username }}</b><span class="caret"></span></a>
             <ul class="dropdown-menu">
                 <li><a href="/admin/password_change/">Zmień hasło</a></li>
                 <li><a href="/opinions/">Moje oceny kursu</a></li>
+                <li><a href="/achievements/">Osiągnięcia</a></li>
             </ul>
         </li>
         <li class=""><a href="/admin/logout/">Wyloguj</a></li>

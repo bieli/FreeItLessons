@@ -1,0 +1,65 @@
+{% extends 'mainapp/base.html' %}
+
+{% load bootstrap3 %}
+
+{% block title %}Zadania{% endblock %}
+
+
+{% block bootstrap3_content %}
+{% if user.is_authenticated %}
+
+{% include "header.html" %}
+
+<div class="container-fluid">
+
+	<div class="row">
+		<div class="col-md-8">
+			<div class="page-header">
+				<h1>
+					Zadania z programowania
+				</h1>
+			</div>
+            <p>Zachęcamy do zmierzenia się z testem znajomości języka programowania <b>Python</b> oraz umiejętności pisania testów do kodu.</p>
+            <p>Każde zadanie jest punktowane. Skorzystanie z pomocy odejmuje punkty. Wyniki będą przechowywane na Twoim koncie.</p>
+
+            <hr />
+
+			<h3>
+                Lista zadań do rozwiązania
+			</h3>
+
+            <div class="row">
+                {% for task in tasks %}
+                    <div class="col-md-12">
+                        <div class="caption" style="padding: 10px;">
+                            <h4>
+                                {{ task.id }}) <a href="/zadania/{{ task.id }}.html">{{ task.name }}</a> <small>za {{ task.points }} punktów</small>
+                            </h4>
+                            <p>
+                            </p>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="text-warning" style="padding: 20px;">Nie dodano żadnego zadania. Opublikujemy niebawem :-)</div>
+                {% endfor %}
+            </div>
+		</div>
+		<div class="col-md-4">
+			<div class="page-header">
+				<h2 class="text-muted">
+                Programowanie
+				</h2>
+			</div>
+			<h3 class="text-muted">
+				Test + kod
+			</h3>
+			<p class="text-muted">
+				Pamiętaj, że <a href="https://pl.wikipedia.org/wiki/Test-driven_development">każda linijka testu przed napisaniem linijki kodu przybliża do zwycięstwa</a> :-)
+			</p>
+
+		</div>
+	</div>
+</div>
+
+{% endif %}
+{% endblock %}

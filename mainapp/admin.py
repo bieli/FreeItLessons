@@ -1,13 +1,13 @@
 from django.contrib import admin
 from mainapp.models import Author, Module, Chapter, \
-                           Content, Curiosity, ContentStatus, Faq
+                           Content, Curiosity, ContentStatus, Faq, Task, TaskSolution
 from adminsortable2.admin import SortableAdminMixin, SortableInlineAdminMixin
 
 
 class AuthorAdmin(admin.ModelAdmin):
     list_display = ('name', 'surname', 'author', 'is_public_mentor')
     fieldsets = [
-        (None, {'fields': [('name', 'surname', 'blog_link', 'is_public_mentor')]}),
+        (None, {'fields': [('name', 'surname', 'blog_link', 'is_public_mentor', 'additional_info')]}),
     ]
 
     def save_model(self, request, obj, form, change):
@@ -74,10 +74,21 @@ class ContentStatusAdmin(admin.ModelAdmin):
 class SortableFaqAdmin(SortableAdminMixin, admin.ModelAdmin):
     list_display = ('question',)
 
+
+class TaskAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name', 'is_visible', 'level', 'points',)
+
+
+class TaskSolutionAdmin(admin.ModelAdmin):
+    list_display = ('id', 'task', 'user', 'suggestions_count', 'is_finished', 'is_surrender')
+
+
 admin.site.register(Author, AuthorAdmin)
 admin.site.register(Module)
 admin.site.register(Chapter)
 admin.site.register(Content)
+admin.site.register(Task, TaskAdmin)
+admin.site.register(TaskSolution, TaskSolutionAdmin)
 admin.site.register(Curiosity, CuriosityAdmin)
 admin.site.register(ContentStatus, ContentStatusAdmin)
 #admin.site.register(Faq, FaqAdmin)
