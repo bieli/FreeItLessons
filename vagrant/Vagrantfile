@@ -1,39 +1,23 @@
-# -*- mode: ruby -*-
-# vi: set ft=ruby :
+Vagrant.configure("2") do |config|
 
-
-require 'time'
-
-VAGRANTFILE_API_VERSION = "2"
-
-Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.box = "ubuntu/xenial64"
-  vm_name = "free-it-lessons"
 
-  config.vm.provider "virtualbox" do |vb|
-    vb.gui = false
-    #vb.name = "free-it-lessons.local"
-    vb.name = vm_name + "." + Time.now.strftime("%y%m%d%H%M")
+  # Use a private network so that we don't have to worry about forwarding ports
+  config.vm.network "private_network", ip: "192.168.50.11"
+
+  config.vm.provider "virtualbox" do |v|
+    v.name = "FreeItLessons"
+    v.memory = 1024
+
+    # Only allow drift of 1 sec, instead of 20 min default
+    v.customize [ "guestproperty", "set", :id, "/VirtualBox/GuestAdd/VBoxService/--timesync-set-threshold", 1000 ]
   end
-  
-  config.vm.network "private_network", ip: "192.168.10.20"
 
-  # allow for symlinks in the app folder
-  # config.vm.customize ["setextradata", :id, "VBoxInternal2/SharedFoldersEnableSymlinksCreate/app", "1"]
+  # Bootstrap script for configuring VM
+  config.vm.provision :shell, path: "bootstrap.sh"
 
-  # provision
-  config.vm.provision "shell", :inline => <<-SHELL
-          sudo apt-get update
-          sudo apt-get upgrade -y
-          sudo apt-get install python3-pip python3-setuptools build-essential -y
-          sudo pip3 install --upgrade pip
-          sudo pip3 install virtualenv
-          mkdir ~/.virtualenvs
-          sudo pip3 install virtualenvwrapper
-  SHELL
+  #config.vm.synced_folder "vagrant/", "/home/ubuntu/vagrant", create: true
+  #config.vm.synced_folder ".", "/home/vagrant/FreeItLessons", owner: "vagrant", group: "vagrant"
 
-  config.vm.provision :shell, :path => "vagrant/provision.sh"
-
-  config.vm.synced_folder "vagrant/", "/home/ubuntu/vagrant", create: true
 end
 
