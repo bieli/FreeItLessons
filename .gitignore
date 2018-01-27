@@ -118,3 +118,5 @@ pip-selfcheck.json
 pyvenv.cfg
 share/
 twisted/
+
+.vagrant

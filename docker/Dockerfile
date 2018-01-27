@@ -11,8 +11,6 @@ ENV DEBIAN_FRONTEND noninteractive
 
 ENV PYTHONIOENCODING=utf8
 
-ENV DJANGO_VERSION 1.10.4
-
 RUN apt-get update && apt-get install -y \
     python-setuptools \
     gcc \
@@ -25,19 +23,12 @@ RUN apt-get update && apt-get install -y \
     libffi-dev \
     libssl-dev \
     libpython3-dev \
+    libcurl4-openssl-dev \
 	--no-install-recommends && rm -rf /var/lib/apt/lists/*
-
-RUN dpkg-reconfigure locales && \
-    locale-gen C.UTF-8 && \
-    /usr/sbin/update-locale LANG=C.UTF-8
-
-ENV LC_ALL C.UTF-8
-
-RUN pip install mysqlclient psycopg2 django=="$DJANGO_VERSION"
 
 WORKDIR /usr/src/app
 COPY requirements.txt ./
-RUN pip install -r requirements.txt
+RUN pip3 install -r requirements.txt
 COPY . .
 
 EXPOSE 8000
