@@ -45,4 +45,11 @@ How to start developing new feature or fixing
 5. vagrant > $ docker build -f docker/Dockerfile  .
 6. vagrant > $ git add change-or-add-file && git commit -m "commit comment" && git push origin HEAD:new-futer-branch
 
-
+TODO:
+- [x] merging first pull requests
+- [x] creating README with screen shots
+- [x] creating vagrant wimage (with docker container) - ready env. for other developers
+- [ ] describe screen shots
+- [ ] more information about features (maybe youtube video !)
+- [ ] refactoring tasks in dedicated modules with unit tests
+- [ ] add unit tests and CI on travis
