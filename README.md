@@ -33,12 +33,12 @@ Screen shots with ready features
 Requirements
 ------------
 1. Linux or other operationg system
-2. Vagrant or Docker
+2. Docker or Vagrant (with Docker)
 
 Developing project using Docker
 ------
-docker build -t free-it-lessons:1.0 -f ./Dockerfile .
-docker run -p 8000:8000 -it free-it-lessons:1.0 python3 manage.py runserver 0.0.0.0:8000
+1. docker build -t free-it-lessons:1.0 -f ./Dockerfile .
+2. docker run -p 8000:8000 -it free-it-lessons:1.0 python3 manage.py runserver 0.0.0.0:8000
 
 Run web browser and open http://127.0.0.1:8000
 
