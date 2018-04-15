@@ -2,5 +2,4 @@
 
 /vagrant/ubuntu.sh
 /vagrant/docker.sh
-#/vagrant/provision.sh
-
+/vagrant/provision.sh

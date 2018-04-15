@@ -2,10 +2,8 @@
 
 {% load static %}
 {% load bootstrap3 %}
-{% load newrelic_tags %}
 {% bootstrap_javascript jquery=1 %}
 
-{% newrelic_browser_timing_header %}
 
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
@@ -106,6 +104,5 @@
 {% block bootstrap3_content %}
 
 {% endblock %}
-{% newrelic_browser_timing_footer %}
 
 

@@ -25,7 +25,7 @@ SECRET_KEY = '@j=t223ji9etm7a3xd1*n=ma@sfh##&$wl-z9%c#3-vqa%!%f41'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', '137.74.43.98', 'vps337737.ovh.net']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '137.74.43.98']
 
 
 # Application definition
@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     #'crispy_forms',
     #'contact_form_bootstrap',
     'adminsortable2',
-    'newrelic.extras.framework_django',
+    #'newrelic.extras.framework_django',
 ]
 
 MIDDLEWARE_CLASSES = [
