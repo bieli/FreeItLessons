@@ -31,7 +31,7 @@ cycler==0.10.0
 ddt==1.1.1
 decorator==4.0.9
 dj-database-url==0.4.1
-Django==1.8.17
+django>=1.11.19
 django-admin-sortable2==0.6.10
 django-appconf==1.0.2
 django-attachments==1.0.1
@@ -53,7 +53,7 @@ Django-Select2==4.3.2
 django-simple-menu==1.2.1
 django-taggit==0.18.3
 django-treebeard==4.1.0
-djangorestframework==3.5.3
+djangorestframework>=3.9.1
 docopt==0.6.2
 docutils==0.12
 dodgy==0.1.9
@@ -69,7 +69,7 @@ idna==2.1
 imagesize==0.7.1
 iso8601==0.1.11
 itsdangerous==0.24
-Jinja2==2.7.3
+Jinja2>=2.10.1
 jmespath==0.9.0
 jsonschema==2.5.1
 kazoo==2.2.1
@@ -87,7 +87,7 @@ nose-exclude==0.4.1
 nose-parameterized==0.3.5
 nose-progressive==1.5.1
 oauthlib==1.1.2
-paramiko==2.1.1
+paramiko>=2.1.6
 params==0.1.4
 parse==1.6.6
 parse-type==0.3.4
@@ -110,7 +110,7 @@ pyasn1==0.1.9
 pyasn1-modules==0.0.8
 pybitbucket==0.11.1
 pycparser==2.17
-pycrypto==2.6
+pycrypto==2.6.1
 pyflakes==1.0.0
 pylint==1.4.4
 pylint-celery==0.3
@@ -131,11 +131,11 @@ python-vagrant==0.5.14
 pytools==2016.2.1
 pytz==2016.3
 pyxdg==0.25
-PyYAML==3.11
+pyyaml>=4.2b1
 queuelib==1.4.2
 rednose==0.4.1
 request==0.0.2
-requests==2.13.0
+requests>=2.20.0
 requests-mock==1.1.0
 requests-toolbelt==0.6.2
 requirements-detector==0.4.1
