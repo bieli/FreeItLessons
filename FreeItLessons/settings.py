@@ -25,8 +25,7 @@ SECRET_KEY = '@j=t223ji9etm7a3xd1*n=ma@sfh##&$wl-z9%c#3-vqa%!%f41'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '137.74.43.98']
-
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '137.74.43.98', 'elearning.bieli.net', 'e-learning.bieli.net', 'learning.bieli.net']
 
 # Application definition
 
@@ -134,9 +133,9 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-#STATIC_ROOT = '/home/mbielak/Pulpit/internal/itclasses_panel/FreeItLessons' + STATIC_URL
+# STATIC_ROOT = '/home/mbielak/Pulpit/internal/itclasses_panel/FreeItLessons' + STATIC_URL
+# STATIC_ROOT = '/home/bieli/webapps/elearning_bieli_net/FreeItLessons/' + STATIC_URL
 STATIC_ROOT = '/home/dev/webapps/FreeItLessons' + STATIC_URL
-
 # Location of folders that will be added to static folder
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, "mainapp"),
