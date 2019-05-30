@@ -3,6 +3,8 @@ import os
 
 from pip._vendor.distlib.metadata import _get_name_and_version
 
+from FreeItLessons import settings
+
 
 class CodeBlock:
     UNIT_SEPARATOR = '# unit'
@@ -58,8 +60,6 @@ class CodeBlock:
 
 
 class CodeBlockRunner:
-    PYTHON_EXEC = '/usr/bin/python3.4'
-
     def __init__(self, code_block_obj):
         self.code_block_obj = code_block_obj
 
@@ -91,7 +91,7 @@ class CodeBlockRunner:
             result = 'ERR: 3'
 
         try:
-            cmd = "%s %s" % (self.PYTHON_EXEC, f.name)
+            cmd = "%s %s" % (settings.PYTHON_EXEC, f.name)
             p = Popen(cmd, shell=True, stdout=PIPE, stderr=PIPE)
             out, err = p.communicate()
             print("Return code: ", p.returncode)
@@ -122,7 +122,7 @@ class CodeBlockRunner:
 
 if __name__ == '__main__':
     from subprocess import Popen, PIPE
-    cmd = "python3.4 test003.py"
+    cmd = settings.PYTHON_EXEC + " test003.py"
     p = Popen(cmd, shell=True, stdout=PIPE, stderr=PIPE)
     out, err = p.communicate()
     print("Return code: ", p.returncode)

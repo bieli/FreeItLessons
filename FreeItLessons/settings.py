@@ -205,3 +205,4 @@ EMAIL_HOST_PASSWORD = ""
 #      'apptemplates.Loader',
 #  ]
 
+PYTHON_EXEC = '/usr/bin/python3.6'

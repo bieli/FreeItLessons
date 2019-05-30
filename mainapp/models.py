@@ -14,7 +14,7 @@ class Author(models.Model):
     name = models.CharField(max_length=64)
     surname = models.CharField(max_length=64)
     optional_email = models.EmailField(unique=True, null=True, blank=True)
-    author = models.ForeignKey(User, null=True, blank=True)
+    author = models.ForeignKey(User, null=True, blank=True, on_delete=models.DO_NOTHING)
     additional_info = models.TextField(max_length=256)
     image_link = models.CharField(max_length=256, null=True, blank=True)
     blog_link = models.CharField(max_length=256, null=True, blank=True)
@@ -47,7 +47,7 @@ class Content(models.Model):
     status = enum.EnumField(ContentType)
     value = models.TextField(max_length=4000)
     additional_text = models.CharField(max_length=512)
-    author = models.ForeignKey(Author, null=True, blank=True)
+    author = models.ForeignKey(Author, null=True, blank=True, on_delete=models.DO_NOTHING)
     #created_at = models.DateField(default=django.utils.timezone.now)
     #updated_at = AutoDateTimeField(default=django.utils.timezone.now)
 
@@ -67,7 +67,7 @@ class ChapterLevelType(enum.Enum):
 class Curiosity(models.Model):
     title = models.CharField(max_length=128)
     contents = models.ManyToManyField(Content)
-    author = models.ForeignKey(Author, null=True, blank=True)
+    author = models.ForeignKey(Author, null=True, blank=True, on_delete=models.DO_NOTHING)
 
     def __str__(self):
         return self.title
@@ -82,7 +82,7 @@ class Chapter(models.Model):
     sort_order = models.PositiveIntegerField(default=0, editable=False, db_index=True)
     level = enum.EnumField(ChapterLevelType)
     note = models.TextField(max_length=256)
-    author = models.ForeignKey(Author, null=True, blank=True)
+    author = models.ForeignKey(Author, null=True, blank=True, on_delete=models.DO_NOTHING)
     #created_at = models.DateField(default=django.utils.timezone.now)
     #updated_at = AutoDateTimeField(default=django.utils.timezone.now)
 
@@ -98,7 +98,7 @@ class Module(models.Model):
     title = models.CharField(max_length=128)
     comment = models.CharField(max_length=1024, blank=True)
     sort_order = models.PositiveIntegerField(default=0, editable=False, db_index=True)
-    author = models.ForeignKey(Author, null=True, blank=True)
+    author = models.ForeignKey(Author, null=True, blank=True, on_delete=models.DO_NOTHING)
     curiosities = models.ManyToManyField(Curiosity)
     achievements_desc = models.CharField(max_length=256, blank=True)
     is_enabled = models.BooleanField(default=False)
@@ -153,8 +153,8 @@ CONTENT_STATUS_TYPE_CHOICES = (
 )
 
 class ContentStatus(models.Model):
-    user = models.ForeignKey(User, null=False, blank=False)
-    content = models.ForeignKey(Content, null=False, blank=False)
+    user = models.ForeignKey(User, null=False, blank=False, on_delete=models.DO_NOTHING)
+    content = models.ForeignKey(Content, null=False, blank=False, on_delete=models.DO_NOTHING)
     status = models.CharField(max_length=4,
                               choices=CONTENT_STATUS_TYPE_CHOICES,
                               default=ContentStatusType.NEW)
@@ -212,8 +212,8 @@ class Task(models.Model):
 class TaskSolution(models.Model):
     MAX_HINT_NO = 5
 
-    task = models.ForeignKey(Task, null=False, blank=False)
-    user = models.ForeignKey(User, null=False, blank=False)
+    task = models.ForeignKey(Task, null=False, blank=False, on_delete=models.DO_NOTHING)
+    user = models.ForeignKey(User, null=False, blank=False, on_delete=models.DO_NOTHING)
     is_finished = models.BooleanField(default=False)
     suggestions_count = models.PositiveIntegerField(default=0, blank=False, null=False)
     solution_code_block = models.TextField(max_length=4000)
@@ -225,12 +225,17 @@ class TaskSolution(models.Model):
     def save_or_update(task_id, user_id, is_finished, hint_id):
         try:
             ts = TaskSolution.objects.filter(task_id__exact=task_id, user_id__exact=user_id).get()
-        except:
+        except Exception as err:
             ts = TaskSolution()
             ts.user_id = int(user_id)
             ts.task_id = int(task_id)
+
+        if hint_id > 0:
             ts.hint_id = hint_id
+        if is_finished:
             ts.is_finished = is_finished
+
+        print("ts:", ts)
 
         if ts:
             # TODO: what ifthere no record in DB
@@ -242,5 +247,10 @@ class TaskSolution(models.Model):
                     ts.is_surrender = True
                 else:
                     ts.is_surrender = False
+            else:
+                ts.suggestions_count = 0
             ts.save()
 
+    def __str__(self):
+        return 'TaskSolution(user_id: {}, task_id: {}, is_finished: {})'\
+            .format(self.user_id, self.task_id, self.is_finished)

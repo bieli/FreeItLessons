@@ -14,6 +14,7 @@ from django.db.models.fields.files import FieldFile
 from django.views.generic.base import View, TemplateView
 import time
 
+from FreeItLessons import settings
 from mainapp.models import User, Author, Module, Chapter, Content, \
     ContentStatusType, ContentStatus, Faq, Task, TaskSolution
 
@@ -256,6 +257,7 @@ class TaskCodeRunView(View):
         # print("Return code: ", p.returncode)
         # print(out.rstrip(), err.rstrip())
         result = ''
+        returncode = -1
         main = """
 # main
 if __name__ == '__main__':
@@ -281,10 +283,11 @@ if __name__ == '__main__':
                 result = "Unexpected instructions !\nPlease rewrite your code and run again !"
             else:
                 try:
-                    cmd = "%s %s" % ("/usr/bin/python3.4", tmp_filename)
+                    cmd = "%s %s" % (settings.PYTHON_EXEC, tmp_filename)
                     p = Popen(cmd, shell=True, stdout=PIPE, stderr=PIPE)
                     out, err = p.communicate()
-                    print("Return code: ", p.returncode)
+                    returncode = p.returncode
+                    # print("Return code: ", p.returncode)
                     # print("Result from Python: ", out.rstrip(), err.rstrip())
                     result = out.rstrip() + err.rstrip()
                 except:
@@ -297,7 +300,7 @@ if __name__ == '__main__':
 
                 result = self._prepare_result(result, tmp_filename)
 
-        return result
+        return result, returncode
 
     def post(self, request):
         if not request.user.is_authenticated():
@@ -321,7 +324,7 @@ if __name__ == '__main__':
             task_id = request.POST.get('task_id', None)
             # print('task_id: {}'.format(task_id))
             hint_id = int(request.POST.get('hint_id', 0))
-            print('hint_id: {}'.format(hint_id))
+            # print('hint_id: {}'.format(hint_id))
             codeb64 = request.POST.get('code', None)
             code = base64.decodebytes(bytes(codeb64.encode(content_type)))
             # print('code: {}'.format(code))
@@ -329,10 +332,13 @@ if __name__ == '__main__':
             tests = base64.decodebytes(bytes(testsb64.encode(content_type)))
             # print('tests: {}'.format(tests))
 
-            result = self.run_python_code(code, task_id, tests, user_id)
+            result, returncode = self.run_python_code(code, task_id, tests, user_id)
+            # print('returncode: ', type(returncode))
+            # print('returncode: ', returncode)
             is_finished = False
-            if type(result) == int and result == 0:
+            if isinstance(returncode, int) and returncode == 0:
                 is_finished = True
+            # print('is_finished: ', is_finished)
             TaskSolution.save_or_update(task_id, user_id, is_finished, hint_id)
         else:
             # print('user NOT EXISTS')
@@ -448,9 +454,49 @@ class AchievementsView(TemplateView):
     def get_context_data(self, **kwargs):
         tasks_achievements = []
         tasks = Task.objects.select_related().filter(is_visible=True)
-        # print(tasks)
+        print('tasks: ', tasks)
+        print('self.request.user.id: ', self.request.user.id)
         points_summary = 0
         max_points_summary = 0
+
+        '''
+        query = """
+        SELECT
+            ts.id as id,
+            t.name as task_name,
+            ts.user_id as user_id,
+            SUM(t.points - ts.suggestions_count) as summary,
+            t.points as max_points,
+            ts.suggestions_count,
+            ts.task_id as task_id
+        FROM mainapp_tasksolution as ts
+        JOIN mainapp_task as t
+        ON (t.id == ts.task_id)
+        WHERE ts.user_id={}
+        AND ts.is_finished=1
+        AND ts.task_id IN ({});
+        """.format(self.request.user.id,
+                   ','.join([str(task.id) for task in tasks]))
+
+        # print("query:", query)
+        achievements = TaskSolution.objects.raw(query)
+        for achievement in achievements:
+            print("achievement: ", achievement)
+            print("achievement.summary: ", achievement.summary)
+            if achievement.summary is None:
+                continue
+            print("achievement for task_id: {} - summary: {}"
+                  .format(achievement.task_id, achievement.summary))
+            tasks_achievements.append({
+                "task_id": achievement.task_id,
+                "summary": achievement.summary,
+                "task_name": achievement.task_name,
+                "max_points": achievement.max_points
+            })
+            points_summary += achievement.summary
+            max_points_summary += achievement.max_points
+        '''
+
         for task in tasks:
             query = """
             SELECT
@@ -460,20 +506,24 @@ class AchievementsView(TemplateView):
                 SUM(t.points - ts.suggestions_count) as summary,
                 t.points as max_points,
                 ts.suggestions_count,
-                ts.task_id as task_id
+                ts.task_id as task_id,
+                ts.is_finished as is_finished
             FROM mainapp_tasksolution as ts
             JOIN mainapp_task as t
             ON (t.id == ts.task_id)
-            WHERE ts.user_id=1 AND ts.task_id={};
-            """.format(task.id)
+            WHERE ts.user_id={} AND ts.task_id={};
+            """.format(self.request.user.id, task.id)
+
+            # print("query:", query)
             achievements = TaskSolution.objects.raw(query)
-            summary = achievements[0].summary
+            summary = achievements[0].summary if achievements[0].is_finished else 0
             if summary is None:
                 continue
-            # print("achievements for task_id: {} - summary: {}".format(task.id, summary))
+            print("achievements for task_id: {} - summary: {}".format(task.id, summary))
             tasks_achievements.append({
                 "task_id": task.id,
                 "summary": summary,
+                "is_finished": achievements[0].is_finished,
                 "task_name": achievements[0].task_name,
                 "max_points": achievements[0].max_points
             })
@@ -482,7 +532,14 @@ class AchievementsView(TemplateView):
         return {'tasks_achievements': tasks_achievements,
                 "points_summary": points_summary,
                 "max_points_summary": max_points_summary,
-                "points_percents": "%d" % ((points_summary / max_points_summary) * 100)}
+                "points_percents": "%d" % (self._calc_summary(points_summary, max_points_summary))}
+
+    def _calc_summary(self, points_summary, max_points_summary):
+        try:
+            return (points_summary / max_points_summary) * 100
+        except ZeroDivisionError:
+            return 0
+
 
 
 class LearnerSupportView(TemplateView):

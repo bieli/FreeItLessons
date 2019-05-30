@@ -21,7 +21,7 @@
   }
   ul.myul, ul.myul li, ul.myul li span {
     margin: 0.3em;
-    padding: 0.2em;
+    padding: 0.4em;
     list-style-type: none;
   }
   ul.myul li span {
@@ -47,20 +47,36 @@
           <h3 class="tech-font">
             Lista zadań oraz punktów przyznanych za ich rozwiązanie
           </h3>
+                <br />
             <p>
+
+                <b style="font-size: 22px; color: green;">
+                    Liczba zdobytych punktów: <span style="font-size: 34px">{{ points_summary }} -- {{ points_percents }} %</span>
+                    <small style="color: gray;">(max. {{ max_points_summary }})</small>
+                </b>
                 <ul class="myul">
                 {% for ta in tasks_achievements %}
                     <li>
-                        <a href="/zadania/{{ ta.task_id }}.html">{{ ta.task_name }}</a> <span class="glyphicon"></span> <b>{{ ta.summary }}</b> <small>(max. {{ ta.max_points }})</small>
+                        {% if ta.is_finished %}
+                            <span style="color: green; font-size: 34px;">✓</span>
+                        {% else %}
+                            <span style="color: red; font-size: 34px;">✕</span>
+                        {% endif %}
+                        <a href="/zadania/{{ ta.task_id }}.html" style="font-size: 20px">{{ ta.task_name }}</a> <span class="glyphicon"></span>
+                        <b>
+                        {% if ta.is_finished %}
+                            {{ ta.summary }}
+                        {% else %}
+                            0
+                        {% endif %}
+                        </b>
+                        <span>(max. {{ ta.max_points }})</span>
                     </li>
                 {% empty %}
-                    <div class="text-warning" style="padding: 20px;">Nie dodano żadnego zadania. Opublikujemy niebawem :-)</div>
+                    <div class="text-warning" style="padding: 20px;">Nie dodano żadnego zadania lub nie udało się rozwiązać. Opublikujemy niebawem :-) ew. spróbuj swoich sił w kodowaniu :-)</div>
                 {% endfor %}
                 </ul>
             </p>
-                <p>
-                    Liczba zdobytych punktów: {{ points_summary }} (max. {{ max_points_summary }}) - {{ points_percents }} %
-                </p>
          </div>
     </div>
 </div>
