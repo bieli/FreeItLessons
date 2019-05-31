@@ -205,3 +205,4 @@ EMAIL_HOST_PASSWORD = ""
 #  ]
 
 PYTHON_EXEC = '/usr/bin/python3.6'
+# PYTHON_EXEC = '/usr/local/bin/python3.6'
