@@ -14,7 +14,6 @@ bunch==1.0.1
 cachetools==1.1.6
 celery==4.0.2
 cffi==1.9.1
-chardet==2.3.0
 checkbox-ng==0.3
 checkbox-support==0.2
 click==6.3
@@ -38,16 +37,15 @@ django-attachments==1.0.1
 django-bootstrap-form==3.2
 django-bootstrap3==11.0.0
 django-classy-tags==0.8.0
-django-cms==3.4.1
+# django-cms==3.4.1
 django-dedal==1.0.2
 django-enumfield==1.5
-django-filer==1.2.5
 django-formtools==1.0
 django-lineage==0.2.0
 django-modelcluster==2.0
 django-mptt==0.8.6
 django-pgcrypto==1.4.0
-django-polymorphic==0.8.1
+django-polymorphic>=2.0
 django-sekizai==0.10.0
 Django-Select2==4.3.2
 django-simple-menu==1.2.1
@@ -65,7 +63,6 @@ fudge==1.1.0
 funky==0.0.2
 future==0.15.2
 httplib2==0.8
-idna==2.1
 imagesize==0.7.1
 iso8601==0.1.11
 itsdangerous==0.24
@@ -110,7 +107,7 @@ pyasn1==0.1.9
 pyasn1-modules==0.0.8
 pybitbucket==0.11.1
 pycparser==2.17
-#pycrypto==2.6.1
+# pycrypto==2.6.1
 pyflakes==1.0.0
 pylint==1.4.4
 pylint-celery==0.3

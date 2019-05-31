@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 """
 
 import os
+import socket
+
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -38,12 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'bootstrap3',
     'mainapp',
-    #'menu',
     'lineage',
-    #'crispy_forms',
-    #'contact_form_bootstrap',
     'adminsortable2',
-    #'newrelic.extras.framework_django',
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -87,7 +85,13 @@ DATABASES = {
     }
 }
 
-
+if 'webfaction' in socket.gethostname():
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'db.PROD.sqlite3'),
+        }
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators
@@ -205,4 +209,6 @@ EMAIL_HOST_PASSWORD = ""
 #  ]
 
 PYTHON_EXEC = '/usr/bin/python3.6'
-# PYTHON_EXEC = '/usr/local/bin/python3.6'
+
+if 'webfaction' in socket.gethostname():
+    PYTHON_EXEC = '/usr/local/bin/python3.6'

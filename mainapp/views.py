@@ -528,7 +528,8 @@ class AchievementsView(TemplateView):
                 "max_points": achievements[0].max_points
             })
             points_summary += summary
-            max_points_summary += achievements[0].max_points
+            if achievements[0].max_points is not None:
+                max_points_summary += achievements[0].max_points
         return {'tasks_achievements': tasks_achievements,
                 "points_summary": points_summary,
                 "max_points_summary": max_points_summary,
