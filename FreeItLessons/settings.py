@@ -138,8 +138,11 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 # STATIC_ROOT = '/home/mbielak/Pulpit/internal/itclasses_panel/FreeItLessons' + STATIC_URL
-# STATIC_ROOT = '/home/bieli/webapps/elearning_bieli_net/FreeItLessons/' + STATIC_URL
 STATIC_ROOT = '/home/dev/webapps/FreeItLessons' + STATIC_URL
+
+if 'webfaction' in socket.gethostname():
+  STATIC_ROOT = '/home/bieli/webapps/elearning_bieli_net/FreeItLessons/' + STATIC_URL
+
 # Location of folders that will be added to static folder
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, "mainapp"),
