@@ -27,7 +27,7 @@ coveralls==0.4.2
 cryptography>=2.1.4
 cssselect==0.9.1
 cycler==0.10.0
-ddt==1.1.1
+ddt==1.2.1
 decorator==4.0.9
 dj-database-url==0.4.1
 django==1.11.20

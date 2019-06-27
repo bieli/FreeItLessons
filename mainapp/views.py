@@ -19,7 +19,7 @@ from mainapp.models import User, Author, Module, Chapter, Content, \
     ContentStatusType, ContentStatus, Faq, Task, TaskSolution
 
 from django.http import HttpResponse, HttpResponseBadRequest
-
+from mainapp.utils import TaskCodeRun
 
 class FakeField(object):
     storage = default_storage
@@ -127,7 +127,7 @@ class TaskPageView(TemplateView):
         for assert_line in str(tests_code).split("\n"):
             if 'assert ' in assert_line:
                 asserts.append(assert_line.strip())
-        print("asserts:", asserts)
+        # print("asserts:", asserts)
         return asserts
 
     def get_context_data(self, **kwargs):
@@ -202,45 +202,6 @@ class ContetUserStatusView(View):
 
 
 class TaskCodeRunView(View):
-    def _security_check(self, result):
-        if 'input' in result:
-            return False
-
-        if 'bytes(' in result:
-            return False
-
-        if 'raw_input' in result:
-            return False
-
-        if 'import ' in result:
-            return False
-
-        if ' loader' in result:
-            return False
-
-        if 'open(' in result:
-            return False
-
-        if 'write(' in result:
-            return False
-
-        if '/proc/' in result:
-            return False
-
-        if 'process' in result:
-            return False
-
-        if 'subprocess' in result:
-            return False
-
-        if 'os.' in result:
-            return False
-
-        if 'sys.' in result:
-            return False
-
-        return True
-
     def _prepare_result(self, result, tmp_filename, replaced_filename='program.py'):
         result = result.decode("utf-8")
         result = result.replace(tmp_filename, replaced_filename)
@@ -279,7 +240,9 @@ if __name__ == '__main__':
             tmpfile.close()
 
             result = ''
-            if not self._security_check(str(code)):
+            is_code_block_secure = TaskCodeRun.is_code_block_secure(code)
+            print("is_code_block_secure: ", is_code_block_secure, ' code: ', code)
+            if is_code_block_secure is False:
                 result = "Unexpected instructions !\nPlease rewrite your code and run again !"
             else:
                 try:
@@ -356,7 +319,7 @@ class TaskCodeHintView(View):
             return HttpResponseBadRequest()
 
         user_id = request.POST.get('user_id', None)
-        print('user_id: {}'.format(user_id))
+        # print('user_id: {}'.format(user_id))
 
         user_obj = User.objects.filter(id__iexact=user_id)
         if user_obj.exists():
@@ -367,11 +330,11 @@ class TaskCodeHintView(View):
                 return HttpResponseBadRequest('wrong auth user in request')
 
             content_type = request.META['CONTENT_TYPE'].replace('application/x-www-form-urlencoded; charset=', '')
-            print('content_type: {}'.format(content_type))
+            # print('content_type: {}'.format(content_type))
             task_id = request.POST.get('task_id', None)
-            print('task_id: {}'.format(task_id))
+            # print('task_id: {}'.format(task_id))
             hint_id = int(request.POST.get('hint_id', 0))
-            print('hint_id: {}'.format(hint_id))
+            # print('hint_id: {}'.format(hint_id))
 
             if hint_id > TaskSolution.MAX_HINT_NO:
                 return HttpResponseBadRequest('Unexpected (too high) hint_id !')
@@ -385,7 +348,7 @@ class TaskCodeHintView(View):
             # result = Task.objects.filter(id__exact=task_id).values(field_name)
             is_finished = False
             TaskSolution.save_or_update(task_id, user_id, is_finished, hint_id)
-            print("result: {}".format(result))
+            # print("result: {}".format(result))
         else:
             # print('user NOT EXISTS')
             return HttpResponseBadRequest('user NOT EXISTS')
@@ -454,8 +417,8 @@ class AchievementsView(TemplateView):
     def get_context_data(self, **kwargs):
         tasks_achievements = []
         tasks = Task.objects.select_related().filter(is_visible=True)
-        print('tasks: ', tasks)
-        print('self.request.user.id: ', self.request.user.id)
+        # print('tasks: ', tasks)
+        # print('self.request.user.id: ', self.request.user.id)
         points_summary = 0
         max_points_summary = 0
 
@@ -519,7 +482,7 @@ class AchievementsView(TemplateView):
             summary = achievements[0].summary if achievements[0].is_finished else 0
             if summary is None:
                 continue
-            print("achievements for task_id: {} - summary: {}".format(task.id, summary))
+            # print("achievements for task_id: {} - summary: {}".format(task.id, summary))
             tasks_achievements.append({
                 "task_id": task.id,
                 "summary": summary,
