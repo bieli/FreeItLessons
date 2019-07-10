@@ -70,13 +70,15 @@ class ContentStatusAdmin(admin.ModelAdmin):
         #media_url = getattr(settings, 'MEDIA_URL', '/media')
         js = [ 'https://www.gstatic.com/charts/loader.js', '/static/admin/js/content_status_stats.js' ]
 
+
 @admin.register(Faq)
 class SortableFaqAdmin(SortableAdminMixin, admin.ModelAdmin):
     list_display = ('question',)
 
 
-class TaskAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'is_visible', 'level', 'points',)
+@admin.register(Task)
+class SortableTaskAdmin(SortableAdminMixin, admin.ModelAdmin):
+    list_display = ('name', 'is_visible', 'level', 'points',)
 
 
 class TaskSolutionAdmin(admin.ModelAdmin):
@@ -87,9 +89,6 @@ admin.site.register(Author, AuthorAdmin)
 admin.site.register(Module)
 admin.site.register(Chapter)
 admin.site.register(Content)
-admin.site.register(Task, TaskAdmin)
 admin.site.register(TaskSolution, TaskSolutionAdmin)
 admin.site.register(Curiosity, CuriosityAdmin)
 admin.site.register(ContentStatus, ContentStatusAdmin)
-#admin.site.register(Faq, FaqAdmin)
-

@@ -115,7 +115,7 @@ class TasksPageView(TemplateView):
     template_name = 'mainapp/tasks.html'
 
     def get_context_data(self, **kwargs):
-        tasks = Task.objects.select_related().filter(is_visible=True)
+        tasks = Task.objects.order_by('my_order').select_related().filter(is_visible=True)
         return {'tasks': tasks}
 
 
@@ -132,7 +132,7 @@ class TaskPageView(TemplateView):
 
     def get_context_data(self, **kwargs):
         task_id = kwargs['task_id']
-        task_instance = Task.objects.filter(id=task_id).get()
+        task_instance = Task.objects.order_by('my_order').filter(id=task_id).get()
         return {'task': task_instance,
                 'asserts': self._get_asserts_from_tests_code(task_instance.tests)
         }
@@ -341,11 +341,11 @@ class TaskCodeHintView(View):
 
             field_name = 'suggestion_' + str(hint_id)
             # Employees.objects.only('eng_name')
-            result = Task.objects.filter(id__exact=task_id).values('suggestion_' + str(hint_id))
+            result = Task.objects.order_by('my_order').filter(id__exact=task_id).values('suggestion_' + str(hint_id))
             if result and len(result):
                 # print(result)
                 result = result[0]['suggestion_' + str(hint_id)]
-            # result = Task.objects.filter(id__exact=task_id).values(field_name)
+            # result = Task.objects.order_by('my_order').filter(id__exact=task_id).values(field_name)
             is_finished = False
             TaskSolution.save_or_update(task_id, user_id, is_finished, hint_id)
             # print("result: {}".format(result))
@@ -416,7 +416,7 @@ class AchievementsView(TemplateView):
 
     def get_context_data(self, **kwargs):
         tasks_achievements = []
-        tasks = Task.objects.select_related().filter(is_visible=True)
+        tasks = Task.objects.order_by('my_order').select_related().filter(is_visible=True)
         # print('tasks: ', tasks)
         # print('self.request.user.id: ', self.request.user.id)
         points_summary = 0
