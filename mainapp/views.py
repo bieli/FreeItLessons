@@ -218,6 +218,7 @@ class TaskCodeRunView(View):
         # print("Return code: ", p.returncode)
         # print(out.rstrip(), err.rstrip())
         result = ''
+        tmp_code_block_encoding = 'latin-1'
         returncode = -1
         main = """
 # main
@@ -229,9 +230,9 @@ if __name__ == '__main__':
         tmp_filename = "/tmp/{}-{}-{}-{}".format(user_id, task_id, time.time(), hash)
         # tmp_filename = "{}/tmp/{}-{}-{}-{}".format(settings.STATIC_ROOT, user_id, task_id, time.time(), hash)
         with open(tmp_filename, 'w+') as tmpfile:
-            tmpfile.write(code.decode('latin-1'))
+            tmpfile.write(code.decode(tmp_code_block_encoding))
             tmpfile.write("\n\n")
-            tmpfile.write(tests.decode('latin-1'))
+            tmpfile.write(tests.decode(tmp_code_block_encoding))
             tmpfile.write("\n\n")
             tmpfile.write(main)
             tmpfile.write("\n\n")
@@ -262,6 +263,14 @@ if __name__ == '__main__':
                 #     pass
 
                 result = self._prepare_result(result, tmp_filename)
+
+                if int(returncode) == 0:
+                    ts_obj, created = TaskSolution.objects.update_or_create(
+                        user=User.objects.get(id=user_id),
+                        task=Task.objects.get(id=task_id)
+                    )
+                    ts_obj.solution_code_block = code.decode(tmp_code_block_encoding)
+                    ts_obj.save()
 
         return result, returncode
 
