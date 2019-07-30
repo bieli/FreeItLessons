@@ -227,8 +227,9 @@ if __name__ == '__main__':
 # main
         """
         hash = hashlib.sha1(bytes(code)).hexdigest()
-        tmp_filename = "/tmp/{}-{}-{}-{}".format(user_id, task_id, time.time(), hash)
-        # tmp_filename = "{}/tmp/{}-{}-{}-{}".format(settings.STATIC_ROOT, user_id, task_id, time.time(), hash)
+        tmp_filename = "{}{}-{}-{}-{}".format(
+            settings.TEMP_SOLUTION_CODE_BLOCK, user_id, task_id, time.time(), hash
+        )
         with open(tmp_filename, 'w+') as tmpfile:
             tmpfile.write(code.decode(tmp_code_block_encoding))
             tmpfile.write("\n\n")

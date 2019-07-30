@@ -213,5 +213,8 @@ EMAIL_HOST_PASSWORD = ""
 
 PYTHON_EXEC = '/usr/bin/python3.6'
 
+TEMP_SOLUTION_CODE_BLOCK = '/tmp/'
+
 if 'webfaction' in socket.gethostname():
     PYTHON_EXEC = '/usr/local/bin/python3.6'
+    TEMP_SOLUTION_CODE_BLOCK = '/home/bieli/tmp/'
