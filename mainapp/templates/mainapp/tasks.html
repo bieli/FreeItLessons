@@ -29,19 +29,28 @@
 			</h3>
 
             <div class="row">
-                {% for task in tasks %}
-                    <div class="col-md-12">
-                        <div class="caption" style="padding: 10px;">
-                            <h4>
-                                <!-- {{ task.id }}) --> <a href="/zadania/{{ task.id }}.html">{{ task.name }}</a> <small>za {{ task.points }} punktów</small>
-                            </h4>
-                            <p>
-                            </p>
-                        </div>
-                    </div>
-                {% empty %}
-                    <div class="text-warning" style="padding: 20px;">Nie dodano żadnego zadania. Opublikujemy niebawem :-)</div>
-                {% endfor %}
+				<div class="col-md-12">
+					<div class="caption" style="padding: 10px;">
+						<div>
+							<h4><small>[ilość punktów do zdobycia (☆ - nierozwiązane, <span style="color: green;">★</span> - rozwiązne) nazwa zadania]</small></h4>
+						</div>
+						<p>
+						</p>
+					</div>
+					{% for task in tasks %}
+						<div class="caption" style="padding: 10px;">
+							<h4>{{ task.points }}
+							{% if task.task_solution.is_finished %}
+								<span style="color: green;">★</span>
+							{% else %}
+								☆
+							{% endif %}
+							<a href="/zadania/{{ task.id }}.html">{{ task.name }}</a></h4>
+						</div>
+					{% empty %}
+						<div class="text-warning" style="padding: 20px;">Nie dodano żadnego zadania. Opublikujemy niebawem :-)</div>
+					{% endfor %}
+				</div>
             </div>
 		</div>
 		<div class="col-md-4">

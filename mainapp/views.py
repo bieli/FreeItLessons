@@ -115,7 +115,15 @@ class TasksPageView(TemplateView):
     template_name = 'mainapp/tasks.html'
 
     def get_context_data(self, **kwargs):
-        tasks = Task.objects.order_by('my_order').select_related().filter(is_visible=True)
+        tasks_data = Task.objects.order_by('my_order').select_related().filter(is_visible=True)
+        tasks = []
+        for task in tasks_data:
+                tasks.append({
+                    'id': task.id,
+                    'points': task.points,
+                    'name': task.name,
+                    'task_solution': TaskSolution.objects.get(task_id=task.id)
+                })
         return {'tasks': tasks}
 
 
