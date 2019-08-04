@@ -9,6 +9,7 @@ import tempfile
 import django
 from django.core.files.storage import default_storage
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 from django.db.models.fields.files import FieldFile
 from django.views.generic.base import View, TemplateView
@@ -111,7 +112,7 @@ class CourseDetailPageView(TemplateView):
                 'contents_id': contents_id}
 
 
-class TasksPageView(TemplateView):
+class TasksPageView(LoginRequiredMixin, TemplateView):
     template_name = 'mainapp/tasks.html'
 
     def get_context_data(self, **kwargs):
@@ -122,7 +123,7 @@ class TasksPageView(TemplateView):
                     'id': task.id,
                     'points': task.points,
                     'name': task.name,
-                    'task_solution': TaskSolution.objects.get(task_id=task.id)
+                    'task_solution': TaskSolution.objects.get(task_id=task.id, user_id=self.request.user.id),
                 })
         return {'tasks': tasks}
 
