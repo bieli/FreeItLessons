@@ -123,4 +123,6 @@ twisted/
 static/*
 static/*/*
 static/*/*/*
+db.PROD.sqlite3
+db.sqlite3.last
 
