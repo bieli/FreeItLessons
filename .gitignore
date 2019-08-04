@@ -120,3 +120,7 @@ share/
 twisted/
 
 .vagrant
+static/*
+static/*/*
+static/*/*/*
+
