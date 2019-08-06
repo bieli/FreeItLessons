@@ -204,7 +204,7 @@ class Task(models.Model):
     #created_by: relatet to User
     #reviewd_at: datetime
     #reviewd_by: relatet to User
-    my_order = models.PositiveIntegerField(default=0, blank=False, null=False)
+    my_order = models.PositiveIntegerField(default=1, blank=False, null=False)
 
     class Meta(object):
         ordering = ('my_order',)
