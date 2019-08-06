@@ -119,11 +119,16 @@ class TasksPageView(LoginRequiredMixin, TemplateView):
         tasks_data = Task.objects.order_by('my_order').select_related().filter(is_visible=True)
         tasks = []
         for task in tasks_data:
+                try:
+                    task_solution = TaskSolution.objects.get(task_id=task.id, user_id=self.request.user.id)
+                except TaskSolution.DoesNotExist:
+                    task_solution = None
+
                 tasks.append({
                     'id': task.id,
                     'points': task.points,
                     'name': task.name,
-                    'task_solution': TaskSolution.objects.get(task_id=task.id, user_id=self.request.user.id),
+                    'task_solution': task_solution,
                 })
         return {'tasks': tasks}
 
