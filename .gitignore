@@ -120,3 +120,5 @@ share/
 twisted/
 
 .vagrant
+
+db.sqlite3
