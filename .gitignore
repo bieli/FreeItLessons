@@ -120,5 +120,9 @@ share/
 twisted/
 
 .vagrant
-
+static/*
+static/*/*
+static/*/*/*
 db.sqlite3
+db.PROD.sqlite3
+db.sqlite3.last

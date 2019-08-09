@@ -21,41 +21,55 @@ ul.nav a, a,navbar-brand {
   font-family: 'Share Tech', sans-serif;
   color: #5f58f6;
 }
+
+.navbar-toggler {
+    width: 1.5em;
+    height: 1.5em;
+    margin: 10px 10px 10px 10px;
+    padding: 0;
+    float: right;
+    background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(167, 167, 167, 0.7)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 8h24M4 16h24M4 24h24'/%3E%3C/svg%3E");
+}
 </style>
 
 <div class="container-fluid">
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="navbar-header">
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
       <a class="navbar-brand" href="/">Start</a>
     </div>
-    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-      <ul class="nav navbar-nav">
-        <li><a href="/faq.html" class="modula-font active">Pytania i odpowiedzi</a></li>
-        <li><a href="/mentorzy.html" class="modula-font active">Mentorzy</a></li>
-        <li><a href="/kursy.html" class="modula-font active">Kursy</a></li>
-{% if user.is_authenticated %}
-        <li><a href="/zadania.html" class="modula-font active">Zadania</a></li>
-{% endif %}
+
+    <a class="navbar-brand" href="#"></a>
+    <div class="collapse navbar-collapse" id="navbarNavDropdown">
+        <ul class="nav navbar-nav">
+          <li><a href="/faq.html" class="modula-font active">Pytania i odpowiedzi</a></li>
+          <li><a href="/mentorzy.html" class="modula-font active">Mentorzy</a></li>
+          <li><a href="/kursy.html" class="modula-font active">Kursy</a></li>
+  {% if user.is_authenticated %}
+          <li><a href="/zadania.html" class="modula-font active">Zadania</a></li>
+  {% endif %}
+        </ul>
+      <ul class="nav navbar-nav pull-right">
+  {% if user.is_authenticated %}
+          <li class="dropdown">
+              <a href="#" class="dropdown-toggle active" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+  Zalogowany <b>{{ user.get_username }}</b><span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                  <li><a href="/admin/password_change/">Zmień hasło</a></li>
+                  <li><a href="/opinions/">Moje oceny kursu</a></li>
+                  <li><a href="/achievements/">Osiągnięcia</a></li>
+              </ul>
+          </li>
+          <li class=""><a href="/admin/logout/">Wyloguj</a></li>
+    <input type="hidden" name="logged-user-id" value="{{ user.id }}" />
+    {% csrf_token %}
+  {% else %}
+          <li class="">  <a href="/admin/login/?next=/">Zaloguj się</a></li>
+    <input type="hidden" name="logged-user-id" value="" />
+  {% endif %}
       </ul>
-    <ul class="nav navbar-nav pull-right">
-{% if user.is_authenticated %}
-        <li class="dropdown">
-            <a href="#" class="dropdown-toggle active" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-Zalogowany <b>{{ user.get_username }}</b><span class="caret"></span></a>
-            <ul class="dropdown-menu">
-                <li><a href="/admin/password_change/">Zmień hasło</a></li>
-                <li><a href="/opinions/">Moje oceny kursu</a></li>
-                <li><a href="/achievements/">Osiągnięcia</a></li>
-            </ul>
-        </li>
-        <li class=""><a href="/admin/logout/">Wyloguj</a></li>
-  <input type="hidden" name="logged-user-id" value="{{ user.id }}" />
-  {% csrf_token %}
-{% else %}
-        <li class="">  <a href="/admin/login/?next=/">Zaloguj się</a></li>
-  <input type="hidden" name="logged-user-id" value="" />
-{% endif %}
-    </ul>
-
     </div>
-  </div>
-
+  </nav>
+</div>
