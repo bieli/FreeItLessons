@@ -224,9 +224,10 @@ class TaskSolution(models.Model):
     solution_additional_tests_code_block = models.TextField(max_length=4000, blank=False, null=False)
     student_comments = models.TextField(max_length=256, blank=False, null=False)
     is_surrender = models.BooleanField(default=False)
+    time_spent_seconds = models.PositiveIntegerField(null=False, default=0)
 
     @staticmethod
-    def save_or_update(task_id, user_id, is_finished, hint_id):
+    def save_or_update(task_id, user_id, is_finished, hint_id, time_spent_seconds=1):
         try:
             ts = TaskSolution.objects.filter(task_id__exact=task_id, user_id__exact=user_id).get()
         except Exception as err:
@@ -242,8 +243,11 @@ class TaskSolution(models.Model):
         print("ts:", ts)
 
         if ts:
+            ts.time_spent_seconds = time_spent_seconds
+
             # TODO: what ifthere no record in DB
             print("ts: {}".format(ts))
+
             if hint_id > 0:
                 if hint_id > ts.suggestions_count:
                     ts.suggestions_count = hint_id
@@ -256,5 +260,5 @@ class TaskSolution(models.Model):
             ts.save()
 
     def __str__(self):
-        return 'TaskSolution(user_id: {}, task_id: {}, is_finished: {})'\
-            .format(self.user_id, self.task_id, self.is_finished)
+        return 'TaskSolution(user_id: {}, task_id: {}, is_finished: {}, time_spent_seconds: {})'\
+            .format(self.user_id, self.task_id, self.is_finished, self.time_spent_seconds)

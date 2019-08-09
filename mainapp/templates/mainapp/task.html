@@ -18,6 +18,7 @@
 
 <script src="/static/mainapp/js/jquery-1.11.1.min.js"></script>
 <script language="Javascript" type="text/javascript" src="/static/mainapp/js/jquery.base64.min.js"></script>
+<script language="Javascript" type="text/javascript" src="/static/mainapp/js/easytimer/easytimer.js"></script>
 <script>
   $.noConflict();
   jQuery( document ).ready(function( $ ) {
@@ -112,7 +113,8 @@
 
     var myEvent = { user_id: logged_user_id, task_id: task_id, csrfmiddlewaretoken: '{{ csrf_token }}',
                     code: $.base64.encode(code), hint_id: hint_id,
-                    tests: $.base64.encode($("#source_tests_block pre code").text())
+                    tests: $.base64.encode($("#source_tests_block pre code").text()),
+                    timer: $('#timerHtml').text()
     };
     console.log("myEvent:", myEvent)
     $.ajax({
@@ -170,7 +172,9 @@
             });
         } else {
             if (assertion_obj !== 'undefined') {
-                assertion = $.trim(assertion_obj[0]);
+                if (assertion_obj && assertion_obj.length > 0) {
+                    var assertion = $.trim(assertion_obj[0]);
+                }
                 $('#asserts_list blockquote').each(function() {
                     assertion_block = $.trim($(this).text());
                     //console.log("assertion", assertion);
@@ -231,6 +235,13 @@
     });
 
     postDataIntoServiceEndpoint("{{ task.id }}", "status");
+
+    var timerInstance = new easytimer.Timer();
+    timerInstance.start();
+    timerInstance.addEventListener('secondsUpdated', function (e) {
+        var timeFormated = timerInstance.getTimeValues().toString();
+        $('#timerHtml').html(timeFormated);
+    });
 });
 </script>
 
@@ -341,6 +352,9 @@ if __name__ == '__main__':
 		<div class="col-md-1">
             &nbsp;
         </div>
+    </div>
+    <div class="row">
+        <div id="timerHtml" style="float: right; color: white;">00:00:00</div>
     </div>
 </div>
 

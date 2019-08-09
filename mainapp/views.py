@@ -319,6 +319,12 @@ if __name__ == '__main__':
             tests = base64.decodebytes(bytes(testsb64.encode(content_type)))
             # print('tests: {}'.format(tests))
 
+            timer = request.POST.get('timer', None)
+            # print('timer: {}'.format(timer))
+            tm = timer.split(':')
+            time_spent_seconds = int(tm[0]) * 3600 + int(tm[1]) * 60 + int(tm[2])
+            # print('tm: {}, time_spent_seconds: {}'.format(tm, time_spent_seconds))
+
             result, returncode = self.run_python_code(code, task_id, tests, user_id)
             # print('returncode: ', type(returncode))
             # print('returncode: ', returncode)
@@ -326,7 +332,7 @@ if __name__ == '__main__':
             if isinstance(returncode, int) and returncode == 0:
                 is_finished = True
             # print('is_finished: ', is_finished)
-            TaskSolution.save_or_update(task_id, user_id, is_finished, hint_id)
+            TaskSolution.save_or_update(task_id, user_id, is_finished, hint_id, time_spent_seconds=time_spent_seconds)
         else:
             # print('user NOT EXISTS')
             return HttpResponseBadRequest('user NOT EXISTS')

@@ -1,0 +1,7 @@
+setuptools>=37.0.0
+virtualenv
+django==1.11.23
+django-bootstrap3
+django-admin-sortable2
+django_enumfield
+django-lineage
