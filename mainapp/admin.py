@@ -82,7 +82,7 @@ class SortableTaskAdmin(SortableAdminMixin, admin.ModelAdmin):
 
 
 class TaskSolutionAdmin(admin.ModelAdmin):
-    list_display = ('id', 'task', 'user', 'suggestions_count', 'is_finished', 'is_surrender')
+    list_display = ('id', 'task', 'user', 'suggestions_count', 'is_finished', 'is_surrender', 'time_spent_seconds')
 
 
 admin.site.register(Author, AuthorAdmin)
