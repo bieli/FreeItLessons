@@ -163,3 +163,4 @@ Werkzeug==0.15.3
 wrapt==1.9.0
 xmltodict==0.10.2
 
+pygments>=2.7.4 # not directly required, pinned by Snyk to avoid a vulnerability
