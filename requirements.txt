@@ -73,7 +73,7 @@ kombu==4.0.2
 lazy-object-proxy==1.2.1
 listparser==0.18
 ludibrio==3.1.0
-lxml==3.7.2
+lxml==4.6.3
 memory-profiler==0.41
 nicelog==0.1.8
 nose
