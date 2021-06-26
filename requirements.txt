@@ -30,7 +30,7 @@ cycler==0.10.0
 ddt==1.2.1
 decorator==4.0.9
 dj-database-url==0.4.1
-django==1.11.23
+django==2.2.18
 django-admin-sortable2==0.6.10
 django-appconf==1.0.2
 django-attachments==1.0.1
@@ -73,7 +73,7 @@ kombu==4.0.2
 lazy-object-proxy==1.2.1
 listparser==0.18
 ludibrio==3.1.0
-lxml==3.7.2
+lxml==4.6.2
 memory-profiler==0.41
 nicelog==0.1.8
 nose
