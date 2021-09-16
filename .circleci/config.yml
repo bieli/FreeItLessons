@@ -1,0 +1,18 @@
+# This config is equivalent to both the '.circleci/extended/orb-free.yml' and the base '.circleci/config.yml'
+version: 2.1
+
+jobs:
+  tests:
+    docker:
+      - image: cimg/python:3.9.7
+    steps:
+      - checkout
+      - run: python --version
+      - run: make install
+      - run: pip3 install -r requirements.dev.txt
+      - run: make test
+
+workflows:
+  sample:
+    jobs:
+      - tests
