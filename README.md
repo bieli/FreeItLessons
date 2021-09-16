@@ -1,3 +1,5 @@
+[![CircleCI](https://circleci.com/gh/bieli/FreeItLessons/tree/master.svg?style=svg)](https://circleci.com/gh/bieli/FreeItLessons/tree/master)
+
 # FreeItLessons
 
 It's mini e-Learning platform with CMS and home working options for sharing education teachers with students.
