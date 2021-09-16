@@ -7,8 +7,10 @@ jobs:
     steps:
       - checkout
       - run: python --version
+      - run: which python
       - run: pip3 install -r requirements.txt
       - run: pip3 install -r requirements.dev.txt
+      - run: which pytest
       - run: pytest tests
 
 workflows:
