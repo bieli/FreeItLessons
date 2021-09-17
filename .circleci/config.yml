@@ -8,7 +8,8 @@ jobs:
       - checkout
       - run:
           command: |
-            . venv/bin/activate
+            pyenv virtualenv 3.9.7 venv
+            pyenv shell venv
             pip3 install -r requirements.txt
             pip3 install -r requirements.dev.txt
             pytest tests
