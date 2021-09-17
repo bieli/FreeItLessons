@@ -6,13 +6,11 @@ jobs:
       - image: cimg/python:3.9.7
     steps:
       - checkout
-      - run:
-          command: |
-            pyenv virtualenv 3.9.7 venv
-            pyenv shell venv
-            pip3 install -r requirements.txt
-            pip3 install -r requirements.dev.txt
-            pytest tests
+      - run: pyenv virtualenv 3.9.7 venv
+      - run: pyenv shell venv
+      - run: pip3 install -r requirements.txt
+      - run: pip3 install -r requirements.dev.txt
+      - run: pytest tests
 
 workflows:
   ci:
