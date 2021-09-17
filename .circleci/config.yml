@@ -6,6 +6,8 @@ jobs:
       - image: cimg/python:3.9.7
     steps:
       - checkout
+      - run: pyenv install 3.9.7
+      - run: pyenv global 3.9.7
       - run: pyenv virtualenv 3.9.7 venv
       - run: pyenv shell venv
       - run: pip3 install -r requirements.txt
