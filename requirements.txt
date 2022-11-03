@@ -30,7 +30,7 @@ cycler==0.10.0
 ddt==1.2.1
 decorator==4.0.9
 dj-database-url==0.4.1
-django==1.11.23
+django==3.2.15
 django-admin-sortable2==0.6.10
 django-appconf==1.0.2
 django-attachments==1.0.1
@@ -54,7 +54,7 @@ djangorestframework>=3.9.1
 docopt==0.6.2
 docutils==0.12
 dodgy==0.1.9
-dulwich==0.9.7
+dulwich==0.18.5
 easy-thumbnails==2.3
 ExifRead==2.1.2
 flake8==2.3.0
@@ -163,3 +163,4 @@ Werkzeug==0.15.3
 wrapt==1.9.0
 xmltodict==0.10.2
 
+wheel>=0.38.0 # not directly required, pinned by Snyk to avoid a vulnerability
