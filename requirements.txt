@@ -30,7 +30,7 @@ cycler==0.10.0
 ddt==1.2.1
 decorator==4.0.9
 dj-database-url==0.4.1
-django==1.11.23
+django==3.2.15
 django-admin-sortable2==0.6.10
 django-appconf==1.0.2
 django-attachments==1.0.1
@@ -46,7 +46,7 @@ django-mptt==0.8.6
 django-pgcrypto==1.4.0
 django-polymorphic>=2.0
 django-sekizai==0.10.0
-Django-Select2==4.3.2
+Django-Select2==5.7.0
 django-simple-menu==1.2.1
 django-taggit==0.18.3
 django-treebeard==4.1.0
@@ -73,7 +73,7 @@ kombu==4.0.2
 lazy-object-proxy==1.2.1
 listparser==0.18
 ludibrio==3.1.0
-lxml==3.7.2
+lxml==4.9.1
 memory-profiler==0.41
 nicelog==0.1.8
 nose
