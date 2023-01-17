@@ -60,7 +60,7 @@ ExifRead==2.1.2
 flake8==2.3.0
 fudge==1.1.0
 funky==0.0.2
-future==0.15.2
+future==0.18.3
 httplib2==0.8
 imagesize==0.7.1
 iso8601==0.1.11
