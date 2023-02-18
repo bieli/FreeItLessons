@@ -9,7 +9,6 @@ https://docs.djangoproject.com/en/1.10/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.10/ref/settings/
 """
-
 import os
 import socket
 
@@ -27,7 +26,7 @@ SECRET_KEY = '@j=t223ji9etm7a3xd1*n=ma@sfh##&$wl-z9%c#3-vqa%!%f41'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '137.74.43.98', 'elearning.bieli.net', 'e-learning.bieli.net', 'learning.bieli.net']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '137.74.43.98']
 
 # Application definition
 
@@ -130,10 +129,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
 
-#STATICFILES_FINDERS = [
-#    'django.contrib.staticfiles.finders.FileSystemFinder',
-#    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-#]
+# STATICFILES_FINDERS = [
+#     'django.contrib.staticfiles.finders.FileSystemFinder',
+#     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+# ]
 
 STATIC_URL = '/static/'
 
@@ -141,7 +140,7 @@ STATIC_URL = '/static/'
 STATIC_ROOT = '/home/dev/webapps/FreeItLessons' + STATIC_URL
 
 if 'webfaction' in socket.gethostname():
-  STATIC_ROOT = '/home/bieli/webapps/elearning_bieli_net/FreeItLessons/' + STATIC_URL
+    STATIC_ROOT = '/home/bieli/webapps/elearning_bieli_net/FreeItLessons/' + STATIC_URL
 
 # Location of folders that will be added to static folder
 STATICFILES_DIRS = (
@@ -149,11 +148,11 @@ STATICFILES_DIRS = (
 )
 
 # Settings for django-bootstrap3
-#BOOTSTRAP3 = {
+# BOOTSTRAP3 = {
 #    'error_css_class': 'bootstrap3-error',
 #    'required_css_class': 'bootstrap3-required',
 #    'javascript_in_head': True,
-#}
+# }
 
 SITE_ID = 1
 
@@ -207,14 +206,10 @@ EMAIL_HOST_USER = ""
 EMAIL_HOST_PASSWORD = ""
 
 
-#TEMPLATE_LOADERS = [
-#      'apptemplates.Loader',
-#  ]
+# TEMPLATE_LOADERS = [
+#     'apptemplates.Loader',
+# ]
 
-PYTHON_EXEC = '/usr/bin/python3.6'
+PYTHON_EXEC = '/usr/bin/python3'
 
 TEMP_SOLUTION_CODE_BLOCK = '/tmp/'
-
-if 'webfaction' in socket.gethostname():
-    PYTHON_EXEC = '/usr/local/bin/python3.6'
-    TEMP_SOLUTION_CODE_BLOCK = '/home/bieli/tmp/'

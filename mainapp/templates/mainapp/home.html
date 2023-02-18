@@ -59,17 +59,6 @@
           <br /><br /><br />
           </p>
 {% comment %}
-<pre style="font-family: 'Courier New'">
-<samp>
-                o       .oOo                   #####
-                O        O                    _/_ ####
-                o        o                   [.[.]-=##
-                o        OoO                  /_    )#
-.oOo  .oOo. .oOoO  .oOo. o    O   o  'OoOo.  |__/  #
-O     O   o o   O  OooO' O    o   O   o   O    \___/
-o     o   O O   o  O     o    O   o   O   o
-`OoO' `OoO' `OoO'o `OoO' O'   `OoO'o  o   O
-</samp>
 </pre>
 {% endcomment %}
 		    </div>
@@ -83,7 +72,7 @@ o     o   O O   o  O     o    O   o   O   o
 <script src="//beneposto.pl/jqueryrotate/js/jQueryRotateCompressed.js"></script>
 <script src="http://www.gamehouse.com/blog/wp-content/themes/gamehouse/js/jquery.spritely.js"></script>
 <script src="https://unpkg.com/floating.js"></script>
-    <script>
+<script>
 if (Math.random() >= 0.5) {
     floating({
       content: '<b style="font-family: Courier New;">0</b>',
@@ -113,19 +102,10 @@ if (Math.random() >= 0.5) {
       size: [0.1,3]
     });
 }
-  </script>
+</script>
 <script type="text/javascript">
 
-/*
-(function($) {
-    $(document).ready(function() {
-        $('#img1').pan({fps: 30, speed: 0.7, dir: 'left', depth: 10});
-    })
-})(jQuery);
-*/
-
 $(document).ready(function() {
-    //$('#img1').animate({}, 100) // .pan({fps: 30, speed: 2, dir: 'left'});
 
 
 function AnimateRotate(d, elem, duration){
@@ -150,43 +130,6 @@ AnimateRotate(-10, '#img2', 1500);
 AnimateRotate(-20, '#img3', 2600);
 AnimateRotate(15, '#img4', 3500);
 AnimateRotate(45, '#img5', 1800);
-
-$('#img1').mouseover(function () {
-    console.log(this);
-    //$(this).css();
-})
-
-
-
-
-/*
-    $("#img1").rotate({bind:{
-          click: function(){
-            $(this).rotate({
-                angle: 0,
-                animateTo:180
-            })
-          }
-    }});
-
-    var rotation = function (){
-        $(this).rotate({
-            angle:0,
-            animateTo:360,
-            duration: 2000,
-            callback: rotation,
-            easing: function (x,t,b,c,d){        // t: current time, b: begInnIng value, c: change In value, d: duration
-                return c*(t/d)+b;
-            }
-        });
-    };
-
-var angle = 0;
-  setInterval(function(){
-    angle+=3;
-  $("#img1").rotate(angle);
-  },50);
-*/
 });
 </script>
 {% endblock %}

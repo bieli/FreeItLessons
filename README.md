@@ -3,8 +3,7 @@
 It's mini e-Learning platform with CMS and home working options for sharing education teachers with students.
 
 
-Features:
---------
+## Features
 - welcome page
 - FAQ page (with administrator CRUD)
 - courses pages (with administrator CRUD)
@@ -12,8 +11,8 @@ Features:
 - about mentors
 
 
-Screen shots with ready features
----------------
+### Screen shots with ready features
+
 ---
 ![](https://raw.githubusercontent.com/bieli/FreeItLessons/master/docs/img/FreeItLessons.1.png)
 
@@ -30,21 +29,39 @@ Screen shots with ready features
 ![](https://raw.githubusercontent.com/bieli/FreeItLessons/master/docs/img/FreeItLessons.5.png)
 ---
 
-Requirements
-------------
+
+## How to run
+
+
+### Development fast track
+
+```bash
+python3 -m venv .venv
+. .venv/bin/activate
+
+make install
+make ci
+
+python3 manage.py runserver
+```
+
+
+
+### Requirements
+
 1. Linux or other operationg system
 2. Docker or Vagrant (with Docker)
 
-Developing project using Docker
-------
+### Developing project using Docker
+
 1. docker build -t free-it-lessons:1.0 -f ./Dockerfile .
 2. docker run -p 8000:8000 -it free-it-lessons:1.0 python3 manage.py runserver 0.0.0.0:8000
 
 Run web browser and open http://127.0.0.1:8000
 
 
-How to start developing using Vagrant with Docker
----------------------------------------------
+### How to start developing using Vagrant with Docker
+
 1. vagrant up
 2. vagrant ssh
 3. vagrant > $ cd FreeItLessons
@@ -53,8 +70,7 @@ How to start developing using Vagrant with Docker
 6. vagrant > $ docker run -p 8000:8000 -it free-it-lessons:1.0 python3 manage.py runserver 0.0.0.0:8000
 7. vagrant > $ git add change-or-add-file && git commit -m "commit comment" && git push origin HEAD:new-futer-branch
 
-Alternative method to run Docker container from your host machine for Vagrant
------------------------------------------------------------------
+### Alternative method to run Docker container from your host machine for Vagrant
 
 ssh -o 'RequestTTY force' vagrant@127.0.0.1 -p 2222 'docker run -p 8000:8000 -it free-it-lessons:1.1 python3 manage.py runserver 0.0.0.0:8000'
 
@@ -72,7 +88,7 @@ ssh vagrant 'docker run -ti ubuntu:xenial echo hi'
   
 
 
-TODO:
+## TODO:
 - [x] merging first pull requests
 - [x] creating README with screen shots
 - [x] creating vagrant wimage (with docker container) - ready env. for other developers
