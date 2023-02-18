@@ -1,3 +1,5 @@
+![example workflow](https://github.com/github/docs/actions/workflows/ci-checks.yaml/badge.svg)
+
 # FreeItLessons
 
 It's mini e-Learning platform with CMS and home working options for sharing education teachers with students.
