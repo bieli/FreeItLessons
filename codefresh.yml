@@ -2,7 +2,7 @@ version: '1.0'
 stages:
  - clone
  - test
- - build
+# - build
 steps:
   clone:
     title: "Cloning main repository..."
@@ -22,16 +22,16 @@ steps:
        commands:
          - "pip install -r requirements.txt --cache-dir=/codefresh/volume/pip-cache"
          - "python -m unittest tests/*.py"
-  build_my_image:
-    stage: build
-    type: build
-    title: Building Docker Image
-    working_directory: ${{clone_step_name}}
-    dockerfile: Dockerfile
-    image_name: freeitlessons
-    tag: develop
-    no_cache: false
-    no_cf_cache: false
-    tag_policy: original
-    fail_fast: false
+#  build_my_image:
+#    stage: build
+#    type: build
+#    title: Building Docker Image
+#    working_directory: ${{clone_step_name}}
+#    dockerfile: Dockerfile
+#    image_name: freeitlessons
+#    tag: develop
+#    no_cache: false
+#    no_cf_cache: false
+#    tag_policy: original
+#    fail_fast: false
 
