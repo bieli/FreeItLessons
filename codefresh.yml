@@ -1,0 +1,33 @@
+version: '1.0'
+stages:
+ - clone
+ - test
+ - build
+steps:
+  clone:
+    title: "Cloning main repository..."
+    stage: "clone"
+    type: "git-clone"
+    arguments:
+      repo: "bieli/FreeItLessons"
+      revision: "master"
+      git: "github"
+  run_unit_tests:
+     title: "Running unit tests..."
+     stage: "test"
+     type: "freestyle"
+     working_directory: "${{clone}}"
+     arguments:
+       image: "python:3.8-slim"
+       commands:
+         - "pip install -r requirements.txt --cache-dir=/codefresh/volume/pip-cache"
+         - "python -m unittest tests/*.py"
+  build_my_image:
+    title: Building Docker Image
+    stage: build
+    type: build
+    image_name: FreeItLessons-dev
+    working_directory: ./
+    tag: full
+    dockerfile: Dockerfile
+
