@@ -23,11 +23,15 @@ steps:
          - "pip install -r requirements.txt --cache-dir=/codefresh/volume/pip-cache"
          - "python -m unittest tests/*.py"
   build_my_image:
-    title: Building Docker Image
     stage: build
     type: build
-    image_name: FreeItLessons-dev
-    working_directory: ./
-    tag: full
+    title: Building Docker Image
+    working_directory: ${{clone_step_name}}
     dockerfile: Dockerfile
+    image_name: bieli/FreeItLessons
+    tag: develop
+    no_cache: false
+    no_cf_cache: false
+    tag_policy: original
+    fail_fast: false
 
