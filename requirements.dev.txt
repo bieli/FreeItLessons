@@ -5,4 +5,5 @@ django-bootstrap3==v12.0.0
 django-admin-sortable2==0.7.8
 django_enumfield==1.6
 django-lineage==0.1.1
+flake8
 ddt
