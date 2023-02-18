@@ -1,4 +1,4 @@
-![example workflow](https://github.com/github/docs/actions/workflows/ci-checks.yaml/badge.svg)
+![CI status](https://github.com/bieli/FreeItLessons/actions/workflows/ci-checks.yaml/badge.svg)
 
 # FreeItLessons
 
