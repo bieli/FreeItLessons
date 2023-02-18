@@ -28,7 +28,7 @@ steps:
     title: Building Docker Image
     working_directory: ${{clone_step_name}}
     dockerfile: Dockerfile
-    image_name: bieli/free-it-lessons
+    image_name: freeitlessons
     tag: develop
     no_cache: false
     no_cf_cache: false
