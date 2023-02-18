@@ -1,4 +1,5 @@
-FROM avnergoncalves/ubuntu-python3.5
+#FROM matthewfeickert/docker-python3-ubuntu:latest
+FROM django:1.11-python3
 
 MAINTAINER Marcin Bielak <marcin.bieli@gmail.com>
 
@@ -11,7 +12,8 @@ ENV DEBIAN_FRONTEND noninteractive
 
 ENV PYTHONIOENCODING=utf8
 
-RUN apt-get update && apt-get install -y \
+RUN sudo apt-get update
+RUN sudo apt-get install -y \
     python-setuptools \
     gcc \
     gettext \
@@ -24,7 +26,9 @@ RUN apt-get update && apt-get install -y \
     libssl-dev \
     libpython3-dev \
     libcurl4-openssl-dev \
-	--no-install-recommends && rm -rf /var/lib/apt/lists/*
+	--no-install-recommends
+RUN sudo apt-get clean
+RUN sudo rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/*
 
 WORKDIR /usr/src/app
 COPY . .
