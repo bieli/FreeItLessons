@@ -1,6 +1,6 @@
 setuptools>=37.0.0
 virtualenv
-django==1.11.23
+django==3.2.22
 django-bootstrap3==v12.0.0
 django-admin-sortable2==0.7.8
 django_enumfield==1.6
