@@ -13,7 +13,7 @@ bs4==0.0.1
 #bunch==1.0.1
 #cachetools==1.1.6
 celery==4.0.2
-cffi==1.9.1
+#cffi==1.9.1
 checkbox-ng==0.3
 checkbox-support==0.2
 click==6.3
@@ -73,7 +73,7 @@ jsonschema==2.5.1
 lazy-object-proxy==1.2.1
 listparser==0.18
 ludibrio==3.1.0
-lxml==3.7.2
+#lxml==3.7.2
 #memory-profiler==0.41
 #nicelog==0.1.8
 #nose
