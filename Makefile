@@ -8,7 +8,7 @@ install:
 
 ci:
 	pip3 install ddt
-	python3 -m unittest tests/*.py
+	python3 manage.py test tests
 
 run:
 	python3 manage.py runserver
