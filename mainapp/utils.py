@@ -21,12 +21,7 @@ def similar(seq1, seq2, ratio=0.9):
 class TaskCodeRun:
     @staticmethod
     def is_code_block_secure(code_block):
-      phrase = set(['input', 'bytes(', 'raw_input', 'import ', '__import__', 'super', 'file', 'compile',
-                    ' loader', 'open(', 'write(', '/proc/', 'execfile', 'callable', 'globals', 'memoryview',
-                    'process', 'subprocess', 'os.', 'sys.', 'staticmethod', 'classmethod', 'help'])
-
-      # TODO: check below conversion method
-      #if isinstance(code_block, (bytes, bytearray)):
-      #    code_block = bytes(code_block).decode('utf-8')
-
-      return not (str(code_block) in phrase)
+        negatives = set(['input', 'bytes(', 'raw_input', 'import ', '__import__', 'super', 'file', 'compile',
+                         ' loader', 'open(', 'write(', '/proc/', 'execfile', 'callable', 'globals', 'memoryview',
+                         'process', 'subprocess', 'os.', 'sys.', 'staticmethod', 'classmethod', 'help'])
+        return not any([1 for phase in negatives if phase in str(code_block)])

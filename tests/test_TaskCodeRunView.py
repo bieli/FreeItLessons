@@ -26,7 +26,6 @@ class TaskCodeRunTest(unittest.TestCase):
 
         self.assertTrue(result)
 
-    @unittest.skip
     def test_should_not_pass_with_code_block_with_import(self):
         code_block = """# unit
 def reverse_chars(chars):
@@ -38,7 +37,7 @@ def reverse_chars(chars):
 # unit
 """
 #b"# unit\ndef reverse_chars(chars):\n    reversed = ''\n    import os\n    # TUTAJ DODAJ SWOJ KOD    \n\n    return reversed\n# unit"
-
+        code_block = "import os"
         result = TaskCodeRun.is_code_block_secure(code_block)
 
         self.assertFalse(result)
