@@ -1,7 +1,7 @@
 setuptools>=37.0.0
 anyconfig==0.4.0
-appdirs==1.4.0
-argh==0.26.1
+#appdirs==1.4.0
+#argh==0.26.1
 arrow==0.4.4
 attrs==15.2.0
 Babel==2.3.4
@@ -23,8 +23,8 @@ codegen==1.0
 configobj==5.0.6
 configparser2==4.0.0
 coverage==4.0.3
-coveralls==0.4.2
-cryptography>=2.1.4
+#coveralls==0.4.2
+#cryptography>=2.1.4
 cssselect==0.9.1
 cycler==0.10.0
 ddt==1.2.1
@@ -43,7 +43,7 @@ django-formtools==1.0
 django-lineage==0.2.0
 django-modelcluster==2.0
 django-mptt==0.8.6
-django-pgcrypto==1.4.0
+#django-pgcrypto==1.4.0
 django-polymorphic>=2.0
 django-sekizai==0.10.0
 Django-Select2==4.3.2
