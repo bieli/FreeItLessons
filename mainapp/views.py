@@ -1,26 +1,22 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+
 import base64
 import hashlib
-import json
-import os
-import tempfile
+import time
 
 import django
-from django.core.files.storage import default_storage
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-
+from django.core.files.storage import default_storage
 from django.db.models.fields.files import FieldFile
+from django.http import HttpResponse, HttpResponseBadRequest
 from django.views.generic.base import View, TemplateView
-import time
 
 from FreeItLessons import settings
 from mainapp.models import User, Author, Module, Chapter, Content, \
     ContentStatusType, ContentStatus, Faq, Task, TaskSolution
-
-from django.http import HttpResponse, HttpResponseBadRequest
 from mainapp.utils import TaskCodeRun
+
 
 class FakeField(object):
     storage = default_storage
@@ -119,17 +115,17 @@ class TasksPageView(LoginRequiredMixin, TemplateView):
         tasks_data = Task.objects.order_by('my_order').select_related().filter(is_visible=True)
         tasks = []
         for task in tasks_data:
-                try:
-                    task_solution = TaskSolution.objects.get(task_id=task.id, user_id=self.request.user.id)
-                except TaskSolution.DoesNotExist:
-                    task_solution = None
+            try:
+                task_solution = TaskSolution.objects.get(task_id=task.id, user_id=self.request.user.id)
+            except TaskSolution.DoesNotExist:
+                task_solution = None
 
-                tasks.append({
-                    'id': task.id,
-                    'points': task.points,
-                    'name': task.name,
-                    'task_solution': task_solution,
-                })
+            tasks.append({
+                'id': task.id,
+                'points': task.points,
+                'name': task.name,
+                'task_solution': task_solution,
+            })
         return {'tasks': tasks}
 
 
@@ -149,7 +145,7 @@ class TaskPageView(TemplateView):
         task_instance = Task.objects.order_by('my_order').filter(id=task_id).get()
         return {'task': task_instance,
                 'asserts': self._get_asserts_from_tests_code(task_instance.tests)
-        }
+                }
 
 
 class ContetUserStatusView(View):
@@ -197,11 +193,11 @@ class ContetUserStatusView(View):
                         obj.save()
                         # print("created")
 
-                        #obj, created = ContentStatus.objects.update_or_create(user=user_instance,
+                        # obj, created = ContentStatus.objects.update_or_create(user=user_instance,
                         #                                                      content=content_instance,
                         #                                                      status=str(status).lower())
-                        ## print('ContentStatus created: {}'.format(created))
-                        #cs.save()
+                        # print('ContentStatus created: {}'.format(created))
+                        # cs.save()
                 else:
                     # print('status NOT EXISTS')
                     return HttpResponseBadRequest('status NOT EXISTS')
@@ -420,7 +416,7 @@ class ContetUserView(View):
                 # print('content - id {}, data: {}'.format(content_id, cs))
                 # print('status: {}'.format(cs.status))
                 return HttpResponse(cs.status)
-                #return HttpResponse('OK')
+                # return HttpResponse('OK')
             else:
                 # print('content NOT EXISTS')
                 return HttpResponseBadRequest('content NOT EXISTS')
@@ -434,9 +430,9 @@ class OpinionsView(TemplateView):
 
     def get_context_data(self, **kwargs):
         opinions = ContentStatus.get_opinions_by_user_id(self.request.user.id)
-        ## print("opinions: {}".format(opinions))
-        ## print("opinions.columns: {}".format(opinions.columns))
-        #for item in opinions:
+        # print("opinions: {}".format(opinions))
+        # print("opinions.columns: {}".format(opinions.columns))
+        # for item in opinions:
         #    # print("status: {}, status_count: {}".format(item.status, item.status_count))
         return {'opinions': opinions}
 
@@ -535,12 +531,11 @@ class AchievementsView(TemplateView):
             return 0
 
 
-
 class LearnerSupportView(TemplateView):
     template_name = 'mainapp/learner_support_list.html'
 
     def get_context_data(self, **kwargs):
-        #items = LearnerSupport.get_all_by_user_id(self.request.user.id)
+        # items = LearnerSupport.get_all_by_user_id(self.request.user.id)
         items = {}
         # print("items: {}".format(items))
         return {'items': items}
@@ -560,7 +555,7 @@ class ContetUserStatusAjaxView2(TemplateView):
       user_id = kwargs['user_id']
       if User.objects.filter(id__iexact=user_id).exists():
           # print('user EXISTS')
-      
+
           # request.user.is_authenticated():
 
           content_id = kwargs['content_id']
@@ -608,4 +603,3 @@ class ContetUserStatusAjaxView2(TemplateView):
   #    # print(kwargs)
   #    return {'test_results': 123}
 """
-

@@ -7,6 +7,7 @@ install:
 	pip3 install -r requirements.txt
 
 ci:
+	pep8 mainapp/ --ignore=E501
 	pip3 install ddt
 	python3 manage.py test tests
 

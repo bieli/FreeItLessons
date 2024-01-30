@@ -11,7 +11,6 @@ Menu.add_item("main", MenuItem("Reports",
                                weight=20,
                                icon="report"))
 
-
 # Define children for the my account menu
 myaccount_children = (
     MenuItem("Edit Profile",
@@ -35,5 +34,3 @@ Menu.add_item("user", MenuItem("My Account",
                                reverse("accounts.views.myaccount"),
                                weight=10,
                                children=myaccount_children))
-
-

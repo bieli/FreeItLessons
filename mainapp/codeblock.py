@@ -1,7 +1,5 @@
-import tempfile
 import os
-
-from pip._vendor.distlib.metadata import _get_name_and_version
+import tempfile
 
 from FreeItLessons import settings
 
@@ -55,8 +53,7 @@ class CodeBlock:
             return cb, tb, mb
 
     def _hide_solutions(self, cb, tb, mb):
-        return '', '',  ''
-
+        return '', '', ''
 
 
 class CodeBlockRunner:
@@ -122,6 +119,7 @@ class CodeBlockRunner:
 
 if __name__ == '__main__':
     from subprocess import Popen, PIPE
+
     cmd = settings.PYTHON_EXEC + " test003.py"
     p = Popen(cmd, shell=True, stdout=PIPE, stderr=PIPE)
     out, err = p.communicate()
@@ -140,4 +138,3 @@ if __name__ == '__main__':
     #     else:
     #         print("ERROR: run_results -> {}".format(run_results))
     #
-

@@ -1,14 +1,15 @@
 import datetime
-import django
 
-from django.db import models
+import django
 from django.contrib.auth.models import User
+from django.db import models
 from django_enumfield import enum
 
 
 class AutoDateTimeField(models.DateTimeField):
     def pre_save(self, model_instance, add):
         return datetime.datetime.now()
+
 
 class Author(models.Model):
     name = models.CharField(max_length=64)
@@ -21,8 +22,9 @@ class Author(models.Model):
     linkedin_link = models.CharField(max_length=256, null=True, blank=True)
     external_link = models.CharField(max_length=256, null=True, blank=True)
     is_public_mentor = models.BooleanField(default=False)
-    #created_at = models.DateField(default=django.utils.timezone.now)
-    #updated_at = AutoDateTimeField(default=django.utils.timezone.now)
+
+    # created_at = models.DateField(default=django.utils.timezone.now)
+    # updated_at = AutoDateTimeField(default=django.utils.timezone.now)
 
     def __str__(self):
         return "{} {}".format(self.name, self.surname)
@@ -48,8 +50,9 @@ class Content(models.Model):
     value = models.TextField(max_length=4000)
     additional_text = models.CharField(max_length=512)
     author = models.ForeignKey(Author, null=True, blank=True, on_delete=models.DO_NOTHING)
-    #created_at = models.DateField(default=django.utils.timezone.now)
-    #updated_at = AutoDateTimeField(default=django.utils.timezone.now)
+
+    # created_at = models.DateField(default=django.utils.timezone.now)
+    # updated_at = AutoDateTimeField(default=django.utils.timezone.now)
 
     def __str__(self):
         return self.additional_text
@@ -83,8 +86,9 @@ class Chapter(models.Model):
     level = enum.EnumField(ChapterLevelType)
     note = models.TextField(max_length=256)
     author = models.ForeignKey(Author, null=True, blank=True, on_delete=models.DO_NOTHING)
-    #created_at = models.DateField(default=django.utils.timezone.now)
-    #updated_at = AutoDateTimeField(default=django.utils.timezone.now)
+
+    # created_at = models.DateField(default=django.utils.timezone.now)
+    # updated_at = AutoDateTimeField(default=django.utils.timezone.now)
 
     def __str__(self):
         return self.name
@@ -107,8 +111,9 @@ class Module(models.Model):
     chapters = []
     contents_list = []
     icons_list = []
-    #created_at = models.DateField(default=django.utils.timezone.now)
-    #updated_at = AutoDateTimeField(default=django.utils.timezone.now)
+
+    # created_at = models.DateField(default=django.utils.timezone.now)
+    # updated_at = AutoDateTimeField(default=django.utils.timezone.now)
 
     def __str__(self):
         return self.title
@@ -141,7 +146,7 @@ class ContentStatusType():
 
     @staticmethod
     def exists(type_name):
-        return hasattr(ContentStatusType, str(type_name).upper()) 
+        return hasattr(ContentStatusType, str(type_name).upper())
 
 
 CONTENT_STATUS_TYPE_CHOICES = (
@@ -151,6 +156,7 @@ CONTENT_STATUS_TYPE_CHOICES = (
     (ContentStatusType.GOOD, 'Good'),
     (ContentStatusType.DONE, 'Done'),
 )
+
 
 class ContentStatus(models.Model):
     user = models.ForeignKey(User, null=False, blank=False, on_delete=models.DO_NOTHING)
@@ -166,10 +172,8 @@ class ContentStatus(models.Model):
 
     @staticmethod
     def get_opinions_by_user_id(user_id):
-        q = '''SELECT id, status, COUNT(status) AS status_count 
-               FROM mainapp_contentstatus
-               WHERE user_id=%s
-               GROUP BY status'''
+        q = "SELECT id, status, COUNT(status) AS status_count "\
+            "FROM mainapp_contentstatus WHERE user_id=%s GROUP BY status"
         return ContentStatus.objects.raw(q, [user_id])
 
 
@@ -200,10 +204,10 @@ class Task(models.Model):
     suggestion_5 = models.TextField(max_length=1024, null=True, blank=True)
     level = models.PositiveIntegerField(default=0, blank=False, null=False)
     points = models.PositiveIntegerField(default=5, blank=False, null=False)
-    #created_at: datetime
-    #created_by: relatet to User
-    #reviewd_at: datetime
-    #reviewd_by: relatet to User
+    # created_at: datetime
+    # created_by: relatet to User
+    # reviewd_at: datetime
+    # reviewd_by: relatet to User
     my_order = models.PositiveIntegerField(default=1, blank=False, null=False)
 
     class Meta(object):
@@ -260,5 +264,5 @@ class TaskSolution(models.Model):
             ts.save()
 
     def __str__(self):
-        return 'TaskSolution(user_id: {}, task_id: {}, is_finished: {}, time_spent_seconds: {})'\
+        return 'TaskSolution(user_id: {}, task_id: {}, is_finished: {}, time_spent_seconds: {})' \
             .format(self.user_id, self.task_id, self.is_finished, self.time_spent_seconds)
