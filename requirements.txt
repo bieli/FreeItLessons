@@ -79,7 +79,7 @@ lxml==3.7.2
 nose
 nose-exclude
 nose-parameterized
-nose-progressive
+#nose-progressive
 #oauthlib==1.1.2
 #paramiko>=2.1.6
 params==0.1.4
