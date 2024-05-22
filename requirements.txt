@@ -127,7 +127,7 @@ pyyaml>=4.2b1
 #queuelib==1.4.2
 #rednose==0.4.1
 #request==0.0.2
-requests>=2.20.0
+requests>=2.32.0
 requests-mock==1.1.0
 requests-toolbelt==0.6.2
 requirements-detector==0.4.1
