@@ -110,7 +110,7 @@ pylint-common>=0.2.2
 pylint-django>=0.7.1
 pylint-flask>=0.1
 pylint-plugin-utils>=0.2.3
-PyMySQL==0.7.2
+PyMySQL==1.1.1
 pyparsing==2.1.1
 pyquery==1.2.11
 pytest==2.7.2
