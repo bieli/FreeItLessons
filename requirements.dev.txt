@@ -7,3 +7,4 @@ django_enumfield==1.6
 django-lineage==0.1.1
 flake8
 ddt
+zipp>=3.19.1 # not directly required, pinned by Snyk to avoid a vulnerability
