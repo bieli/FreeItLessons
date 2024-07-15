@@ -1,4 +1,4 @@
-setuptools>=37.0.0
+setuptools>=70.0.0
 virtualenv
 django==1.11.23
 django-bootstrap3==v12.0.0
