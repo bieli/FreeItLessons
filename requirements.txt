@@ -20,7 +20,7 @@ click==6.3
 codegen==1.0
 #colorex==2.0
 #colour-runner==0.0.4
-configobj==5.0.6
+configobj==5.0.9
 configparser2==4.0.0
 coverage==4.0.3
 #coveralls==0.4.2
