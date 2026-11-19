@@ -1,16 +1,28 @@
 import base64
-import hashlib
-import time
+import binascii
+import logging
 
-from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse, HttpResponseBadRequest
+from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.views.generic.base import View, TemplateView
 
 from mainapp.models import User, Author, Module, Chapter, Content, \
     ContentStatusType, ContentStatus, Faq, Task, TaskSolution
+from mainapp.sandbox import run_program
 from mainapp.utils import TaskCodeRun
+
+logger = logging.getLogger(__name__)
+
+MAIN_BLOCK = """
+# main
+if __name__ == '__main__':
+    __run_tests()
+# main
+        """
+# legacy contract: the browser sends base64 of the code, decoded as latin-1
+CODE_BLOCK_ENCODING = 'latin-1'
 
 
 def is_ajax(request):
@@ -18,14 +30,33 @@ def is_ajax(request):
     return request.headers.get('x-requested-with') == 'XMLHttpRequest'
 
 
+def to_int(value):
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return None
+
+
+class AjaxUserView(View):
+    """Common guard of the AJAX endpoints: authenticated XHR request whose
+    ``user_id`` parameter is the logged in user (legacy messages kept)."""
+
+    def check_request(self, request, params):
+        if not request.user.is_authenticated:
+            return HttpResponse(status=401)
+        if not is_ajax(request):
+            return HttpResponseBadRequest()
+        user_id = to_int(params.get('user_id'))
+        if user_id is None or not User.objects.filter(id=user_id).exists():
+            return HttpResponseBadRequest('user NOT EXISTS')
+        if request.user.id != user_id:
+            return HttpResponseBadRequest('wrong auth user in request')
+        return None
+
+
 class HomePageView(TemplateView):
     template_name = 'mainapp/home.html'
 
-
-# def get_context_data(self, **kwargs):
-# context = super(HomePageView, self).get_context_data(**kwargs)
-# messages.info(self.request, 'hello http://example.com')
-#    return context
 
 class FaqPageView(TemplateView):
     template_name = 'mainapp/faq.html'
@@ -37,18 +68,10 @@ class FaqPageView(TemplateView):
 
 class CoursesListPageView(TemplateView):
     template_name = 'mainapp/courses_list.html'
-    id1 = 1
 
     def get_context_data(self, **kwargs):
-        try:
-            module_id = kwargs['module_id']
-        except KeyError:
-            module_id = None
-
-        try:
-            chapter_id = kwargs['chapter_id']
-        except KeyError:
-            chapter_id = None
+        module_id = kwargs.get('module_id')
+        chapter_id = kwargs.get('chapter_id')
 
         modules = []
         contents_list = []
@@ -80,27 +103,6 @@ class MentorsListPageView(TemplateView):
         return {'mentors': Author.objects.filter(is_public_mentor=True)}
 
 
-class CourseDetailPageView(TemplateView):
-    template_name = 'mainapp/course_detail.html'
-
-    def get_context_data(self, **kwargs):
-        # module_id = kwargs['module_id']
-        chapter_id = kwargs['chapter_id']
-        contents_id = kwargs['contents_id']
-        chapters = []
-        chapters_tmp = Chapter.objects.filter(id=chapter_id)
-        # chapters_tmp = Chapter.objects.select_related().filter(module__id=module_id)
-        for chapter in chapters_tmp:
-            # print(chapter)
-            contents = Content.objects.filter(id=contents_id)
-            # print(contents)
-            chapter.add_contents_list(contents)
-            chapters.append(chapter)
-        return {'chapters': chapters,
-                'chapter_id': chapter_id,
-                'contents_id': contents_id}
-
-
 class TasksPageView(LoginRequiredMixin, TemplateView):
     template_name = 'mainapp/tasks.html'
 
@@ -130,292 +132,127 @@ class TaskPageView(TemplateView):
         for assert_line in str(tests_code).split("\n"):
             if 'assert ' in assert_line:
                 asserts.append(assert_line.strip())
-        # print("asserts:", asserts)
         return asserts
 
     def get_context_data(self, **kwargs):
-        task_id = kwargs['task_id']
-        task_instance = Task.objects.order_by('my_order').filter(id=task_id).get()
+        task_instance = get_object_or_404(Task, id=kwargs['task_id'])
         return {'task': task_instance,
                 'asserts': self._get_asserts_from_tests_code(task_instance.tests)
                 }
 
 
-class ContetUserStatusView(View):
-    def get(self, request):
-        if not request.user.is_authenticated:
-            return HttpResponse(status=401)
+class ContetUserStatusView(AjaxUserView):
+    """Stores the student's opinion about a course content (state change: POST + CSRF)."""
 
-        if not is_ajax(request):
-            return HttpResponseBadRequest()
+    def post(self, request):
+        error = self.check_request(request, request.POST)
+        if error:
+            return error
 
-        user_id = request.GET.get('user_id', None)
-        # print('user_id: {}'.format(user_id))
-        content_id = request.GET.get('content_id', None)
-        # print('content_id: {}'.format(content_id))
-        status = request.GET.get('status', None)
-        # print('status: {}'.format(status))
+        content_id = to_int(request.POST.get('content_id'))
+        status = request.POST.get('status', None)
 
-        # print('is_authenticated: {}'.format(request.user.is_authenticated))
-        # print('Raw Data: {}'.format(request.body))
-        # print('Raw User Id: {}'.format(request.user.id))
-        # print('request.is_ajax(): {}'.format(request.is_ajax()))
+        content_instance = Content.objects.filter(id=content_id).first() if content_id else None
+        if content_instance is None:
+            return HttpResponseBadRequest('content NOT EXISTS')
+        if not ContentStatusType.exists(status):
+            return HttpResponseBadRequest('status NOT EXISTS')
 
-        if User.objects.filter(id__iexact=user_id).exists():
-            # print('user EXISTS')
-
-            if int(request.user.id) != int(user_id):
-                # print('request.user.id != user_id')
-                return HttpResponseBadRequest('wrong auth user in request')
-
-            if Content.objects.filter(id__iexact=content_id).exists():
-                # print('content EXISTS')
-                if ContentStatusType.exists(status):
-                    # print('status EXISTS')
-                    user_instance = User.objects.filter(id=user_id).get()
-                    content_instance = Content.objects.filter(id=content_id).get()
-
-                    obj = ContentStatus.objects.filter(user=user_instance, content=content_instance)
-                    if obj:
-                        obj.update(status=str(status).lower(), updated_at=timezone.now())
-                        # print("update")
-                    else:
-                        obj = ContentStatus(user=user_instance,
-                                            content=content_instance,
-                                            status=str(status).lower())
-                        obj.save()
-                        # print("created")
-
-                        # obj, created = ContentStatus.objects.update_or_create(user=user_instance,
-                        #                                                      content=content_instance,
-                        #                                                      status=str(status).lower())
-                        # print('ContentStatus created: {}'.format(created))
-                        # cs.save()
-                else:
-                    # print('status NOT EXISTS')
-                    return HttpResponseBadRequest('status NOT EXISTS')
-            else:
-                # print('content NOT EXISTS')
-                return HttpResponseBadRequest('content NOT EXISTS')
+        status = str(status).lower()
+        obj = ContentStatus.objects.filter(user=request.user, content=content_instance)
+        if obj:
+            obj.update(status=status, updated_at=timezone.now())
         else:
-            # print('user NOT EXISTS')
-            return HttpResponseBadRequest('user NOT EXISTS')
-
+            ContentStatus.objects.create(user=request.user, content=content_instance, status=status)
         return HttpResponse('OK')
 
 
-class TaskCodeRunView(View):
+class TaskCodeRunView(AjaxUserView):
+    TIMEOUT_MESSAGE = "Time limit exceeded !\nPlease check your code (infinite loop ?) and run again !"
+
     def _prepare_result(self, result, tmp_filename, replaced_filename='program.py'):
-        result = result.decode("utf-8")
-        result = result.replace(tmp_filename, replaced_filename)
-        # if 'AssertionError' in result and ' assert ' in result:
-        #     assert_pos = result.index(' assert ')
-        #     result = result[assert_pos:].replace('AssertionError', '').strip()
-        return str(result)
+        result = result.decode("utf-8", errors="replace")
+        return result.replace(tmp_filename, replaced_filename)
 
-    def run_python_code(self, code, task_id, tests, user_id):
-        from subprocess import Popen, PIPE
-        # cmd = "python3.4 test003.py"
-        # p = Popen(cmd, shell=True, stdout=PIPE, stderr=PIPE)
-        # out, err = p.communicate()
-        # print("Return code: ", p.returncode)
-        # print(out.rstrip(), err.rstrip())
-        result = ''
-        tmp_code_block_encoding = 'latin-1'
-        returncode = -1
-        main = """
-# main
-if __name__ == '__main__':
-    __run_tests()
-# main
-        """
-        hash = hashlib.sha1(bytes(code)).hexdigest()
-        tmp_filename = "{}{}-{}-{}-{}".format(
-            settings.TEMP_SOLUTION_CODE_BLOCK, user_id, task_id, time.time(), hash
-        )
-        with open(tmp_filename, 'w+') as tmpfile:
-            tmpfile.write(code.decode(tmp_code_block_encoding))
-            tmpfile.write("\n\n")
-            tmpfile.write(tests.decode(tmp_code_block_encoding))
-            tmpfile.write("\n\n")
-            tmpfile.write(main)
-            tmpfile.write("\n\n")
-            # tmpfile.write("def __run_tests():\n  print('aaaa from TEMFILE !!!')")
-            tmpfile.flush()
-            tmpfile.close()
+    def run_python_code(self, code, task, user_id):
+        """``code`` are the bytes sent by the browser; the tests ALWAYS come
+        from the database - client supplied tests are never executed."""
+        if not TaskCodeRun.is_code_block_secure(code):
+            return "Unexpected instructions !\nPlease rewrite your code and run again !", -1
 
-            result = ''
-            is_code_block_secure = TaskCodeRun.is_code_block_secure(code)
-            print("is_code_block_secure: ", is_code_block_secure, ' code: ', code)
-            if is_code_block_secure is False:
-                result = "Unexpected instructions !\nPlease rewrite your code and run again !"
-            else:
-                try:
-                    cmd = "%s %s" % (settings.PYTHON_EXEC, tmp_filename)
-                    p = Popen(cmd, shell=True, stdout=PIPE, stderr=PIPE)
-                    out, err = p.communicate()
-                    returncode = p.returncode
-                    # print("Return code: ", p.returncode)
-                    # print("Result from Python: ", out.rstrip(), err.rstrip())
-                    result = out.rstrip() + err.rstrip()
-                except Exception:
-                    result = 'ERR: 2'
+        code_text = code.decode(CODE_BLOCK_ENCODING)
+        source = code_text + "\n\n" + task.tests + "\n\n" + MAIN_BLOCK + "\n\n"
+        run = run_program(source)
+        if run.timed_out:
+            logger.warning('code run timed out: user=%s task=%s', user_id, task.id)
+            return self.TIMEOUT_MESSAGE, -1
 
-                # try:
-                # os.unlink(tmp_filename)
-                # except:
-                #     pass
-
-                result = self._prepare_result(result, tmp_filename)
-
-                if int(returncode) == 0:
-                    ts_obj, created = TaskSolution.objects.update_or_create(
-                        user=User.objects.get(id=user_id),
-                        task=Task.objects.get(id=task_id)
-                    )
-                    ts_obj.solution_code_block = code.decode(tmp_code_block_encoding)
-                    ts_obj.save()
-
-        return result, returncode
+        result = self._prepare_result(run.stdout.rstrip() + run.stderr.rstrip(), run.program_path)
+        if run.returncode == 0:
+            ts_obj, created = TaskSolution.objects.update_or_create(user_id=user_id, task=task)
+            ts_obj.solution_code_block = code_text
+            ts_obj.save()
+        return result, run.returncode
 
     def post(self, request):
-        if not request.user.is_authenticated:
-            return HttpResponse(status=401)
+        error = self.check_request(request, request.POST)
+        if error:
+            return error
 
-        if not is_ajax(request):
-            return HttpResponseBadRequest()
+        task = Task.objects.filter(id=to_int(request.POST.get('task_id')) or 0).first()
+        if task is None:
+            return HttpResponseBadRequest('task NOT EXISTS')
+        hint_id = to_int(request.POST.get('hint_id', 0))
+        if hint_id is None:
+            return HttpResponseBadRequest('wrong hint_id')
+        try:
+            code = base64.b64decode(request.POST.get('code', '').encode('ascii'), validate=False)
+        except (binascii.Error, UnicodeEncodeError):
+            return HttpResponseBadRequest('wrong code')
+        try:
+            hours, minutes, seconds = (int(part) for part in request.POST.get('timer', '').split(':'))
+        except ValueError:
+            return HttpResponseBadRequest('wrong timer')
+        time_spent_seconds = hours * 3600 + minutes * 60 + seconds
 
-        user_id = request.POST.get('user_id', None)
-        # print('user_id: {}'.format(user_id))
-
-        if User.objects.filter(id__iexact=user_id).exists():
-            # print('user EXISTS')
-
-            if int(request.user.id) != int(user_id):
-                # print('request.user.id != user_id')
-                return HttpResponseBadRequest('wrong auth user in request')
-
-            content_type = request.META['CONTENT_TYPE'].replace('application/x-www-form-urlencoded; charset=', '')
-            # print('content_type: {}'.format(content_type))
-            task_id = request.POST.get('task_id', None)
-            # print('task_id: {}'.format(task_id))
-            hint_id = int(request.POST.get('hint_id', 0))
-            # print('hint_id: {}'.format(hint_id))
-            codeb64 = request.POST.get('code', None)
-            code = base64.decodebytes(bytes(codeb64.encode(content_type)))
-            # print('code: {}'.format(code))
-            testsb64 = request.POST.get('tests', None)
-            tests = base64.decodebytes(bytes(testsb64.encode(content_type)))
-            # print('tests: {}'.format(tests))
-
-            timer = request.POST.get('timer', None)
-            # print('timer: {}'.format(timer))
-            tm = timer.split(':')
-            time_spent_seconds = int(tm[0]) * 3600 + int(tm[1]) * 60 + int(tm[2])
-            # print('tm: {}, time_spent_seconds: {}'.format(tm, time_spent_seconds))
-
-            result, returncode = self.run_python_code(code, task_id, tests, user_id)
-            # print('returncode: ', type(returncode))
-            # print('returncode: ', returncode)
-            is_finished = False
-            if isinstance(returncode, int) and returncode == 0:
-                is_finished = True
-            # print('is_finished: ', is_finished)
-            TaskSolution.save_or_update(task_id, user_id, is_finished, hint_id, time_spent_seconds=time_spent_seconds)
-        else:
-            # print('user NOT EXISTS')
-            return HttpResponseBadRequest('user NOT EXISTS')
-
+        result, returncode = self.run_python_code(code, task, request.user.id)
+        is_finished = returncode == 0
+        TaskSolution.save_or_update(task.id, request.user.id, is_finished, hint_id,
+                                    time_spent_seconds=time_spent_seconds)
         return HttpResponse(result)
 
 
-class TaskCodeHintView(View):
+class TaskCodeHintView(AjaxUserView):
     def post(self, request):
-        if not request.user.is_authenticated:
-            return HttpResponse(status=401)
+        error = self.check_request(request, request.POST)
+        if error:
+            return error
 
-        if not is_ajax(request):
-            return HttpResponseBadRequest()
+        task = Task.objects.filter(id=to_int(request.POST.get('task_id')) or 0).first()
+        if task is None:
+            return HttpResponseBadRequest('task NOT EXISTS')
+        hint_id = to_int(request.POST.get('hint_id', 0))
+        if hint_id is None or hint_id < 1:
+            return HttpResponseBadRequest('Unexpected hint_id !')
+        if hint_id > TaskSolution.MAX_HINT_NO:
+            return HttpResponseBadRequest('Unexpected (too high) hint_id !')
 
-        user_id = request.POST.get('user_id', None)
-        # print('user_id: {}'.format(user_id))
-
-        user_obj = User.objects.filter(id__iexact=user_id)
-        if user_obj.exists():
-            # print('user EXISTS')
-
-            if int(request.user.id) != int(user_id):
-                # print('request.user.id != user_id')
-                return HttpResponseBadRequest('wrong auth user in request')
-
-            content_type = request.META['CONTENT_TYPE'].replace('application/x-www-form-urlencoded; charset=', '')
-            # print('content_type: {}'.format(content_type))
-            task_id = request.POST.get('task_id', None)
-            # print('task_id: {}'.format(task_id))
-            hint_id = int(request.POST.get('hint_id', 0))
-            # print('hint_id: {}'.format(hint_id))
-
-            if hint_id > TaskSolution.MAX_HINT_NO:
-                return HttpResponseBadRequest('Unexpected (too high) hint_id !')
-
-            field_name = 'suggestion_' + str(hint_id)
-            # Employees.objects.only('eng_name')
-            result = Task.objects.order_by('my_order').filter(id__exact=task_id).values('suggestion_' + str(hint_id))
-            if result and len(result):
-                # print(result)
-                result = result[0]['suggestion_' + str(hint_id)]
-            # result = Task.objects.order_by('my_order').filter(id__exact=task_id).values(field_name)
-            is_finished = False
-            TaskSolution.save_or_update(task_id, user_id, is_finished, hint_id)
-            # print("result: {}".format(result))
-        else:
-            # print('user NOT EXISTS')
-            return HttpResponseBadRequest('user NOT EXISTS')
-
+        result = getattr(task, 'suggestion_%d' % hint_id)
+        TaskSolution.save_or_update(task.id, request.user.id, False, hint_id)
         return HttpResponse(result)
 
 
-class ContetUserView(View):
+class ContetUserView(AjaxUserView):
     def get(self, request):
-        if not request.user.is_authenticated:
-            return HttpResponse(status=401)
+        error = self.check_request(request, request.GET)
+        if error:
+            return error
 
-        if not is_ajax(request):
-            return HttpResponseBadRequest()
-
-        user_id = request.GET.get('user_id', None)
-        # print('user_id: {}'.format(user_id))
-        content_id = request.GET.get('content_id', None)
-        # print('content_id: {}'.format(content_id))
-
-        # print('is_authenticated: {}'.format(request.user.is_authenticated))
-        # print('Raw Data: {}'.format(request.body))
-        # print('Raw User Id: {}'.format(request.user.id))
-        # print('request.is_ajax(): {}'.format(request.is_ajax()))
-
-        if User.objects.filter(id__iexact=user_id).exists():
-            # print('user EXISTS')
-
-            if int(request.user.id) != int(user_id):
-                # print('request.user.id != user_id')
-                return HttpResponseBadRequest('wrong auth user in request')
-
-            user_instance = User.objects.filter(id=user_id).get()
-            content_instance = Content.objects.filter(id=content_id).get()
-
-            obj = ContentStatus.objects.filter(user=user_instance, content=content_instance)
-            if obj:
-                cs = obj.get()
-                # print('content - id {}, data: {}'.format(content_id, cs))
-                # print('status: {}'.format(cs.status))
-                return HttpResponse(cs.status)
-                # return HttpResponse('OK')
-            else:
-                # print('content NOT EXISTS')
-                return HttpResponseBadRequest('content NOT EXISTS')
-        else:
-            # print('user NOT EXISTS')
-            return HttpResponseBadRequest('user NOT EXISTS')
+        content_id = to_int(request.GET.get('content_id'))
+        cs = ContentStatus.objects.filter(user=request.user, content_id=content_id).first()
+        if cs is None:
+            return HttpResponseBadRequest('content NOT EXISTS')
+        return HttpResponse(cs.status)
 
 
 class OpinionsView(TemplateView):
@@ -423,85 +260,40 @@ class OpinionsView(TemplateView):
 
     def get_context_data(self, **kwargs):
         opinions = ContentStatus.get_opinions_by_user_id(self.request.user.id)
-        # print("opinions: {}".format(opinions))
-        # print("opinions.columns: {}".format(opinions.columns))
-        # for item in opinions:
-        #    # print("status: {}, status_count: {}".format(item.status, item.status_count))
         return {'opinions': opinions}
 
 
-class AchievementsView(TemplateView):
+ACHIEVEMENT_QUERY = """
+    SELECT
+        ts.id as id,
+        t.name as task_name,
+        ts.user_id as user_id,
+        SUM(t.points - ts.suggestions_count) as summary,
+        t.points as max_points,
+        ts.suggestions_count,
+        ts.task_id as task_id,
+        ts.is_finished as is_finished
+    FROM mainapp_tasksolution as ts
+    JOIN mainapp_task as t
+    ON (t.id = ts.task_id)
+    WHERE ts.user_id = %s AND ts.task_id = %s
+"""
+
+
+class AchievementsView(LoginRequiredMixin, TemplateView):
     template_name = 'mainapp/achievements_list.html'
 
     def get_context_data(self, **kwargs):
         tasks_achievements = []
         tasks = Task.objects.order_by('my_order').select_related().filter(is_visible=True)
-        # print('tasks: ', tasks)
-        # print('self.request.user.id: ', self.request.user.id)
         points_summary = 0
         max_points_summary = 0
 
-        '''
-        query = """
-        SELECT
-            ts.id as id,
-            t.name as task_name,
-            ts.user_id as user_id,
-            SUM(t.points - ts.suggestions_count) as summary,
-            t.points as max_points,
-            ts.suggestions_count,
-            ts.task_id as task_id
-        FROM mainapp_tasksolution as ts
-        JOIN mainapp_task as t
-        ON (t.id == ts.task_id)
-        WHERE ts.user_id={}
-        AND ts.is_finished=1
-        AND ts.task_id IN ({});
-        """.format(self.request.user.id,
-                   ','.join([str(task.id) for task in tasks]))
-
-        # print("query:", query)
-        achievements = TaskSolution.objects.raw(query)
-        for achievement in achievements:
-            print("achievement: ", achievement)
-            print("achievement.summary: ", achievement.summary)
-            if achievement.summary is None:
-                continue
-            print("achievement for task_id: {} - summary: {}"
-                  .format(achievement.task_id, achievement.summary))
-            tasks_achievements.append({
-                "task_id": achievement.task_id,
-                "summary": achievement.summary,
-                "task_name": achievement.task_name,
-                "max_points": achievement.max_points
-            })
-            points_summary += achievement.summary
-            max_points_summary += achievement.max_points
-        '''
-
         for task in tasks:
-            query = """
-            SELECT
-                ts.id as id,
-                t.name as task_name,
-                ts.user_id as user_id,
-                SUM(t.points - ts.suggestions_count) as summary,
-                t.points as max_points,
-                ts.suggestions_count,
-                ts.task_id as task_id,
-                ts.is_finished as is_finished
-            FROM mainapp_tasksolution as ts
-            JOIN mainapp_task as t
-            ON (t.id == ts.task_id)
-            WHERE ts.user_id={} AND ts.task_id={};
-            """.format(self.request.user.id, task.id)
-
-            # print("query:", query)
-            achievements = TaskSolution.objects.raw(query)
+            achievements = TaskSolution.objects.raw(ACHIEVEMENT_QUERY, [self.request.user.id, task.id])
             summary = achievements[0].summary if achievements[0].is_finished else 0
             if summary is None:
                 continue
-            # print("achievements for task_id: {} - summary: {}".format(task.id, summary))
             tasks_achievements.append({
                 "task_id": task.id,
                 "summary": summary,
@@ -528,71 +320,4 @@ class LearnerSupportView(TemplateView):
     template_name = 'mainapp/learner_support_list.html'
 
     def get_context_data(self, **kwargs):
-        # items = LearnerSupport.get_all_by_user_id(self.request.user.id)
-        items = {}
-        # print("items: {}".format(items))
-        return {'items': items}
-
-
-"""
-# from django.views.decorators.csrf import csrf_exempt
-# import json
-
-class ContetUserStatusAjaxView2(TemplateView):
-  template_name = 'mainapp/empty.html'
-
-
-  def get_context_data(self, **kwargs):
-      # print('kwargs: {}'.format(kwargs))
-
-      user_id = kwargs['user_id']
-      if User.objects.filter(id__iexact=user_id).exists():
-          # print('user EXISTS')
-
-          # request.user.is_authenticated:
-
-          content_id = kwargs['content_id']
-          if Content.objects.filter(id__iexact=content_id).exists():
-              # print('content EXISTS')
-              status = kwargs['status']
-          else:
-              # print('content NOT EXISTS')
-      else:
-          # print('user NOT EXISTS')
-
-      return {'respons': user_id}
-
-
-  #def post(self, request):
-  #    return HttpResponse(json.dumps({'key': 'value'}), mimetype="application/json")
-
-  # @login_required
-  # @csrf_exempt
-  def content_user_status(request):
-      #return HttpResponse("OK")
-      #if not request.user.is_authenticated:
-      #    return HttpResponse(status=401)
-
-      user_id = request.GET.get('user_id', None)
-      # print('user_id: "%d"' % user_id)
-
-      # print('Raw Data: "%s"' % request.body)
-
-      if request.is_ajax():
-          if request.method == 'GET':
-              user_id = request.GET.get('user_id', None)
-
-              # print('Raw Data: "%s"' % request.body)
-              #if user_id:
-              #    if User.objects.filter(userid__iexact=user_id).exists():
-              #        cs = ContentStatus(user=user_id, content=content_id, status=selected_status)
-              #        cs.save()
-              return HttpResponse("OK")
-
-      return HttpResponseBadRequest()
-
-  #def get_context_data(self, **kwargs):
-  #    # module_id = kwargs['module_id']
-  #    # print(kwargs)
-  #    return {'test_results': 123}
-"""
+        return {'items': {}}

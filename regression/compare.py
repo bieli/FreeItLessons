@@ -71,7 +71,8 @@ def main():
     applied = apply_replacements(legacy['steps'], replacements)
     old_steps = {s['id']: s for s in legacy['steps']}
     new_steps = {s['id']: s for s in candidate['steps']}
-    for step_id in sorted(set(old_steps) | set(new_steps)):
+    order = [s['id'] for s in legacy['steps']] + [i for i in new_steps if i not in old_steps]
+    for step_id in order:
         compared += 1
         old, new = old_steps.get(step_id), new_steps.get(step_id)
         if old != new:

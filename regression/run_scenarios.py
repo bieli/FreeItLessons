@@ -24,6 +24,7 @@ import os
 import re
 import sqlite3
 import sys
+from urllib.parse import urlencode
 
 import requests
 from bs4 import BeautifulSoup
@@ -46,6 +47,22 @@ TASK_FAKE_TESTS = """# tests
 def __run_tests():
     print('ASSERTS TESTS - OK.')
 # tests
+"""
+
+# substring blacklist bypass: imports "os" and runs a shell command
+SANDBOX_ESCAPE = """# unit
+m = getattr(__builtins__, '__imp' + 'ort__')('o' + 's')
+getattr(m, 'sy' + 'stem')('echo SHELL-' + 'EXECUTED')
+def reverse_chars(chars):
+    return chars
+# unit
+"""
+
+INFINITE_LOOP = """# unit
+def reverse_chars(chars):
+    while True:
+        pass
+# unit
 """
 
 # Admin pages are rendered by Django's own (version specific) templates, so
@@ -179,8 +196,13 @@ class Client:
         headers = kwargs.pop('headers', {})
         if ajax:
             headers['X-Requested-With'] = 'XMLHttpRequest'
-        resp = self.session.request(method, self.base_url + path, headers=headers,
-                                    allow_redirects=False, timeout=60, **kwargs)
+        timeout = kwargs.pop('timeout', 60)
+        try:
+            resp = self.session.request(method, self.base_url + path, headers=headers,
+                                        allow_redirects=False, timeout=timeout, **kwargs)
+        except requests.Timeout:
+            self.recorder.record_timeout(self.actor, name, method, path, timeout)
+            return None
         self.recorder.record(self.actor, name, method, path, resp, record)
         return resp
 
@@ -215,12 +237,24 @@ class Client:
 class Recorder:
     def __init__(self):
         self.steps = []
+        self._ids = {}
+
+    def step_id(self, actor, name, path):
+        """Stable id: "actor: name [path]" (+ " #n" when repeated)."""
+        base = '%s: %s [%s]' % (actor, name, path.split('?')[0])
+        count = self._ids[base] = self._ids.get(base, 0) + 1
+        return base if count == 1 else '%s #%d' % (base, count)
+
+    def record_timeout(self, actor, name, method, path, timeout):
+        self.steps.append({'id': self.step_id(actor, name, path),
+                           'request': '%s %s' % (method, path),
+                           'status': 'no response within %ds' % timeout})
 
     def record(self, actor, name, method, path, resp, mode):
         ctype = resp.headers.get('Content-Type', '').split(';')[0].strip()
         ctype = _CONTENT_TYPES.get(ctype, ctype)
         entry = {
-            'id': '%03d %s: %s' % (len(self.steps) + 1, actor, name),
+            'id': self.step_id(actor, name, path),
             'request': '%s %s' % (method, path),
             'status': resp.status_code,
         }
@@ -269,7 +303,7 @@ class SeedData:
         unrated = q('SELECT id FROM mainapp_content WHERE id NOT IN '
                     '(SELECT content_id FROM mainapp_contentstatus WHERE user_id=?) '
                     'ORDER BY id', STUDENT_ID)
-        self.content_a, self.content_b = unrated[0][0], unrated[1][0]
+        self.content_a, self.content_b, self.content_c = unrated[0][0], unrated[1][0], unrated[2][0]
         self.first = {}
         for model in ('author', 'module', 'chapter', 'content', 'curiosity', 'contentstatus',
                       'faq', 'task', 'tasksolution'):
@@ -280,6 +314,9 @@ class SeedData:
 PUBLIC_PAGES = ['/', '/faq.html', '/kursy.html', '/mentorzy.html', '/opinions/',
                 '/learner-support/', '/achievements/', '/zadania.html', '/zadania/1.html',
                 '/does-not-exist.html']
+
+# security probes: application source code must not be downloadable
+SOURCE_PROBES = ['/static/views.py', '/static/models.py', '/static/templates/mainapp/base.html']
 
 STATIC_FILES = ['/static/mainapp/js/postStatus.js', '/static/mainapp/js/jquery.base64.min.js',
                 '/static/mainapp/js/easytimer/easytimer.js', '/static/mainapp/img/new.png',
@@ -297,6 +334,8 @@ def anonymous_journey(base_url, rec, seed):
         c.get('chapter page', '/kursy/%d/rozdzial/%d.html' % (module_id, chapter_id))
     for path in STATIC_FILES:
         c.get('static file', path)
+    for path in SOURCE_PROBES:
+        c.get('SECURITY probe: source code via /static/', path, record='status')
     # AJAX endpoints refuse anonymous users
     c.get('content status (anonymous)', '/content/user/status/?user_id=%d&content_id=%d&status=good'
           % (STUDENT_ID, seed.content_a), ajax=True)
@@ -317,32 +356,49 @@ def student_journey(base_url, rec, seed):
 
     # ---- course content opinions (AJAX) --------------------------------
     rated, unrated = seed.content_a, seed.content_b
-    status_url = '/content/user/status/?user_id=%s&content_id=%s&status=%s'
     read_url = '/content/user/?user_id=%s&content_id=%s'
-    c.get('create first opinion', status_url % (STUDENT_ID, rated, 'doit'), ajax=True)
+    # send the opinion exactly the way courses_list.html does it (GET or POST)
+    module_id, chapter_id = seed.module_chapters[0]
+    page = c.session.get(c.base_url + '/kursy/%d/rozdzial/%d.html' % (module_id, chapter_id), timeout=60)
+    method = re.search(r"url: '/content/user/status/',\s*type: '(\w+)'", page.text).group(1).upper()
+
+    def opinion(name, user_id, content_id, status, ajax=True, csrf=True, method=method):
+        params = {'user_id': user_id, 'content_id': content_id, 'status': status}
+        if method == 'GET':
+            return c.get(name, '/content/user/status/?' + urlencode(params), ajax=ajax)
+        if csrf:
+            params['csrfmiddlewaretoken'] = c.csrf_token()
+        return c.post(name, '/content/user/status/', data=params, ajax=ajax)
+
+    opinion('create first opinion', STUDENT_ID, rated, 'doit')
     c.get('read existing opinion', read_url % (STUDENT_ID, rated), ajax=True)
     c.get('read missing opinion', read_url % (STUDENT_ID, unrated), ajax=True)
-    c.get('create opinion', status_url % (STUDENT_ID, unrated, 'good'), ajax=True)
+    opinion('create opinion', STUDENT_ID, unrated, 'good')
     c.get('read created opinion', read_url % (STUDENT_ID, unrated), ajax=True)
-    c.get('update opinion (upper case)', status_url % (STUDENT_ID, rated, 'HELP'), ajax=True)
+    opinion('update opinion (upper case)', STUDENT_ID, rated, 'HELP')
     c.get('read updated opinion', read_url % (STUDENT_ID, rated), ajax=True)
     c.get('read opinion of unknown content', read_url % (STUDENT_ID, 999999), ajax=True)
-    c.get('opinion without XHR header', status_url % (STUDENT_ID, rated, 'done'))
-    c.get('opinion with unknown status', status_url % (STUDENT_ID, rated, 'bogus'), ajax=True)
-    c.get('opinion for unknown content', status_url % (STUDENT_ID, 999999, 'done'), ajax=True)
-    c.get('opinion for other user', status_url % (SUPERUSER_ID, rated, 'done'), ajax=True)
-    c.get('opinion for unknown user', status_url % (999999, rated, 'done'), ajax=True)
+    opinion('opinion without XHR header', STUDENT_ID, rated, 'done', ajax=False)
+    opinion('opinion with unknown status', STUDENT_ID, rated, 'bogus')
+    opinion('opinion for unknown content', STUDENT_ID, 999999, 'done')
+    opinion('opinion for other user', SUPERUSER_ID, rated, 'done')
+    opinion('opinion for unknown user', 999999, rated, 'done')
     c.get('read opinion of other user', read_url % (SUPERUSER_ID, rated), ajax=True)
+    # a state change must not be possible cross-site (plain GET / POST without token)
+    opinion('SECURITY probe: opinion change via GET (CSRF)', STUDENT_ID, seed.content_c, 'done', method='GET')
+    opinion('SECURITY probe: opinion change without CSRF token', STUDENT_ID, seed.content_c, 'done',
+            method='POST', csrf=False)
+    opinion('SECURITY probe: garbage user_id', 'abc', rated, 'done')
 
     # ---- programming tasks (AJAX) --------------------------------------
     run_url, hint_url = '/zadania/task/code/run/', '/zadania/task/code/hint/'
 
-    def run(name, task_id, code, tests=None, ajax=True, csrf=True, user_id=STUDENT_ID, hint_id=0):
+    def run(name, task_id, code, tests=None, ajax=True, csrf=True, user_id=STUDENT_ID, hint_id=0, timeout=60):
         data = {'user_id': user_id, 'task_id': task_id, 'hint_id': hint_id, 'timer': TIMER,
                 'code': b64(code), 'tests': b64(seed.tasks[task_id]['tests'] if tests is None else tests)}
         if csrf:
             data['csrfmiddlewaretoken'] = c.csrf_token()
-        return c.post(name, run_url, data=data, ajax=ajax,
+        return c.post(name, run_url, data=data, ajax=ajax, timeout=timeout,
                       headers={'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'})
 
     def hint(name, task_id, hint_id):
@@ -364,9 +420,21 @@ def student_journey(base_url, rec, seed):
     hint('hint 5 (surrender)', 3, 5)
     # client supplied tests must not decide whether the task is solved
     run('run with tampered tests', 2, seed.tasks[2]['code'], tests=TASK_FAKE_TESTS)
+    run('SECURITY probe: blacklist bypass runs a shell command', 1, SANDBOX_ESCAPE)
+    run('SECURITY probe: garbage hint_id', 1, TASK_1_SOLUTION, hint_id='x')
+    run('SECURITY probe: unknown task', 999999, TASK_1_SOLUTION, tests='')
+    hint('SECURITY probe: hint for unknown task', 999999, 1)
+    c.post('SECURITY probe: run with bogus charset', run_url, ajax=True,
+           data={'user_id': STUDENT_ID, 'task_id': 1, 'hint_id': 0, 'timer': TIMER,
+                 'code': b64(TASK_1_SOLUTION), 'tests': b64(seed.tasks[1]['tests']),
+                 'csrfmiddlewaretoken': c.csrf_token()},
+           headers={'Content-Type': 'application/x-www-form-urlencoded; charset=no-such-codec'})
+    c.get('SECURITY probe: unknown task page', '/zadania/999999.html')
 
     for path in ('/zadania.html', '/achievements/', '/opinions/'):
         c.get('page after activity', path)
+    # last: the legacy server never answers this request (worker spins forever)
+    run('SECURITY probe: infinite loop', 1, INFINITE_LOOP, timeout=20)
     c.get('password change page', '/admin/password_change/')
     logout(c)
     c.get('home after logout', '/')

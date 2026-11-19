@@ -30,7 +30,9 @@ jobs:
       - name: Test with Django test runner
         env:
           DJANGO_SECRET_KEY: ci-only-secret-key
-        run: python manage.py test tests -v 2
+        run: |
+          python manage.py collectstatic --noinput -v0
+          python manage.py test tests -v 2
 
   regression:
     # legacy (Python 3.7 + Django 1.11) vs this revision - characterization check

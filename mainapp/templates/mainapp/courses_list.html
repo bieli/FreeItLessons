@@ -81,9 +81,9 @@
 }
 </style>
 
-<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+<script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
  
-<script src="http://code.jquery.com/ui/1.11.1/jquery-ui.min.js"></script>
+<script src="https://code.jquery.com/ui/1.11.1/jquery-ui.min.js"></script>
 
 <link rel="stylesheet" href="https://code.jquery.com/ui/1.11.1/themes/smoothness/jquery-ui.css" />
 
@@ -155,7 +155,7 @@ jQuery( document ).ready(function( $ ) {
     var logged_user_id = parseInt($("input[name='logged-user-id']").val());
     //var csrfmiddlewaretoken = $("input[name='csrfmiddlewaretoken']").val()
     //var myEvent = { status: status /*, csrfmiddlewaretoken: '{{ csrf_token }}' */ };
-    var myEvent = { user_id: logged_user_id, content_id: content_id, status: status /*, csrfmiddlewaretoken: '{{ csrf_token }}' */ };
+    var myEvent = { user_id: logged_user_id, content_id: content_id, status: status, csrfmiddlewaretoken: '{{ csrf_token }}' };
     console.log("myEvent:", myEvent)
 /*
     jQuery.ajax({
@@ -178,7 +178,7 @@ xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
     $.ajax({
         // url: '/content/' + content_id + '/user/' + logged_user_id + '/status/' + status + '/',
         url: '/content/user/status/',
-        type: 'GET',
+        type: 'POST',
         data: myEvent,
         success: function(result) {
             console.log("postDataIntoServiceEndpoint: AJAX OK - result: ", result);

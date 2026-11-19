@@ -26,7 +26,7 @@ services:
     build: .
     environment:
       REGRESSION_PASSWORD: Regression-Pass-2024!
-      DJANGO_DEBUG: "1"
+      DJANGO_DEBUG: "0"
       DJANGO_SECRET_KEY: regression-only-secret-key-not-for-production
       DJANGO_ALLOWED_HOSTS: localhost
       DJANGO_DB_PATH: /state/db.sqlite3

@@ -7,7 +7,7 @@ import base64
 from urllib.parse import urlencode
 
 from django.contrib.auth.models import User
-from django.test import TestCase, override_settings
+from django.test import Client, TestCase, override_settings
 
 from mainapp.models import Author, Chapter, ChapterLevelType, Content, ContentStatus, \
     ContentType, Faq, Module, Task, TaskSolution
@@ -95,7 +95,18 @@ class PublicPagesTest(FixturesMixin, TestCase):
 
     def test_tasks_require_login(self):
         response = self.client.get('/zadania.html')
-        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, '/admin/login/?next=/zadania.html', fetch_redirect_response=False)
+
+    def test_achievements_require_login(self):
+        response = self.client.get('/achievements/')
+        self.assertRedirects(response, '/admin/login/?next=/achievements/', fetch_redirect_response=False)
+
+    def test_unknown_task_is_404(self):
+        self.assertEqual(self.client.get('/zadania/999999.html').status_code, 404)
+
+    def test_source_code_is_not_published_as_static(self):
+        for path in ('/static/views.py', '/static/models.py', '/static/templates/mainapp/base.html'):
+            self.assertEqual(self.client.get(path).status_code, 404, path)
 
     def test_static_files_are_served(self):
         response = self.client.get('/static/mainapp/js/jquery.base64.min.js')
@@ -147,31 +158,46 @@ class ContentStatusAjaxTest(FixturesMixin, TestCase):
         return data
 
     def test_anonymous_is_rejected(self):
-        self.assertEqual(self.client.get(self.url, self.params(), **XHR).status_code, 401)
+        self.assertEqual(self.client.post(self.url, self.params(), **XHR).status_code, 401)
         self.assertEqual(self.client.get(self.read_url, self.params(), **XHR).status_code, 401)
 
     def test_create_update_and_read_status(self):
         self.client.force_login(self.student)
-        self.assertEqual(self.client.get(self.url, self.params(), **XHR).content, b'OK')
+        self.assertEqual(self.client.post(self.url, self.params(), **XHR).content, b'OK')
         self.assertEqual(self.client.get(self.read_url, self.params(), **XHR).content, b'good')
-        self.assertEqual(self.client.get(self.url, self.params(status='HELP'), **XHR).content, b'OK')
+        self.assertEqual(self.client.post(self.url, self.params(status='HELP'), **XHR).content, b'OK')
         self.assertEqual(self.client.get(self.read_url, self.params(), **XHR).content, b'help')
         self.assertEqual(ContentStatus.objects.filter(user=self.student).count(), 1)
 
     def test_validation(self):
         self.client.force_login(self.student)
-        self.assertEqual(self.client.get(self.url, self.params()).status_code, 400)
+        self.assertEqual(self.client.post(self.url, self.params()).status_code, 400)
         cases = [
             (self.params(status='bogus'), b'status NOT EXISTS'),
             (self.params(content_id=999999), b'content NOT EXISTS'),
+            (self.params(content_id='abc'), b'content NOT EXISTS'),
             (self.params(user_id=self.other.id), b'wrong auth user in request'),
             (self.params(user_id=999999), b'user NOT EXISTS'),
+            (self.params(user_id='abc'), b'user NOT EXISTS'),
         ]
         for params, message in cases:
-            response = self.client.get(self.url, params, **XHR)
+            response = self.client.post(self.url, params, **XHR)
             self.assertEqual((response.status_code, response.content), (400, message))
-        response = self.client.get(self.read_url, self.params(content_id=self.link.id), **XHR)
-        self.assertEqual((response.status_code, response.content), (400, b'content NOT EXISTS'))
+        for content_id in (self.link.id, 999999, 'abc'):
+            response = self.client.get(self.read_url, self.params(content_id=content_id), **XHR)
+            self.assertEqual((response.status_code, response.content), (400, b'content NOT EXISTS'))
+
+    def test_state_change_requires_post_with_csrf_token(self):
+        self.client.force_login(self.student)
+        self.assertEqual(self.client.get(self.url, self.params(), **XHR).status_code, 405)
+        csrf_client = Client(enforce_csrf_checks=True)
+        csrf_client.force_login(self.student)
+        self.assertEqual(csrf_client.post(self.url, self.params(), **XHR).status_code, 403)
+        csrf_client.get('/kursy/%d/rozdzial/%d.html' % (self.module.id, self.chapter.id))
+        token = csrf_client.cookies['csrftoken'].value
+        response = csrf_client.post(self.url, self.params(csrfmiddlewaretoken=token), **XHR)
+        self.assertEqual(response.content, b'OK')
+        self.assertFalse(ContentStatus.objects.filter(status='done').exists())
 
 
 class TaskAjaxTest(FixturesMixin, TestCase):
@@ -209,8 +235,40 @@ class TaskAjaxTest(FixturesMixin, TestCase):
 
     def test_requests_are_validated(self):
         self.assertEqual(self.run_code(SOLUTION_CODE, user_id=self.other.id).status_code, 400)
+        for bad in ({'user_id': 'abc'}, {'task_id': 'abc'}, {'task_id': 999999}, {'hint_id': 'x'},
+                    {'timer': 'oops'}):
+            self.assertEqual(self.run_code(SOLUTION_CODE, **bad).status_code, 400, bad)
         self.client.logout()
         self.assertEqual(self.run_code(SOLUTION_CODE).status_code, 401)
+
+    def test_client_supplied_tests_are_ignored(self):
+        fake = "# tests\ndef __run_tests():\n    print('ASSERTS TESTS - OK.')\n# tests\n"
+        response = self.run_code(STARTER_CODE, tests=b64(fake))
+        self.assertIn('AssertionError', response.content.decode())
+        self.assertFalse(TaskSolution.objects.get(task=self.task, user=self.student).is_finished)
+
+    @override_settings(CODE_RUN_TIMEOUT_SECONDS=2)
+    def test_infinite_loop_is_stopped(self):
+        code = "# unit\ndef reverse_chars(chars):\n    while True:\n        pass\n# unit\n"
+        response = self.run_code(code)
+        self.assertIn('Time limit exceeded', response.content.decode())
+        self.assertFalse(TaskSolution.objects.get(task=self.task, user=self.student).is_finished)
+
+    def test_blacklist_bypass_cannot_run_commands(self):
+        code = ("m = getattr(__builtins__, '__imp' + 'ort__')('o' + 's')\n"
+                "getattr(m, 'sy' + 'stem')('echo SHELL-' + 'EXECUTED')\n" + SOLUTION_CODE)
+        output = self.run_code(code).content.decode()
+        self.assertNotIn('SHELL-EXECUTED', output)
+        self.assertNotIn('sandbox_bootstrap', output)
+        self.assertIn('PermissionError: Operation not allowed in exercises: os.system', output)
+
+    def test_program_cannot_read_server_files_or_secrets(self):
+        code = ("print(getattr(__builtins__, 'op' + 'en')('/etc/hostname').read())\n" + SOLUTION_CODE)
+        self.assertIn('PermissionError', self.run_code(code).content.decode())
+        code = ("m = getattr(__builtins__, '__imp' + 'ort__')('o' + 's')\n"
+                "print('ENV:', sorted(getattr(m, 'environ')))\n" + SOLUTION_CODE)
+        output = self.run_code(code).content.decode()
+        self.assertNotIn('DJANGO_SECRET_KEY', output)
 
     def test_hints(self):
         data = {'user_id': self.student.id, 'task_id': self.task.id}
@@ -222,6 +280,8 @@ class TaskAjaxTest(FixturesMixin, TestCase):
         self.assertTrue(TaskSolution.objects.get(task=self.task, user=self.student).is_surrender)
         response = self.client.post(self.hint_url, dict(data, hint_id=6), **XHR)
         self.assertEqual(response.status_code, 400)
+        for bad in ({'hint_id': 0}, {'hint_id': 'x'}, {'task_id': 999999}):
+            self.assertEqual(self.client.post(self.hint_url, dict(data, **bad), **XHR).status_code, 400, bad)
 
 
 @override_settings(STORAGES={'staticfiles': {'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage'}})

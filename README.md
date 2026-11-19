@@ -41,32 +41,72 @@ One of the project's key strengths lies in its commitment to fostering great edu
 
 ## How to run
 
+Requirements: **Python 3.12+** (Django 6.1) or **Docker** with Docker Compose.
 
-### Development fast track
-
-```bash
-make install-dev
-make install
-make chpwd # optional: change "admin" user password for login as default "admin" - example user
-make run
-
-make ci
-```
-
-### Requirements to deployment
-
-1. Linux or other operationg system
-2. Docker or Vagrant (with Docker)
-
-### Developing project using Docker
+### Docker Compose (recommended)
 
 ```bash
-docker build -t free-it-lessons:1.0 -f ./Dockerfile .
-docker run -p 8000:8000 -it free-it-lessons:1.0 python3 manage.py runserver 0.0.0.0:8000
+docker compose up --build              # http://127.0.0.1:8000  (demo DB seeded into a volume)
+docker compose run --build --rm tests  # lint + Django checks + test suite
+make regression                        # legacy (Py3.7/Django 1.11) vs current: characterization check
 ```
 
-Run web browser and open http://127.0.0.1:8000
+Create or reset an account inside the container:
 
+```bash
+docker compose exec web python manage.py changepassword admin
+docker compose exec web python manage.py createsuperuser
+```
+
+### Development fast track (virtualenv)
+
+```bash
+make install-dev          # python3.12 -m venv .venv + dev requirements
+. .venv/bin/activate
+make chpwd                # optional: change "admin" user password
+make run                  # DJANGO_DEBUG=1 runserver on http://127.0.0.1:8000
+make ci                   # pycodestyle + tests
+```
+
+### Configuration (environment variables)
+
+| Variable | Default | Meaning |
+|---|---|---|
+| `DJANGO_SECRET_KEY` | — (**required** unless `DJANGO_DEBUG=1`) | secret key |
+| `DJANGO_DEBUG` | `0` | debug mode, never enable in production |
+| `DJANGO_ALLOWED_HOSTS` | `127.0.0.1,localhost` | comma separated host names |
+| `DJANGO_CSRF_TRUSTED_ORIGINS` | — | e.g. `https://elearning.example.com` |
+| `DJANGO_DB_PATH` | `./db.sqlite3` (`/data/db.sqlite3` in Docker) | SQLite database file |
+| `DJANGO_SECURE_COOKIES`, `DJANGO_SECURE_SSL_REDIRECT`, `DJANGO_SECURE_HSTS_SECONDS`, `DJANGO_BEHIND_TLS_PROXY` | off | HTTPS hardening - enable when served over TLS |
+| `CODE_RUN_TIMEOUT_SECONDS` / `CODE_RUN_MEMORY_MB` / `CODE_RUN_OUTPUT_KB` | `5` / `256` / `256` | limits of one run of a student's program |
+
+### Upgrade notes (Python 3.12 + Django 6.1)
+
+The project was migrated from Django 1.11 in two steps, each verified by the
+characterization harness in [`regression/`](regression/README.md) (the legacy
+app and the new one replay the same journeys on identical databases and the
+responses + resulting data are diffed):
+
+1. **Upgrade with behaviour parity** - framework APIs, dependencies, initial
+   migration (the existing database adopts it unchanged), Docker.
+   Only intended change: logout is a POST (Django 5+ dropped GET logout).
+2. **Security fixes** - every intended behaviour change is listed with its reason in
+   [`regression/expected_differences.json`](regression/expected_differences.json):
+   * students' programs run in a restricted child interpreter (no shell, empty
+     environment, timeout, CPU/memory/file/process limits, audit hook blocking
+     processes, network, native code and file access); tests are always taken
+     from the database, never from the browser,
+   * application source code is no longer downloadable under `/static/`,
+   * state changing AJAX call (content opinion) is POST + CSRF token,
+   * no committed secret key, `DEBUG` off by default, HTTPS settings via env,
+   * input validation (no more HTTP 500 on malformed requests), parameterized SQL,
+   * scripts loaded over https only, unused third-party scripts removed.
+
+Known limitations / recommendations: the code runner is defence in depth, not a
+hardened jail - for untrusted users on the public Internet also run it in an OS
+sandbox (gVisor/nsjail or a separate container without access to the database).
+Students log in through the Django admin login and therefore need `is_staff`;
+give them no model permissions in the admin.
 
 ### How to start developing using Vagrant with Docker
 
@@ -109,10 +149,10 @@ ssh vagrant 'docker run -ti ubuntu:xenial echo hi'
 - [ ] JavaScript move from jQuery to EcmaScript or VueJS, etc.
 - [ ] change font sizes into proportional to screen (currently are too small for eyes)
 - [ ] add leader boards (some interesting features for all class mates - challenges for clasess, etc)
-- [ ] switch to newest Django version + upgrade django components
-- [ ] upgrade packages & fixes for interesting SEC. issues :-)
+- [x] switch to newest Django version + upgrade django components
+- [x] upgrade packages & fixes for interesting SEC. issues :-)
 - [ ] describe screen shots
 - [ ] more information about features (maybe youtube video !)
 - [ ] refactoring tasks in dedicated modules with unit tests
-- [ ] add unit tests and CI on travis
+- [x] add unit tests and CI (GitHub Actions)
 

@@ -11,6 +11,8 @@ import os
 import sys
 from pathlib import Path
 
+from django.core.exceptions import ImproperlyConfigured
+
 
 def env_bool(name, default):
     value = os.environ.get(name)
@@ -29,13 +31,36 @@ def env_list(name, default):
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', '@j=t223ji9etm7a3xd1*n=ma@sfh##&$wl-z9%c#3-vqa%!%f41')
-
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env_bool('DJANGO_DEBUG', True)
+DEBUG = env_bool('DJANGO_DEBUG', False)
 
-ALLOWED_HOSTS = env_list('DJANGO_ALLOWED_HOSTS', ['127.0.0.1', 'localhost', '137.74.43.98'])
+# SECURITY WARNING: keep the secret key used in production secret!
+# (the key formerly committed to this repository is public - never reuse it)
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', '')
+if not SECRET_KEY:
+    if not DEBUG:
+        raise ImproperlyConfigured('Set the DJANGO_SECRET_KEY environment variable '
+                                   '(or DJANGO_DEBUG=1 for local development).')
+    SECRET_KEY = 'django-insecure-local-development-only'
+
+ALLOWED_HOSTS = env_list('DJANGO_ALLOWED_HOSTS', ['127.0.0.1', 'localhost'])
+CSRF_TRUSTED_ORIGINS = env_list('DJANGO_CSRF_TRUSTED_ORIGINS', [])
+
+# HTTPS hardening - enable when served over TLS (see README "Configuration")
+SECURE_SSL_REDIRECT = env_bool('DJANGO_SECURE_SSL_REDIRECT', False)
+SESSION_COOKIE_SECURE = env_bool('DJANGO_SECURE_COOKIES', False)
+CSRF_COOKIE_SECURE = SESSION_COOKIE_SECURE
+SECURE_HSTS_SECONDS = int(os.environ.get('DJANGO_SECURE_HSTS_SECONDS', '0'))
+SECURE_HSTS_INCLUDE_SUBDOMAINS = env_bool('DJANGO_SECURE_HSTS_INCLUDE_SUBDOMAINS', False)
+if env_bool('DJANGO_BEHIND_TLS_PROXY', False):
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SESSION_COOKIE_HTTPONLY = True
+X_FRAME_OPTIONS = 'DENY'
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_REFERRER_POLICY = 'same-origin'
+
+# The only login page of the site is the admin one (students log in there too).
+LOGIN_URL = '/admin/login/'
 
 # Application definition
 
@@ -134,10 +159,9 @@ STATIC_URL = '/static/'
 
 STATIC_ROOT = os.environ.get('DJANGO_STATIC_ROOT', str(BASE_DIR / 'staticfiles'))
 
-# Location of folders that will be added to static folder
-STATICFILES_DIRS = (
-    BASE_DIR / 'mainapp',
-)
+# NOTE: the legacy STATICFILES_DIRS = (BASE_DIR / 'mainapp',) published the
+# application's source code and templates under /static/ - removed. All assets
+# live in mainapp/static/ and are found by the app directories finder.
 
 STORAGES = {
     'default': {
@@ -207,3 +231,15 @@ EMAIL_HOST_PASSWORD = os.environ.get('DJANGO_EMAIL_HOST_PASSWORD', '')
 PYTHON_EXEC = os.environ.get('PYTHON_EXEC', sys.executable)
 
 TEMP_SOLUTION_CODE_BLOCK = os.environ.get('TEMP_SOLUTION_CODE_BLOCK', '/tmp/')
+
+# Limits of a single run of a student's program (mainapp/sandbox.py)
+CODE_RUN_TIMEOUT_SECONDS = int(os.environ.get('CODE_RUN_TIMEOUT_SECONDS', '5'))
+CODE_RUN_MEMORY_MB = int(os.environ.get('CODE_RUN_MEMORY_MB', '256'))
+CODE_RUN_OUTPUT_KB = int(os.environ.get('CODE_RUN_OUTPUT_KB', '256'))
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {'console': {'class': 'logging.StreamHandler'}},
+    'loggers': {'mainapp': {'handlers': ['console'], 'level': os.environ.get('DJANGO_LOG_LEVEL', 'INFO')}},
+}

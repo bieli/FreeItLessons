@@ -12,18 +12,19 @@ lint:
 
 test:
 	python3 manage.py makemigrations --check --dry-run
+	python3 manage.py collectstatic --noinput -v0
 	python3 manage.py test tests
 
 ci: lint test
 
 migrate:
-	python3 manage.py migrate
+	DJANGO_DEBUG=1 python3 manage.py migrate
 
 run: migrate
-	python3 manage.py runserver
+	DJANGO_DEBUG=1 python3 manage.py runserver
 
 chpwd:
-	python3 manage.py changepassword admin
+	DJANGO_DEBUG=1 python3 manage.py changepassword admin
 
 docker-up:
 	docker compose up --build

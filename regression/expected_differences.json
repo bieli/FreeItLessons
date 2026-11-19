@@ -1,5 +1,5 @@
 {
-  "_comment": "Intentional behaviour changes only. Keys: step id or db:<table> -> reason.",
+  "_comment": "Intentional behaviour changes only (each reviewed). Keys: step id or db:<table> -> reason.",
   "_line_replacements": [
     {
       "reason": "Django >= 5.0 accepts logout only via POST: the 'Wyloguj' link now submits a hidden POST form (same look, same URL)",
@@ -9,8 +9,102 @@
       "to": [
         "<li class=\"\"><form id=\"logout-form\" method=\"post\" action=\"/admin/logout/\" style=\"display: none;\"><CSRF-INPUT></form><a href=\"/admin/logout/\" onclick=\"event.preventDefault(); document.getElementById('logout-form').submit();\">Wyloguj</a></li>"
       ]
+    },
+    {
+      "reason": "SECURITY home.html: scripts over https only; removed unused third-party scripts (beneposto.pl is dead, gamehouse.com spritely unused); floating.js pinned to a version",
+      "from": [
+        "<script src=\"//code.jquery.com/jquery.min.js\"></script>",
+        "<BOOTSTRAP3-JS>",
+        "<script src=\"//beneposto.pl/jqueryrotate/js/jQueryRotateCompressed.js\"></script>",
+        "<script src=\"http://www.gamehouse.com/blog/wp-content/themes/gamehouse/js/jquery.spritely.js\"></script>",
+        "<script src=\"https://unpkg.com/floating.js\"></script>"
+      ],
+      "to": [
+        "<script src=\"https://code.jquery.com/jquery.min.js\"></script>",
+        "<BOOTSTRAP3-JS>",
+        "<script src=\"https://unpkg.com/floating.js@2.7.4/build/floating.js\"></script>"
+      ]
+    },
+    {
+      "reason": "SECURITY home.html: image over https",
+      "from": [
+        "content: '<img src=\"http://www.svgrepo.com/show/6980/satellite.svg\">',"
+      ],
+      "to": [
+        "content: '<img src=\"https://www.svgrepo.com/show/6980/satellite.svg\">',"
+      ]
+    },
+    {
+      "reason": "SECURITY faq/courses pages: jQuery loaded over https (no mixed content / MITM script injection)",
+      "from": [
+        "<script src=\"http://code.jquery.com/jquery-1.11.1.min.js\"></script>"
+      ],
+      "to": [
+        "<script src=\"https://code.jquery.com/jquery-1.11.1.min.js\"></script>"
+      ]
+    },
+    {
+      "reason": "SECURITY courses pages: jQuery UI loaded over https",
+      "from": [
+        "<script src=\"http://code.jquery.com/ui/1.11.1/jquery-ui.min.js\"></script>"
+      ],
+      "to": [
+        "<script src=\"https://code.jquery.com/ui/1.11.1/jquery-ui.min.js\"></script>"
+      ]
+    },
+    {
+      "reason": "SECURITY: the opinion endpoint changes state, so it accepts only POST with a CSRF token (courses_list.html JS sends POST + token); same parameters, same responses (JS: CSRF token added)",
+      "from": [
+        "var myEvent = { user_id: logged_user_id, content_id: content_id, status: status /*, csrfmiddlewaretoken: '<CSRF>' */ };"
+      ],
+      "to": [
+        "var myEvent = { user_id: logged_user_id, content_id: content_id, status: status, csrfmiddlewaretoken: '<CSRF>' };"
+      ]
+    },
+    {
+      "reason": "SECURITY: the opinion endpoint changes state, so it accepts only POST with a CSRF token (courses_list.html JS sends POST + token); same parameters, same responses (JS: method)",
+      "from": [
+        "url: '/content/user/status/',",
+        "type: 'GET',"
+      ],
+      "to": [
+        "url: '/content/user/status/',",
+        "type: 'POST',"
+      ]
     }
   ],
-  "108 student: logout": "Django >= 5.0 removed logout via GET (CSRF-able); the header's logout control now POSTs (see _line_replacements)",
-  "151 admin: logout": "Django >= 5.0 removed logout via GET (CSRF-able); the header's logout control now POSTs (see _line_replacements)"
+  "student: logout [/admin/logout/]": "Django >= 5.0 removed logout via GET (CSRF-able); the header's logout control now POSTs (see _line_replacements)",
+  "admin: logout [/admin/logout/]": "Django >= 5.0 removed logout via GET (CSRF-able); the header's logout control now POSTs (see _line_replacements)",
+  "anonymous: page [/achievements/]": "BUGFIX/SECURITY: achievements require login (legacy crashed with 500 building SQL with user_id=None); SQL is now parameterized",
+  "anonymous: page [/zadania.html]": "LOGIN_URL points to the site's real login page (/admin/login/); legacy redirected to the non-existing /accounts/login/",
+  "student: tasks after logout [/zadania.html]": "LOGIN_URL points to the site's real login page (/admin/login/); legacy redirected to the non-existing /accounts/login/",
+  "anonymous: SECURITY probe: source code via /static/ [/static/views.py]": "SECURITY: STATICFILES_DIRS=mainapp/ published the application's source code and templates; removed",
+  "anonymous: SECURITY probe: source code via /static/ [/static/models.py]": "SECURITY: STATICFILES_DIRS=mainapp/ published the application's source code and templates; removed",
+  "anonymous: SECURITY probe: source code via /static/ [/static/templates/mainapp/base.html]": "SECURITY: STATICFILES_DIRS=mainapp/ published the application's source code and templates; removed",
+  "anonymous: content status (anonymous) [/content/user/status/]": "SECURITY: the opinion endpoint changes state, so it accepts only POST with a CSRF token (courses_list.html JS sends POST + token); same parameters, same responses - GET is now 405 before the auth check (POST by anonymous is still 401)",
+  "student: create first opinion [/content/user/status/]": "SECURITY: the opinion endpoint changes state, so it accepts only POST with a CSRF token (courses_list.html JS sends POST + token); same parameters, same responses - only the request method differs",
+  "student: create opinion [/content/user/status/]": "SECURITY: the opinion endpoint changes state, so it accepts only POST with a CSRF token (courses_list.html JS sends POST + token); same parameters, same responses - only the request method differs",
+  "student: update opinion (upper case) [/content/user/status/]": "SECURITY: the opinion endpoint changes state, so it accepts only POST with a CSRF token (courses_list.html JS sends POST + token); same parameters, same responses - only the request method differs",
+  "student: opinion without XHR header [/content/user/status/]": "SECURITY: the opinion endpoint changes state, so it accepts only POST with a CSRF token (courses_list.html JS sends POST + token); same parameters, same responses - only the request method differs",
+  "student: opinion with unknown status [/content/user/status/]": "SECURITY: the opinion endpoint changes state, so it accepts only POST with a CSRF token (courses_list.html JS sends POST + token); same parameters, same responses - only the request method differs",
+  "student: opinion for unknown content [/content/user/status/]": "SECURITY: the opinion endpoint changes state, so it accepts only POST with a CSRF token (courses_list.html JS sends POST + token); same parameters, same responses - only the request method differs",
+  "student: opinion for other user [/content/user/status/]": "SECURITY: the opinion endpoint changes state, so it accepts only POST with a CSRF token (courses_list.html JS sends POST + token); same parameters, same responses - only the request method differs",
+  "student: opinion for unknown user [/content/user/status/]": "SECURITY: the opinion endpoint changes state, so it accepts only POST with a CSRF token (courses_list.html JS sends POST + token); same parameters, same responses - only the request method differs",
+  "student: SECURITY probe: garbage user_id [/content/user/status/]": "SECURITY: the opinion endpoint changes state, so it accepts only POST with a CSRF token (courses_list.html JS sends POST + token); same parameters, same responses - only the request method differs",
+  "student: SECURITY probe: opinion change via GET (CSRF) [/content/user/status/]": "SECURITY: the opinion endpoint changes state, so it accepts only POST with a CSRF token (courses_list.html JS sends POST + token); same parameters, same responses - legacy executed the cross-site GET (200 OK, DB changed)",
+  "student: page after activity [/opinions/]": "consequence of the CSRF probe: the forged opinion is no longer stored",
+  "admin: changelist [/admin/mainapp/contentstatus/]": "consequence of the CSRF probe: the forged opinion is no longer stored",
+  "db:mainapp_contentstatus": "consequence of the CSRF probe: the forged opinion is no longer stored",
+  "db:mainapp_tasksolution": "SECURITY: tampered client tests no longer mark task 2 solved / overwrite the stored solution; no junk rows for non-existing task 999999",
+  "student: task page [/zadania/999.html]": "unknown task: 404 instead of 500 (DoesNotExist)",
+  "student: SECURITY probe: unknown task page [/zadania/999999.html]": "unknown task: 404 instead of 500 (DoesNotExist)",
+  "student: read opinion of unknown content [/content/user/]": "input validation: 400 'content NOT EXISTS' instead of 500",
+  "student: hint zero [/zadania/task/code/hint/]": "input validation: hint_id < 1 -> 400 instead of 500 (FieldError suggestion_0)",
+  "student: SECURITY probe: garbage hint_id [/zadania/task/code/run/]": "input validation: non-integer hint_id -> 400 instead of 500",
+  "student: SECURITY probe: unknown task [/zadania/task/code/run/]": "input validation: unknown task -> 400 (legacy executed code and stored a TaskSolution for a non-existing task)",
+  "student: SECURITY probe: hint for unknown task [/zadania/task/code/hint/]": "input validation: unknown task -> 400 (legacy stored a TaskSolution for a non-existing task)",
+  "student: SECURITY probe: run with bogus charset [/zadania/task/code/run/]": "robustness: the base64 payload is ASCII - no longer decoded with a client-chosen codec (legacy 500 LookupError)",
+  "student: run with tampered tests [/zadania/task/code/run/]": "SECURITY: tests always come from the database; client-sent tests are ignored (legacy let students 'solve' any task with fake tests)",
+  "student: SECURITY probe: blacklist bypass runs a shell command [/zadania/task/code/run/]": "SECURITY: sandboxed runner (audit hook + rlimits + empty env, no shell) - legacy executed the shell command",
+  "student: SECURITY probe: infinite loop [/zadania/task/code/run/]": "SECURITY (DoS): runs are killed after CODE_RUN_TIMEOUT_SECONDS - legacy never answered and the worker spun forever"
 }
