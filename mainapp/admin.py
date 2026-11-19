@@ -1,5 +1,6 @@
 from adminsortable2.admin import SortableAdminMixin
 from django.contrib import admin
+from django.utils.html import format_html
 
 from mainapp.models import Author, Module, Chapter, \
     Content, Curiosity, ContentStatus, Faq, Task, TaskSolution
@@ -62,12 +63,10 @@ class ContentStatusAdmin(admin.ModelAdmin):
     list_display = ('id', 'status', 'view_content_link', 'user', 'created_at', 'updated_at',)
     ordering = ('-updated_at',)
 
+    @admin.display(description='Content edit link')
     def view_content_link(self, obj):
-        return '<a href="/admin/mainapp/content/%d/?_to_field=id&_popup=1" target="_blank">%s</a>' % (
-            int(obj.content.id), obj.content,)
-
-    view_content_link.allow_tags = True
-    view_content_link.short_description = 'Content edit link'  # Optional
+        return format_html('<a href="/admin/mainapp/content/{}/?_to_field=id&_popup=1" target="_blank">{}</a>',
+                           int(obj.content.id), obj.content)
 
     class Media:
         # from django.conf import settings

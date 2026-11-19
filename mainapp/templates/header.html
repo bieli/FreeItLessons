@@ -62,7 +62,7 @@ ul.nav a, a,navbar-brand {
                   <li><a href="/achievements/">Osiągnięcia</a></li>
               </ul>
           </li>
-          <li class=""><a href="/admin/logout/">Wyloguj</a></li>
+          <li class=""><form id="logout-form" method="post" action="/admin/logout/" style="display: none;">{% csrf_token %}</form><a href="/admin/logout/" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Wyloguj</a></li>
     <input type="hidden" name="logged-user-id" value="{{ user.id }}" />
     {% csrf_token %}
   {% else %}

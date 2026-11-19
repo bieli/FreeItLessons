@@ -1,28 +1,21 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 import base64
 import hashlib
 import time
 
-import django
+from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.core.files.storage import default_storage
-from django.db.models.fields.files import FieldFile
 from django.http import HttpResponse, HttpResponseBadRequest
+from django.utils import timezone
 from django.views.generic.base import View, TemplateView
 
-from FreeItLessons import settings
 from mainapp.models import User, Author, Module, Chapter, Content, \
     ContentStatusType, ContentStatus, Faq, Task, TaskSolution
 from mainapp.utils import TaskCodeRun
 
 
-class FakeField(object):
-    storage = default_storage
-
-
-fieldfile = FieldFile(None, FakeField, 'dummy.txt')
+def is_ajax(request):
+    """Replacement of ``HttpRequest.is_ajax()`` removed in Django 4.0."""
+    return request.headers.get('x-requested-with') == 'XMLHttpRequest'
 
 
 class HomePageView(TemplateView):
@@ -150,10 +143,10 @@ class TaskPageView(TemplateView):
 
 class ContetUserStatusView(View):
     def get(self, request):
-        if not request.user.is_authenticated():
+        if not request.user.is_authenticated:
             return HttpResponse(status=401)
 
-        if not request.is_ajax():
+        if not is_ajax(request):
             return HttpResponseBadRequest()
 
         user_id = request.GET.get('user_id', None)
@@ -163,7 +156,7 @@ class ContetUserStatusView(View):
         status = request.GET.get('status', None)
         # print('status: {}'.format(status))
 
-        # print('is_authenticated: {}'.format(request.user.is_authenticated()))
+        # print('is_authenticated: {}'.format(request.user.is_authenticated))
         # print('Raw Data: {}'.format(request.body))
         # print('Raw User Id: {}'.format(request.user.id))
         # print('request.is_ajax(): {}'.format(request.is_ajax()))
@@ -184,7 +177,7 @@ class ContetUserStatusView(View):
 
                     obj = ContentStatus.objects.filter(user=user_instance, content=content_instance)
                     if obj:
-                        obj.update(status=str(status).lower(), updated_at=django.utils.timezone.now())
+                        obj.update(status=str(status).lower(), updated_at=timezone.now())
                         # print("update")
                     else:
                         obj = ContentStatus(user=user_instance,
@@ -265,7 +258,7 @@ if __name__ == '__main__':
                     # print("Return code: ", p.returncode)
                     # print("Result from Python: ", out.rstrip(), err.rstrip())
                     result = out.rstrip() + err.rstrip()
-                except:
+                except Exception:
                     result = 'ERR: 2'
 
                 # try:
@@ -286,10 +279,10 @@ if __name__ == '__main__':
         return result, returncode
 
     def post(self, request):
-        if not request.user.is_authenticated():
+        if not request.user.is_authenticated:
             return HttpResponse(status=401)
 
-        if not request.is_ajax():
+        if not is_ajax(request):
             return HttpResponseBadRequest()
 
         user_id = request.POST.get('user_id', None)
@@ -338,10 +331,10 @@ if __name__ == '__main__':
 
 class TaskCodeHintView(View):
     def post(self, request):
-        if not request.user.is_authenticated():
+        if not request.user.is_authenticated:
             return HttpResponse(status=401)
 
-        if not request.is_ajax():
+        if not is_ajax(request):
             return HttpResponseBadRequest()
 
         user_id = request.POST.get('user_id', None)
@@ -384,10 +377,10 @@ class TaskCodeHintView(View):
 
 class ContetUserView(View):
     def get(self, request):
-        if not request.user.is_authenticated():
+        if not request.user.is_authenticated:
             return HttpResponse(status=401)
 
-        if not request.is_ajax():
+        if not is_ajax(request):
             return HttpResponseBadRequest()
 
         user_id = request.GET.get('user_id', None)
@@ -395,7 +388,7 @@ class ContetUserView(View):
         content_id = request.GET.get('content_id', None)
         # print('content_id: {}'.format(content_id))
 
-        # print('is_authenticated: {}'.format(request.user.is_authenticated()))
+        # print('is_authenticated: {}'.format(request.user.is_authenticated))
         # print('Raw Data: {}'.format(request.body))
         # print('Raw User Id: {}'.format(request.user.id))
         # print('request.is_ajax(): {}'.format(request.is_ajax()))
@@ -556,7 +549,7 @@ class ContetUserStatusAjaxView2(TemplateView):
       if User.objects.filter(id__iexact=user_id).exists():
           # print('user EXISTS')
 
-          # request.user.is_authenticated():
+          # request.user.is_authenticated:
 
           content_id = kwargs['content_id']
           if Content.objects.filter(id__iexact=content_id).exists():
@@ -577,7 +570,7 @@ class ContetUserStatusAjaxView2(TemplateView):
   # @csrf_exempt
   def content_user_status(request):
       #return HttpResponse("OK")
-      #if not request.user.is_authenticated():
+      #if not request.user.is_authenticated:
       #    return HttpResponse(status=401)
 
       user_id = request.GET.get('user_id', None)

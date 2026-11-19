@@ -1,0 +1,33 @@
+# Local run of FreeItLessons (Python 3.12 + Django 6.1)
+#
+#   docker compose up --build                 -> http://127.0.0.1:8000
+#   docker compose run --rm tests             -> lint + unit tests
+#   make regression                           -> legacy vs new characterization check
+name: freeitlessons
+
+services:
+  web:
+    build: .
+    ports:
+      - "127.0.0.1:8000:8000"
+    environment:
+      DJANGO_DEBUG: ${DJANGO_DEBUG:-1}
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:-local-docker-compose-secret-change-me}
+      DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS:-127.0.0.1,localhost}
+    volumes:
+      - app-data:/data
+
+  tests:
+    profiles: ["test"]
+    build:
+      context: .
+      args:
+        INSTALL_DEV: "1"
+    environment:
+      DJANGO_SECRET_KEY: tests-only-secret-key
+      DJANGO_DB_PATH: /tmp/tests.sqlite3
+    entrypoint: []
+    command: ["sh", "-c", "pycodestyle mainapp/ tests/ FreeItLessons/ && python manage.py makemigrations --check --dry-run && python manage.py check && python manage.py test tests -v 2"]
+
+volumes:
+  app-data:

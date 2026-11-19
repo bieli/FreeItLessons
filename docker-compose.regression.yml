@@ -1,0 +1,56 @@
+# Characterization regression harness - run it with:  make regression
+# (regression/run.sh prepares ./.regression and drives this file)
+name: freeitlessons-regression
+
+x-health: &health
+  interval: 2s
+  timeout: 5s
+  retries: 60
+
+services:
+  legacy:
+    build:
+      context: ./.regression/legacy-src
+      dockerfile: Dockerfile.legacy
+    environment:
+      REGRESSION_PASSWORD: Regression-Pass-2024!
+    volumes:
+      - ./.regression/legacy:/state
+      - ./regression:/regression:ro
+    command: ["sh", "/regression/start-legacy.sh"]
+    healthcheck:
+      <<: *health
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/faq.html')"]
+
+  candidate:
+    build: .
+    environment:
+      REGRESSION_PASSWORD: Regression-Pass-2024!
+      DJANGO_DEBUG: "1"
+      DJANGO_SECRET_KEY: regression-only-secret-key-not-for-production
+      DJANGO_ALLOWED_HOSTS: localhost
+      DJANGO_DB_PATH: /state/db.sqlite3
+    user: root
+    volumes:
+      - ./.regression/candidate:/state
+      - ./regression:/regression:ro
+    command: ["sh", "/regression/start-candidate.sh"]
+    healthcheck:
+      <<: *health
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen(urllib.request.Request('http://localhost:8000/faq.html', headers={'Host': 'localhost'}))"]
+
+  runner:
+    build: ./regression/runner
+    depends_on:
+      legacy: {condition: service_healthy}
+      candidate: {condition: service_healthy}
+    volumes:
+      - ./regression:/regression:ro
+      - ./.regression:/work
+    command:
+      - sh
+      - -c
+      - >
+        python run_scenarios.py http://legacy:8000 /work/seed.sqlite3 /work/legacy/db.sqlite3 /work/legacy.json &&
+        python run_scenarios.py http://candidate:8000 /work/seed.sqlite3 /work/candidate/db.sqlite3 /work/candidate.json &&
+        { python compare.py /work/legacy.json /work/candidate.json expected_differences.json > /work/report.txt; rc=$$?; cat /work/report.txt; exit $$rc; }

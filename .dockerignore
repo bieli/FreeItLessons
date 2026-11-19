@@ -1,0 +1,9 @@
+.git
+.venv
+.idea
+.vagrant
+.regression
+**/__pycache__
+**/*.pyc
+staticfiles
+db.sqlite3.1

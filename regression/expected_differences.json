@@ -1,0 +1,16 @@
+{
+  "_comment": "Intentional behaviour changes only. Keys: step id or db:<table> -> reason.",
+  "_line_replacements": [
+    {
+      "reason": "Django >= 5.0 accepts logout only via POST: the 'Wyloguj' link now submits a hidden POST form (same look, same URL)",
+      "from": [
+        "<li class=\"\"><a href=\"/admin/logout/\">Wyloguj</a></li>"
+      ],
+      "to": [
+        "<li class=\"\"><form id=\"logout-form\" method=\"post\" action=\"/admin/logout/\" style=\"display: none;\"><CSRF-INPUT></form><a href=\"/admin/logout/\" onclick=\"event.preventDefault(); document.getElementById('logout-form').submit();\">Wyloguj</a></li>"
+      ]
+    }
+  ],
+  "108 student: logout": "Django >= 5.0 removed logout via GET (CSRF-able); the header's logout control now POSTs (see _line_replacements)",
+  "151 admin: logout": "Django >= 5.0 removed logout via GET (CSRF-able); the header's logout control now POSTs (see _line_replacements)"
+}

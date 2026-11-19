@@ -1,40 +1,32 @@
-#FROM matthewfeickert/docker-python3-ubuntu:latest
-FROM django:1.11-python3
+FROM python:3.12-slim
 
-MAINTAINER Marcin Bielak <marcin.bieli@gmail.com>
+LABEL maintainer="Marcin Bielak <marcin.bieli@gmail.com>"
 
-# Enable production settings by default; for development, this can be set to 
-# `false` in `docker run --env`
-ENV DJANGO_PRODUCTION=true
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PYTHONIOENCODING=utf8 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    DJANGO_STATIC_ROOT=/app/staticfiles \
+    DJANGO_DB_PATH=/data/db.sqlite3
 
-# Set terminal to be noninteractive
-ENV DEBIAN_FRONTEND noninteractive
+WORKDIR /app
 
-ENV PYTHONIOENCODING=utf8
+COPY requirements.txt requirements.dev.txt ./
+ARG INSTALL_DEV=0
+RUN if [ "$INSTALL_DEV" = "1" ]; then pip install -r requirements.dev.txt; \
+    else pip install -r requirements.txt; fi
 
-RUN sudo apt-get update
-RUN sudo apt-get install -y \
-    python-setuptools \
-    gcc \
-    gettext \
-    mysql-client libmysqlclient-dev \
-    postgresql-client libpq-dev \
-    sqlite3 \
-    python3-pip \
-    python3-venv \
-    libffi-dev \
-    libssl-dev \
-    libpython3-dev \
-    libcurl4-openssl-dev \
-	--no-install-recommends
-RUN sudo apt-get clean
-RUN sudo rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/*
-
-WORKDIR /usr/src/app
 COPY . .
-RUN pip3 install -U pip setuptools
-RUN pip3 install -r requirements.txt
 
+RUN DJANGO_SECRET_KEY=collectstatic python manage.py collectstatic --noinput \
+    && useradd --uid 1000 --create-home app \
+    && mkdir -p /data \
+    && chown -R app:app /data \
+    && chmod +x docker/entrypoint.sh
+
+USER app
 EXPOSE 8000
-CMD ["python3", "manage.py", "runserver", "0.0.0.0:8000"]
-
+VOLUME ["/data"]
+ENTRYPOINT ["docker/entrypoint.sh"]
+CMD ["gunicorn", "FreeItLessons.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "3", "--access-logfile", "-"]

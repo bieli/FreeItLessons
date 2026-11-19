@@ -1,19 +1,36 @@
+.PHONY: install-dev install lint test ci run chpwd migrate docker-up docker-test regression
+
 install-dev:
-	python3 -m venv .venv
-	. .venv/bin/activate
-	pip3 install -r requirements.dev.txt
+	python3.12 -m venv .venv
+	.venv/bin/pip install -r requirements.dev.txt
 
 install:
 	pip3 install -r requirements.txt
 
-ci:
-	pep8 mainapp/ --ignore=E501
-	pip3 install ddt
+lint:
+	pycodestyle mainapp/ tests/ FreeItLessons/
+
+test:
+	python3 manage.py makemigrations --check --dry-run
 	python3 manage.py test tests
 
-run:
+ci: lint test
+
+migrate:
+	python3 manage.py migrate
+
+run: migrate
 	python3 manage.py runserver
 
 chpwd:
 	python3 manage.py changepassword admin
 
+docker-up:
+	docker compose up --build
+
+docker-test:
+	docker compose run --build --rm tests
+
+# legacy (Python 3.7 + Django 1.11) vs current tree - see regression/README.md
+regression:
+	regression/run.sh

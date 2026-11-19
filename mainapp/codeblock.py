@@ -83,7 +83,7 @@ class CodeBlockRunner:
             f = tempfile.NamedTemporaryFile(delete=False)
             f.write(b"print('aaa from TMPFILE')")
             f.close()
-        except:
+        except Exception:
             os.unlink(f.name)
             result = 'ERR: 3'
 
@@ -93,7 +93,7 @@ class CodeBlockRunner:
             out, err = p.communicate()
             print("Return code: ", p.returncode)
             print(out.rstrip(), err.rstrip())
-        except:
+        except Exception:
             os.unlink(f.name)
             result = 'ERR: 2'
 

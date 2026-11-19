@@ -1,14 +1,13 @@
-import datetime
-
-import django
 from django.contrib.auth.models import User
 from django.db import models
-from django_enumfield import enum
+from django.utils import timezone
 
 
 class AutoDateTimeField(models.DateTimeField):
     def pre_save(self, model_instance, add):
-        return datetime.datetime.now()
+        value = timezone.now()
+        setattr(model_instance, self.attname, value)
+        return value
 
 
 class Author(models.Model):
@@ -30,14 +29,16 @@ class Author(models.Model):
         return "{} {}".format(self.name, self.surname)
 
 
-class ContentType(enum.Enum):
-    TEXT = 1
-    IMAGE = 2
-    MOVIE = 3
-    EXTERNAL_LINK = 4
-    DOWNLOAD_LINK = 5
-    NOTE = 6
-    FORM = 7
+# Integer enums (formerly django-enumfield). Labels equal to the member names,
+# exactly as django-enumfield rendered them in the admin.
+class ContentType(models.IntegerChoices):
+    TEXT = 1, 'TEXT'
+    IMAGE = 2, 'IMAGE'
+    MOVIE = 3, 'MOVIE'
+    EXTERNAL_LINK = 4, 'EXTERNAL_LINK'
+    DOWNLOAD_LINK = 5, 'DOWNLOAD_LINK'
+    NOTE = 6, 'NOTE'
+    FORM = 7, 'FORM'
 
     # _transitions = {
     #     DEAD: (ALIVE,),
@@ -46,7 +47,7 @@ class ContentType(enum.Enum):
 
 
 class Content(models.Model):
-    status = enum.EnumField(ContentType)
+    status = models.IntegerField(choices=ContentType.choices, default=ContentType.TEXT)
     value = models.TextField(max_length=4000)
     additional_text = models.CharField(max_length=512)
     author = models.ForeignKey(Author, null=True, blank=True, on_delete=models.DO_NOTHING)
@@ -61,10 +62,10 @@ class Content(models.Model):
         ordering = ('additional_text',)
 
 
-class ChapterLevelType(enum.Enum):
-    BEGINNER = 1
-    DEVELOPER = 2
-    EXPERT = 3
+class ChapterLevelType(models.IntegerChoices):
+    BEGINNER = 1, 'BEGINNER'
+    DEVELOPER = 2, 'DEVELOPER'
+    EXPERT = 3, 'EXPERT'
 
 
 class Curiosity(models.Model):
@@ -83,7 +84,7 @@ class Chapter(models.Model):
     contents = models.ManyToManyField(Content)
     name = models.CharField(max_length=128, blank=True)
     sort_order = models.PositiveIntegerField(default=0, editable=False, db_index=True)
-    level = enum.EnumField(ChapterLevelType)
+    level = models.IntegerField(choices=ChapterLevelType.choices, default=ChapterLevelType.BEGINNER)
     note = models.TextField(max_length=256)
     author = models.ForeignKey(Author, null=True, blank=True, on_delete=models.DO_NOTHING)
 
@@ -164,8 +165,8 @@ class ContentStatus(models.Model):
     status = models.CharField(max_length=4,
                               choices=CONTENT_STATUS_TYPE_CHOICES,
                               default=ContentStatusType.NEW)
-    created_at = models.DateTimeField(default=django.utils.timezone.now)
-    updated_at = AutoDateTimeField(default=django.utils.timezone.now)
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = AutoDateTimeField(default=timezone.now)
 
     def __str__(self):
         return self.status
