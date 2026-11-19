@@ -10,6 +10,9 @@ fixes) and do not fail the run; any other difference makes the exit code 1.
 show up on many pages (e.g. the logout control in the shared header): each
 ``from`` line sequence is rewritten to ``to`` in the LEGACY recording before
 comparing, so only that exact, reviewed change is tolerated.
+
+``"_compare_page_markup": false`` compares HTML pages by status/redirect only
+(used for a UI rewrite); AJAX responses, files, admin data and DB are compared fully.
 """
 import difflib
 import json
@@ -41,11 +44,12 @@ def apply_replacements(steps, replacements):
 
 def main():
     legacy_path, candidate_path = sys.argv[1:3]
-    expected, replacements = {}, []
+    expected, replacements, compare_markup = {}, [], True
     if len(sys.argv) > 3:
         with open(sys.argv[3], encoding='utf-8') as fd:
             config = json.load(fd)
         replacements = config.get('_line_replacements', [])
+        compare_markup = config.get('_compare_page_markup', True)
         expected = {k: v for k, v in config.items() if not k.startswith('_')}
     with open(legacy_path, encoding='utf-8') as fd:
         legacy = json.load(fd)
@@ -69,6 +73,10 @@ def main():
             print('... (%d more diff lines)' % (len(diff) - 120))
 
     applied = apply_replacements(legacy['steps'], replacements)
+    if not compare_markup:  # UI rewrite: HTML pages are compared by status/redirect only
+        for step in legacy['steps'] + candidate['steps']:
+            if step.get('content_type') == 'text/html' and 'body' in step and not step.get('xhr'):
+                step['body'] = '<page markup not compared>'
     old_steps = {s['id']: s for s in legacy['steps']}
     new_steps = {s['id']: s for s in candidate['steps']}
     order = [s['id'] for s in legacy['steps']] + [i for i in new_steps if i not in old_steps]

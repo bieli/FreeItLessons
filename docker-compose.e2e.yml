@@ -1,0 +1,53 @@
+# Browser level characterization tests - run with:  make e2e
+# (e2e/run.sh prepares ./.e2e and drives this file)
+name: freeitlessons-e2e
+
+x-app: &app
+  user: root
+  environment: &app-env
+    REGRESSION_PASSWORD: Regression-Pass-2024!
+    DJANGO_DEBUG: "0"
+    DJANGO_SECRET_KEY: e2e-only-secret-key-not-for-production
+    DJANGO_ALLOWED_HOSTS: baseline,candidate,localhost
+    DJANGO_DB_PATH: /state/db.sqlite3
+  command: ["sh", "/e2e/start-app.sh"]
+  healthcheck:
+    test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/faq.html')"]
+    interval: 2s
+    timeout: 5s
+    retries: 90
+
+services:
+  baseline:
+    <<: *app
+    build: ./.e2e/baseline-src
+    volumes:
+      - ./.e2e/baseline:/state
+      - ./e2e:/e2e:ro
+      - ./regression:/regression:ro
+
+  candidate:
+    <<: *app
+    build: .
+    volumes:
+      - ./.e2e/candidate:/state
+      - ./e2e:/e2e:ro
+      - ./regression:/regression:ro
+
+  e2e:
+    build: ./e2e
+    user: "${HOST_UID:-1000}"
+    depends_on:
+      baseline: {condition: service_healthy}
+      candidate: {condition: service_healthy}
+    environment:
+      E2E_TARGETS: ${E2E_TARGETS}
+      E2E_STUDENT: ${E2E_STUDENT}
+      E2E_ADMIN: ${E2E_ADMIN}
+      E2E_PASSWORD: Regression-Pass-2024!
+      E2E_REPORT_DIR: /work/report
+      E2E_RESULTS_DIR: /work/results
+      CI: "1"
+      HOME: /tmp
+    volumes:
+      - ./.e2e:/work

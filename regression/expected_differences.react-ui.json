@@ -1,0 +1,9 @@
+{
+  "_comment": "jQuery UI (upgrade/python312-django61) vs React UI. Run: BASELINE_MODE=modern LEGACY_REF=upgrade/python312-django61 EXPECTED_FILE=expected_differences.react-ui.json regression/run.sh. Page markup is the rewritten part (verified in the browser by e2e/); AJAX, files, admin data and DB effects must stay identical.",
+  "_compare_page_markup": false,
+  "anonymous: static file [/static/mainapp/js/postStatus.js]": "removed legacy JS (unused jQuery plugin)",
+  "anonymous: static file [/static/mainapp/js/jquery.base64.min.js]": "removed legacy JS (replaced by lib/latin1Base64.js in the React bundle)",
+  "anonymous: static file [/static/mainapp/js/easytimer/easytimer.js]": "removed legacy JS (replaced by useStopwatch)",
+  "anonymous: static file [/static/mainapp/js/edit_area/edit_area_full.js]": "removed legacy JS (replaced by CodeMirror 6)",
+  "anonymous: static file [/static/admin/js/content_status_stats.js]": "removed legacy JS (replaced by the React StatusPieChart)"
+}

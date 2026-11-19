@@ -3,7 +3,6 @@
 {% load bootstrap3 %}
 {% load static %}
 
-{% bootstrap_javascript jquery=0 %}
 
 {% block title %}Kursy{% endblock %}
 
@@ -81,196 +80,7 @@
 }
 </style>
 
-<script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
- 
-<script src="https://code.jquery.com/ui/1.11.1/jquery-ui.min.js"></script>
 
-<link rel="stylesheet" href="https://code.jquery.com/ui/1.11.1/themes/smoothness/jquery-ui.css" />
-
-<script>
-$.noConflict();
-jQuery( document ).ready(function( $ ) {
-
-  console.log( "ready!" );
-/*
-  // using jQuery
-  function getCookie(name) {
-      var cookieValue = null;
-      if (document.cookie && document.cookie != '') {
-          var cookies = document.cookie.split(';');
-          for (var i = 0; i < cookies.length; i++) {
-              var cookie = jQuery.trim(cookies[i]);
-              // Does this cookie string begin with the name we want?
-              if (cookie.substring(0, name.length + 1) == (name + '=')) {
-                  cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                  break;
-              }
-          }
-      }
-      return cookieValue;
-  }
-
-  var csrftoken = getCookie('csrftoken');
-
-  function csrfSafeMethod(method) {
-      // these HTTP methods do not require CSRF protection
-      return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
-  }
-  $.ajaxSetup({
-      beforeSend: function(xhr, settings) {
-          if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
-              xhr.setRequestHeader("X-CSRFToken", csrftoken);
-          }
-      }
-  });
-*/
-
-  $( "#dialog-send-status" ).dialog({
-    autoOpen: false,
-    resizable: false,
-    height: "auto",
-    width:600,
-    modal: true,
-    buttons: {
-      "Prześlij opinię": function() {
-      	var selected_status = $("input[name='dialog-send-status-select']:checked").val();
-        if(selected_status){
-            var content_id = $("#dialog-send-status").attr("data-content-id");
-            console.log("content_id: ", content_id);
-            console.log("selected_status: ", selected_status);
-
-            postDataIntoServiceEndpoint(content_id, selected_status);
-            $( this ).dialog( "close" );
-        } else {
-          alert("Proszę wskazać jedną opcję !");
-        }
-      },
-      Cancel: function() {
-        $( this ).dialog( "close" );
-      }
-    }
-  });
-
-  function postDataIntoServiceEndpoint(content_id, status) {
-    var logged_user_id = parseInt($("input[name='logged-user-id']").val());
-    //var csrfmiddlewaretoken = $("input[name='csrfmiddlewaretoken']").val()
-    //var myEvent = { status: status /*, csrfmiddlewaretoken: '{{ csrf_token }}' */ };
-    var myEvent = { user_id: logged_user_id, content_id: content_id, status: status, csrfmiddlewaretoken: '{{ csrf_token }}' };
-    console.log("myEvent:", myEvent)
-/*
-    jQuery.ajax({
-        type: 'POST',
-        url: '/content/' + logged_user_id + '/user/' + content_id + '/',
-        beforeSend : function(jqXHR, settings) {
-            jqXHR.setRequestHeader("x-csrftoken", csrfmiddlewaretoken);
-        },
-        data: myEvent,
-        dataType: 'json',
-
-    });
-
-xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
-
-
-*/
-
-
-    $.ajax({
-        // url: '/content/' + content_id + '/user/' + logged_user_id + '/status/' + status + '/',
-        url: '/content/user/status/',
-        type: 'POST',
-        data: myEvent,
-        success: function(result) {
-            console.log("postDataIntoServiceEndpoint: AJAX OK - result: ", result);
-            updateContentIcon(content_id, status);
-        },
-        error: function(result) {
-            console.log("postDataIntoServiceEndpoint: AJAX ERROR - result: ", result);
-        }
-    });
-  }
-
-  function showStatusDialog(content_id) {
-    var logged_user_id = parseInt($("input[name='logged-user-id']").val());
-    console.log("logged_user_id: ", logged_user_id)
-    if (!isNaN(logged_user_id)) {
-      var dialog_elem = $("#dialog-send-status");    
-      dialog_elem.attr("data-content-id", content_id);
-      dialog_elem.dialog('open');
-    } else {
-      alert("W celu wystawienia oceny kontekstu musisz być zalogowany !");
-    }
-  }
-
-  function updateContentIcon(content_id, status) {
-    var icon_status_url = $('#content_id__' + content_id).css('background-image');
-
-    var regex = /(url\(["].*)\/(\w+)(.png["]\))/;
-
-    console.log("icon_status_url:", icon_status_url)
-    
-    var matching = icon_status_url.match(regex);
-
-    console.log("matching:", matching)
-    
-    if (matching) {
-      var new_icon_status_url = icon_status_url.replace(regex, "$1/" + status + "$3");
-      //new_icon_status_url = 'url("' + new_icon_status_url + '")';
-      console.log("new_icon_status_url:", new_icon_status_url)
-      $('#content_id__' + content_id).css('background-image', new_icon_status_url);
-    }
-  }
-
-  function setupContentIcons() {
-    var logged_user_id = parseInt($("input[name='logged-user-id']").val());
-    console.log("logged_user_id: ", logged_user_id)
-    if (isNaN(logged_user_id)) {
-        return null;
-    }
-
-    $("blockquote[id^='content_id__']").each(function(){ 
-      var content_id = $(this).attr("data-id");
-      console.log("content_id:", content_id);
-
-      var myEvent = { user_id: logged_user_id, content_id: content_id };
-      console.log("myEvent:", myEvent);
-
-      $.ajax({
-          url: '/content/user/',
-          type: 'GET',
-          data: myEvent,
-          success: function(status) {
-              console.log("setupContentIcons: AJAX OK - status: ", status);
-              updateContentIcon(content_id, status);
-          },
-          error: function(result) {
-              console.log("setupContentIcons: AJAX ERROR - result: ", result);
-          }
-      });
-    });
-  }
-
-
-  $("blockquote[id^='content_id__']").each(function(){ 
-    var content_id = $(this).attr("data-id");
-    console.log("content_id:", content_id);
-    
-    $(this).click(function(event){
-      var target = $( event.target );
-      if (!target.is("a") && !target.is("img")) {
-        console.log($(this).attr("data-id"));
-        $(this).attr("data-status-change", "1");
-        showStatusDialog(content_id);
-      }
-    });
-  });
-
-  setupContentIcons();
-
-    var path = location.pathname;
-    $('ul.navbar a.nav[href$="' + path + '"]').addClass("active");
-});
-</script>
 
 {% include "header.html" %}
 
@@ -335,9 +145,7 @@ xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
                         </small><br />
                         <br />
                         {% if content.status == 1 %}
-                            <blockquote class="bq1" id="content_id__{{ content.id }}" data-id="{{ content.id }}">
-                            {{ content.value |safe }}
-                            </blockquote>
+                            <div data-island="ContentBlock" data-content-id="{{ content.id }}"><template>{{ content.value|safe }}</template></div>
                         {% elif content.status == 3 %}
 {% comment %}
 <!--                            <iframe width="640" height="360" src="{{ content.value }}" frameborder="1" allowfullscreen></iframe> -->
@@ -432,20 +240,7 @@ xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
 
 
 
-<div id="dialog-send-status" title="Ocena wskazanego konspektu">
-  <p>Oto ikony jakimi może zostać oznaczony konspekt - zgodnie z Twoim wyborem:
-  <ul>
-      <li><input type="radio" name="dialog-send-status-select" value="new" /> <img alt="" src="{% static 'mainapp/img/new.png' %}" class="img-circle" width="40" height="40"> - nie przeczytałem</li>
-      <li><input type="radio" name="dialog-send-status-select" value="doit" /> <img alt="" src="{% static 'mainapp/img/doit.png' %}" class="img-circle" width="40" height="40"> - w trakcie nauki</li>
-      <li><input type="radio" name="dialog-send-status-select" value="help" /> <img alt="" src="{% static 'mainapp/img/help.png' %}" class="img-circle" width="40" height="40"> - potrzebuję czasu, trudno zrozumieć - pomocy !</li>
-      <li><input type="radio" name="dialog-send-status-select" value="good" /> <img alt="" src="{% static 'mainapp/img/good.png' %}" class="img-circle" width="40" height="40"> - ten wątek jest prowadzony ze zrozumieniem - nadążam</li>
-      <li><input type="radio" name="dialog-send-status-select" value="done" /> <img alt="" src="{% static 'mainapp/img/done.png' %}" class="img-circle" width="40" height="40"> - zrozumiałem, hurraaa :-)</li>
-  </ul>
 
-
-</ul>
-</p>
-</div>
 
 {% endblock %}
 

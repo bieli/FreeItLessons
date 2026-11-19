@@ -3,7 +3,6 @@
 
 {% load bootstrap3 %}
 {% load static %}
-{% bootstrap_javascript jquery=0 %}
 
 {% block title %}Pytania i odpowiedzi{% endblock %}
 
@@ -29,32 +28,7 @@ dt {
 
 
 
-<script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
 
-
-<script>
-$.noConflict();
-jQuery( document ).ready(function( $ ) {
-
-  console.log( "ready!" );
-
-
-  $('dd').hide();
-
-  $('dt').click(function() {
-      var toggle = $(this).nextUntil('dt');
-      toggle.slideToggle();
-      $('dd').not(toggle).slideUp();
-  });
-
-  $('.list-group-item').on('click', function() {
-    $('.glyphiconRight', this)
-      .toggleClass('glyphicon-chevron-right')
-      .toggleClass('glyphicon-chevron-down');
-  });
-
-});
-</script>
 
 <div class="container-fluid">
 
@@ -65,15 +39,8 @@ jQuery( document ).ready(function( $ ) {
 					Pytania i odpowiedzi
 		    </h1>
 			</div>
-      <dl>
-          {% for faq in faqs %}
-          <dt><h3 class="list-group-item" data-toggle="collapse"><i class="glyphicon glyphicon-chevron-right glyphiconRight"></i> 
-{{ faq.question }} ?<span id="slidedown" class="glyphicon glyphicon-plus pull-right"></span></h3></dt>
-            <dd><p class="list-group-item-paragraph">
-            {{ faq.answer|safe }}</a>.
-        		</p></dd>
-          {% endfor %}
-      </dl>
+      <div data-island="FaqAccordion" data-props-id="faq-props"></div>
+      {{ faqs_props|json_script:"faq-props" }}
       <p>
       <hr />
       <a class="btn btn-primary btn-large" href="kursy.html">Rozpocznij naukę już teraz ➜</a>

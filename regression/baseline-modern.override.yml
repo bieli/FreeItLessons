@@ -1,0 +1,12 @@
+# BASELINE_MODE=modern: the "legacy" service runs an upgraded revision (same
+# start-up as the candidate) - used to compare two revisions of the new stack.
+services:
+  legacy:
+    user: root
+    environment:
+      REGRESSION_PASSWORD: Regression-Pass-2024!
+      DJANGO_DEBUG: "0"
+      DJANGO_SECRET_KEY: regression-only-secret-key-not-for-production
+      DJANGO_ALLOWED_HOSTS: localhost
+      DJANGO_DB_PATH: /state/db.sqlite3
+    command: ["sh", "/regression/start-candidate.sh"]

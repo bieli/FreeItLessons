@@ -7,3 +7,7 @@
 **/*.pyc
 staticfiles
 db.sqlite3.1
+**/node_modules
+.e2e
+mainapp/static/mainapp/dist
+frontend/coverage

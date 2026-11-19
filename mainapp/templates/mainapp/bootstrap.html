@@ -1,3 +1,21 @@
-{% extends 'bootstrap3/bootstrap3.html' %}
+<!DOCTYPE html>
+{% load bootstrap3 static %}
+<html{% if LANGUAGE_CODE %} lang="{{ LANGUAGE_CODE }}"{% endif %}>
+{# Page skeleton: Bootstrap 3 CSS only - all behaviour comes from the React bundle (frontend/). #}
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block bootstrap3_title %}{% block title %}{% endblock %}{% endblock %}</title>
+    {% bootstrap_css %}
+    <link rel="stylesheet" href="{% static 'mainapp/dist/app.css' %}">
+    {{ frontend_context|json_script:"frontend-context" }}
+    <script type="module" src="{% static 'mainapp/dist/app.js' %}"></script>
+    {% block bootstrap3_extra_head %}{% endblock %}
+</head>
 
-{% block bootstrap3_title %}{% block title %}{% endblock %}{% endblock %}
+<body>
+{% block bootstrap3_content %}{% endblock %}
+{% block bootstrap3_extra_script %}{% endblock %}
+</body>
+
+</html>

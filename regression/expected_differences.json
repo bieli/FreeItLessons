@@ -1,5 +1,5 @@
 {
-  "_comment": "Intentional behaviour changes only (each reviewed). Keys: step id or db:<table> -> reason.",
+  "_comment": "Intentional behaviour changes only (each reviewed). Keys: step id or db:<table> -> reason. Since the React UI rewrite, HTML page markup is verified in the browser (e2e/) and compared here by status only.",
   "_line_replacements": [
     {
       "reason": "Django >= 5.0 accepts logout only via POST: the 'Wyloguj' link now submits a hidden POST form (same look, same URL)",
@@ -92,7 +92,6 @@
   "student: opinion for unknown user [/content/user/status/]": "SECURITY: the opinion endpoint changes state, so it accepts only POST with a CSRF token (courses_list.html JS sends POST + token); same parameters, same responses - only the request method differs",
   "student: SECURITY probe: garbage user_id [/content/user/status/]": "SECURITY: the opinion endpoint changes state, so it accepts only POST with a CSRF token (courses_list.html JS sends POST + token); same parameters, same responses - only the request method differs",
   "student: SECURITY probe: opinion change via GET (CSRF) [/content/user/status/]": "SECURITY: the opinion endpoint changes state, so it accepts only POST with a CSRF token (courses_list.html JS sends POST + token); same parameters, same responses - legacy executed the cross-site GET (200 OK, DB changed)",
-  "student: page after activity [/opinions/]": "consequence of the CSRF probe: the forged opinion is no longer stored",
   "admin: changelist [/admin/mainapp/contentstatus/]": "consequence of the CSRF probe: the forged opinion is no longer stored",
   "db:mainapp_contentstatus": "consequence of the CSRF probe: the forged opinion is no longer stored",
   "db:mainapp_tasksolution": "SECURITY: tampered client tests no longer mark task 2 solved / overwrite the stored solution; no junk rows for non-existing task 999999",
@@ -106,5 +105,11 @@
   "student: SECURITY probe: run with bogus charset [/zadania/task/code/run/]": "robustness: the base64 payload is ASCII - no longer decoded with a client-chosen codec (legacy 500 LookupError)",
   "student: run with tampered tests [/zadania/task/code/run/]": "SECURITY: tests always come from the database; client-sent tests are ignored (legacy let students 'solve' any task with fake tests)",
   "student: SECURITY probe: blacklist bypass runs a shell command [/zadania/task/code/run/]": "SECURITY: sandboxed runner (audit hook + rlimits + empty env, no shell) - legacy executed the shell command",
-  "student: SECURITY probe: infinite loop [/zadania/task/code/run/]": "SECURITY (DoS): runs are killed after CODE_RUN_TIMEOUT_SECONDS - legacy never answered and the worker spun forever"
+  "student: SECURITY probe: infinite loop [/zadania/task/code/run/]": "SECURITY (DoS): runs are killed after CODE_RUN_TIMEOUT_SECONDS - legacy never answered and the worker spun forever",
+  "_compare_page_markup": false,
+  "anonymous: static file [/static/mainapp/js/postStatus.js]": "removed legacy JS (unused jQuery plugin)",
+  "anonymous: static file [/static/mainapp/js/jquery.base64.min.js]": "removed legacy JS (replaced by lib/latin1Base64.js in the React bundle)",
+  "anonymous: static file [/static/mainapp/js/easytimer/easytimer.js]": "removed legacy JS (replaced by useStopwatch)",
+  "anonymous: static file [/static/mainapp/js/edit_area/edit_area_full.js]": "removed legacy JS (replaced by CodeMirror 6)",
+  "anonymous: static file [/static/admin/js/content_status_stats.js]": "removed legacy JS (replaced by the React StatusPieChart)"
 }

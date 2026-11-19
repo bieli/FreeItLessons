@@ -1,5 +1,6 @@
 from adminsortable2.admin import SortableAdminMixin
 from django.contrib import admin
+from django.forms import Script
 from django.utils.html import format_html
 
 from mainapp.models import Author, Module, Chapter, \
@@ -69,9 +70,9 @@ class ContentStatusAdmin(admin.ModelAdmin):
                            int(obj.content.id), obj.content)
 
     class Media:
-        # from django.conf import settings
-        # media_url = getattr(settings, 'MEDIA_URL', '/media')
-        js = ['https://www.gstatic.com/charts/loader.js', '/static/admin/js/content_status_stats.js']
+        # statistics chart above the list (React, frontend/src/admin.jsx)
+        css = {'all': ['mainapp/dist/admin.css']}
+        js = [Script('mainapp/dist/admin.js', type='module')]
 
 
 @admin.register(Faq)

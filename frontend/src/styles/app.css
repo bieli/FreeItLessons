@@ -1,0 +1,24 @@
+/* code editor (task page) */
+.code-editor { border: 1px solid #ccc; background: #fff; margin-bottom: 10px; }
+.code-editor__toolbar { padding: 4px; border-bottom: 1px solid #ddd; background: #f7f7f7; display: block; }
+.code-editor__toolbar .btn { float: none; }
+.code-editor__host .cm-editor { min-height: 250px; font-size: 13px; }
+.code-editor__host .cm-scroller { min-height: 250px; }
+.code-editor--fullscreen { position: fixed; inset: 0; z-index: 1050; margin: 0; }
+.code-editor--fullscreen .code-editor__host .cm-editor { height: calc(100vh - 34px); }
+
+/* Python syntax highlighting (read-only blocks), classes of @lezer/highlight */
+#source_tests_block code { color: #333; }
+.tok-keyword { color: #a71d5d; font-weight: bold; }
+.tok-string, .tok-string2 { color: #183691; }
+.tok-number, .tok-bool, .tok-atom { color: #0086b3; }
+.tok-comment { color: #969896; font-style: italic; }
+.tok-variableName.tok-definition, .tok-propertyName.tok-definition { color: #795da3; }
+.tok-operator, .tok-punctuation { color: #333; }
+
+/* rating dialog (course contents) */
+.opinion-dialog .modal-dialog { width: 600px; max-width: 95%; }
+.opinion-dialog label { font-weight: normal; cursor: pointer; }
+.bq1 { cursor: pointer; }
+
+#source_task_hint_content:empty { display: none; }

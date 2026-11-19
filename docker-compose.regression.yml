@@ -41,6 +41,8 @@ services:
 
   runner:
     build: ./regression/runner
+    environment:
+      EXPECTED_FILE: ${EXPECTED_FILE:-expected_differences.json}
     depends_on:
       legacy: {condition: service_healthy}
       candidate: {condition: service_healthy}
@@ -53,4 +55,4 @@ services:
       - >
         python run_scenarios.py http://legacy:8000 /work/seed.sqlite3 /work/legacy/db.sqlite3 /work/legacy.json &&
         python run_scenarios.py http://candidate:8000 /work/seed.sqlite3 /work/candidate/db.sqlite3 /work/candidate.json &&
-        { python compare.py /work/legacy.json /work/candidate.json expected_differences.json > /work/report.txt; rc=$$?; cat /work/report.txt; exit $$rc; }
+        { python compare.py /work/legacy.json /work/candidate.json $${EXPECTED_FILE} > /work/report.txt; rc=$$?; cat /work/report.txt; exit $$rc; }

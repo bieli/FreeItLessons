@@ -203,7 +203,7 @@ class Client:
         except requests.Timeout:
             self.recorder.record_timeout(self.actor, name, method, path, timeout)
             return None
-        self.recorder.record(self.actor, name, method, path, resp, record)
+        self.recorder.record(self.actor, name, method, path, resp, record, xhr=ajax)
         return resp
 
     def get(self, name, path, **kw):
@@ -250,7 +250,7 @@ class Recorder:
                            'request': '%s %s' % (method, path),
                            'status': 'no response within %ds' % timeout})
 
-    def record(self, actor, name, method, path, resp, mode):
+    def record(self, actor, name, method, path, resp, mode, xhr=False):
         ctype = resp.headers.get('Content-Type', '').split(';')[0].strip()
         ctype = _CONTENT_TYPES.get(ctype, ctype)
         entry = {
@@ -258,6 +258,8 @@ class Recorder:
             'request': '%s %s' % (method, path),
             'status': resp.status_code,
         }
+        if xhr:
+            entry['xhr'] = True
         if resp.is_redirect:
             entry['location'] = re.sub(r'^https?://[^/]+', '', resp.headers.get('Location', ''))
         if mode == 'auto':
@@ -360,7 +362,8 @@ def student_journey(base_url, rec, seed):
     # send the opinion exactly the way courses_list.html does it (GET or POST)
     module_id, chapter_id = seed.module_chapters[0]
     page = c.session.get(c.base_url + '/kursy/%d/rozdzial/%d.html' % (module_id, chapter_id), timeout=60)
-    method = re.search(r"url: '/content/user/status/',\s*type: '(\w+)'", page.text).group(1).upper()
+    found = re.search(r"url: '/content/user/status/',\s*type: '(\w+)'", page.text)
+    method = found.group(1).upper() if found else 'POST'  # React UI (bundle) always POSTs
 
     def opinion(name, user_id, content_id, status, ajax=True, csrf=True, method=method):
         params = {'user_id': user_id, 'content_id': content_id, 'status': status}
@@ -442,11 +445,13 @@ def student_journey(base_url, rec, seed):
 
 
 def logout(c):
-    """Log out the way the page offers it: a link (GET) or a form (POST)."""
+    """Log out the way the page offers it: a plain link (GET, legacy) or a POST form
+    (server rendered form, or the React header which is rendered client side)."""
     home = c.session.get(c.base_url + '/', timeout=60)
     soup = BeautifulSoup(home.text, 'html.parser')
     form = soup.find('form', action=re.compile(r'/admin/logout/'))
-    if form is not None:
+    plain_link = soup.find('a', href='/admin/logout/')
+    if form is not None or plain_link is None:
         c.post('logout', '/admin/logout/', data={'csrfmiddlewaretoken': c.csrf_token()},
                record='status')
     else:

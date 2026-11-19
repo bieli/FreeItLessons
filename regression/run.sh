@@ -2,6 +2,8 @@
 # Characterization regression check: legacy (Django 1.11) vs candidate (this tree).
 #   LEGACY_REF  git revision with the legacy code      (default: b13f205 = last pre-upgrade master)
 #   SEED_DB     database both apps start from          (default: db.sqlite3 at LEGACY_REF)
+#   BASELINE_MODE=modern   LEGACY_REF is an upgraded revision (built with its own Dockerfile)
+#   EXPECTED_FILE          allowlist inside regression/   (default: expected_differences.json)
 set -eu
 cd "$(dirname "$0")/.."
 LEGACY_REF=${LEGACY_REF:-b13f205}
@@ -10,7 +12,14 @@ WORK=.regression
 rm -rf "$WORK"
 mkdir -p "$WORK/legacy-src" "$WORK/legacy" "$WORK/candidate"
 git archive "$LEGACY_REF" | tar -x -C "$WORK/legacy-src"
-cp regression/legacy/Dockerfile "$WORK/legacy-src/Dockerfile.legacy"
+if [ "${BASELINE_MODE:-legacy}" = "modern" ]; then
+    # baseline is a revision of the upgraded app: build it with its own Dockerfile
+    cp "$WORK/legacy-src/Dockerfile" "$WORK/legacy-src/Dockerfile.legacy"
+    COMPOSE_OVERRIDE=${COMPOSE_OVERRIDE:-regression/baseline-modern.override.yml}
+else
+    cp regression/legacy/Dockerfile "$WORK/legacy-src/Dockerfile.legacy"
+fi
+export EXPECTED_FILE=${EXPECTED_FILE:-expected_differences.json}
 if [ -n "${SEED_DB:-}" ]; then cp "$SEED_DB" "$WORK/seed.sqlite3"
 else git show "$LEGACY_REF:db.sqlite3" > "$WORK/seed.sqlite3"; fi
 cp "$WORK/seed.sqlite3" "$WORK/legacy/db.sqlite3"

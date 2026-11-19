@@ -1,4 +1,5 @@
-.PHONY: install-dev install lint test ci run chpwd migrate docker-up docker-test regression
+.PHONY: install-dev install lint test ci run chpwd migrate docker-up docker-test regression \
+	frontend-install frontend-build frontend-dev frontend-test e2e regression-ui
 
 install-dev:
 	python3.12 -m venv .venv
@@ -20,7 +21,7 @@ ci: lint test
 migrate:
 	DJANGO_DEBUG=1 python3 manage.py migrate
 
-run: migrate
+run: migrate frontend-build
 	DJANGO_DEBUG=1 python3 manage.py runserver
 
 chpwd:
@@ -35,3 +36,25 @@ docker-test:
 # legacy (Python 3.7 + Django 1.11) vs current tree - see regression/README.md
 regression:
 	regression/run.sh
+
+# server contract of the React UI branch vs the jQuery UI branch (AJAX, files, admin, DB)
+regression-ui:
+	BASELINE_MODE=modern LEGACY_REF=$${BASE_REF:-upgrade/python312-django61} \
+	EXPECTED_FILE=expected_differences.react-ui.json regression/run.sh
+
+# React UI (needs Node >= 22; or use: docker compose run --rm frontend-tests)
+frontend-install:
+	cd frontend && npm ci
+
+frontend-build:
+	cd frontend && npm run build
+
+frontend-dev:
+	cd frontend && npm run dev
+
+frontend-test:
+	cd frontend && npm test
+
+# browser tests: the same Playwright spec against the jQuery UI (BASE_REF) and the React UI
+e2e:
+	e2e/run.sh

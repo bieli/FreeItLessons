@@ -48,7 +48,9 @@ Requirements: **Python 3.12+** (Django 6.1) or **Docker** with Docker Compose.
 ```bash
 docker compose up --build              # http://127.0.0.1:8000  (demo DB seeded into a volume)
 docker compose run --build --rm tests  # lint + Django checks + test suite
-make regression                        # legacy (Py3.7/Django 1.11) vs current: characterization check
+docker compose run --rm frontend-tests # React unit tests + production build
+make regression                        # legacy (Py3.7/Django 1.11) vs current: characterization check (HTTP)
+make e2e                               # browser tests: jQuery UI (baseline branch) vs React UI
 ```
 
 Create or reset an account inside the container:
@@ -64,7 +66,8 @@ docker compose exec web python manage.py createsuperuser
 make install-dev          # python3.12 -m venv .venv + dev requirements
 . .venv/bin/activate
 make chpwd                # optional: change "admin" user password
-make run                  # DJANGO_DEBUG=1 runserver on http://127.0.0.1:8000
+make frontend-install     # Node >= 22: React UI dependencies (frontend/)
+make run                  # builds the React bundle, DJANGO_DEBUG=1 runserver on http://127.0.0.1:8000
 make ci                   # pycodestyle + tests
 ```
 
@@ -108,6 +111,29 @@ sandbox (gVisor/nsjail or a separate container without access to the database).
 Students log in through the Django admin login and therefore need `is_staff`;
 give them no model permissions in the admin.
 
+### Frontend (React)
+
+The interactive parts of the pages are React components ("islands") built with
+Vite from [`frontend/`](frontend/) into `mainapp/static/mainapp/dist/`
+(the Docker image builds it in a Node stage). Django still renders the pages,
+URLs and contents; an element like `<div data-island="FaqAccordion"
+data-props-id="faq-props">` is taken over by the component of that name, which
+receives its data via `json_script`.
+
+| Island | Page | Replaces |
+|---|---|---|
+| `NavBar` | every page | Bootstrap 3 JS (collapse, dropdown) + jQuery |
+| `FaqAccordion` | FAQ | jQuery slide accordion |
+| `RotatingStatusIcons`, `FloatingBackground` | home | jQuery animate, floating.js |
+| `ContentBlock` + `OpinionDialog` | course chapter | jQuery UI dialog, jQuery AJAX |
+| `TaskWorkspace` (lazy loaded) | task | edit_area, highlight.js, jquery.base64, easytimer, jQuery AJAX |
+| `StatusPieChart` (`admin.js`) | admin: content statuses | jQuery + Google Charts script |
+
+`make frontend-dev` rebuilds the bundle on every change (refresh the page).
+The same Playwright spec ([`e2e/`](e2e/)) runs against the former jQuery UI and the
+React UI, so feature parity is checked in a real browser (`make e2e`);
+known defects of the jQuery UI are declared there as expected failures.
+
 ### How to start developing using Vagrant with Docker
 
 1. vagrant up
@@ -146,7 +172,7 @@ ssh vagrant 'docker run -ti ubuntu:xenial echo hi'
 - [ ] internationalization at admin and all system messages
 - [ ] selecting language for website
 - [ ] migration to new Bootstrap template system
-- [ ] JavaScript move from jQuery to EcmaScript or VueJS, etc.
+- [x] JavaScript move from jQuery to EcmaScript or VueJS, etc. (React)
 - [ ] change font sizes into proportional to screen (currently are too small for eyes)
 - [ ] add leader boards (some interesting features for all class mates - challenges for clasess, etc)
 - [x] switch to newest Django version + upgrade django components

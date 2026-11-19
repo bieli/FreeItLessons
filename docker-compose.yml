@@ -1,8 +1,10 @@
 # Local run of FreeItLessons (Python 3.12 + Django 6.1)
 #
 #   docker compose up --build                 -> http://127.0.0.1:8000
-#   docker compose run --rm tests             -> lint + unit tests
-#   make regression                           -> legacy vs new characterization check
+#   docker compose run --rm tests             -> lint + Django tests
+#   docker compose run --rm frontend-tests    -> React unit tests + production build
+#   make regression                           -> legacy vs new characterization check (HTTP)
+#   make e2e                                  -> jQuery UI vs React UI (browser, Playwright)
 name: freeitlessons
 
 services:
@@ -28,6 +30,18 @@ services:
       DJANGO_DB_PATH: /tmp/tests.sqlite3
     entrypoint: []
     command: ["sh", "-c", "pycodestyle mainapp/ tests/ FreeItLessons/ && python manage.py makemigrations --check --dry-run && python manage.py check && python manage.py test tests -v 2"]
+
+  frontend-tests:
+    profiles: ["test"]
+    image: node:22-slim
+    working_dir: /repo/frontend
+    user: "${HOST_UID:-1000}"
+    environment:
+      HOME: /tmp
+      npm_config_update_notifier: "false"
+    volumes:
+      - .:/repo
+    command: ["sh", "-c", "npm ci --no-audit --no-fund && npm test && npm run build"]
 
 volumes:
   app-data:

@@ -130,3 +130,8 @@ db.sqlite3.last
 # local runtime artefacts
 staticfiles/
 .regression/
+.e2e/
+node_modules/
+mainapp/static/mainapp/dist/
+frontend/coverage/
+!frontend/src/lib/

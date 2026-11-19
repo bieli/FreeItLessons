@@ -1,0 +1,11 @@
+{
+  "name": "freeitlessons-e2e",
+  "private": true,
+  "description": "Browser level characterization tests: the same spec must pass on the jQuery UI (baseline) and on the React UI.",
+  "scripts": {
+    "test": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.65.1"
+  }
+}

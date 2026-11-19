@@ -63,7 +63,9 @@ class FaqPageView(TemplateView):
 
     def get_context_data(self, **kwargs):
         faqs_list = Faq.objects.all()
-        return {'faqs': faqs_list}
+        return {'faqs': faqs_list,
+                'faqs_props': {'faqs': [{'id': faq.id, 'question': faq.question, 'answer': faq.answer}
+                                        for faq in faqs_list]}}
 
 
 class CoursesListPageView(TemplateView):
@@ -136,8 +138,11 @@ class TaskPageView(TemplateView):
 
     def get_context_data(self, **kwargs):
         task_instance = get_object_or_404(Task, id=kwargs['task_id'])
+        asserts = self._get_asserts_from_tests_code(task_instance.tests)
         return {'task': task_instance,
-                'asserts': self._get_asserts_from_tests_code(task_instance.tests)
+                'asserts': asserts,
+                'task_props': {'taskId': task_instance.id, 'code': task_instance.code,
+                               'tests': task_instance.tests, 'asserts': asserts},
                 }
 
 

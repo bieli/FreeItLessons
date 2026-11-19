@@ -1,3 +1,12 @@
+# --- React UI (frontend/) -> mainapp/static/mainapp/dist ---------------------
+FROM node:22-slim AS frontend
+WORKDIR /build/frontend
+COPY frontend/package.json frontend/package-lock.json ./
+RUN npm ci --no-audit --no-fund
+COPY frontend/ ./
+RUN npm run build
+
+# --- Django application ----------------------------------------------------
 FROM python:3.12-slim
 
 LABEL maintainer="Marcin Bielak <marcin.bieli@gmail.com>"
@@ -18,6 +27,7 @@ RUN if [ "$INSTALL_DEV" = "1" ]; then pip install -r requirements.dev.txt; \
     else pip install -r requirements.txt; fi
 
 COPY . .
+COPY --from=frontend /build/mainapp/static/mainapp/dist /app/mainapp/static/mainapp/dist
 
 RUN DJANGO_SECRET_KEY=collectstatic python manage.py collectstatic --noinput \
     && useradd --uid 1000 --create-home app \

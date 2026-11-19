@@ -1,0 +1,6 @@
+#chart { padding: 15px; }
+.status-chart { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; margin: 0; }
+.status-chart figcaption { width: 100%; }
+.status-chart__legend { list-style: none; padding: 0; margin: 0; }
+.status-chart__legend li { margin: 4px 0; list-style: none; }
+.status-chart__swatch { display: inline-block; width: 12px; height: 12px; margin-right: 8px; vertical-align: middle; }

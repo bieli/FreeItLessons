@@ -65,12 +65,26 @@ class PublicPagesTest(FixturesMixin, TestCase):
     def test_home(self):
         response = self.client.get('/')
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'Zaloguj się')
+        self.assertFalse(response.context['frontend_context']['isAuthenticated'])
+        for island in ('NavBar', 'RotatingStatusIcons', 'FloatingBackground'):
+            self.assertContains(response, 'data-island="%s"' % island)
 
     def test_faq(self):
         response = self.client.get('/faq.html')
-        self.assertContains(response, 'What is Python')
-        self.assertContains(response, '<b>A language</b>')
+        self.assertContains(response, 'data-island="FaqAccordion" data-props-id="faq-props"')
+        self.assertEqual(response.context['faqs_props']['faqs'],
+                         [{'id': 1, 'question': 'What is Python', 'answer': '<b>A language</b>'}])
+        # props are embedded with json_script: HTML special characters are escaped
+        self.assertContains(response, '\\u003Cb\\u003EA language\\u003C/b\\u003E')
+
+    def test_pages_load_the_react_bundle_and_no_jquery(self):
+        for path in ('/', '/faq.html', '/kursy.html', '/kursy/%d/rozdzial/%d.html' % (self.module.id, self.chapter.id),
+                     '/mentorzy.html'):
+            response = self.client.get(path)
+            self.assertContains(response, '<script type="module" src="/static/mainapp/dist/app.js"></script>')
+            self.assertContains(response, 'id="frontend-context"')
+            self.assertNotContains(response, 'jquery')
+            self.assertNotContains(response, 'bootstrap.min.js')
 
     def test_courses_list_shows_enabled_modules_only(self):
         response = self.client.get('/kursy.html')
@@ -85,7 +99,8 @@ class PublicPagesTest(FixturesMixin, TestCase):
 
     def test_chapter_page_renders_contents(self):
         response = self.client.get('/kursy/%d/rozdzial/%d.html' % (self.module.id, self.chapter.id))
-        self.assertContains(response, '<p>Lesson body</p>')
+        self.assertContains(response, '<div data-island="ContentBlock" data-content-id="%d">'
+                                      '<template><p>Lesson body</p></template></div>' % self.text.id)
         self.assertContains(response, 'href="https://python.org"')
 
     def test_mentors_lists_public_mentors_only(self):
@@ -109,7 +124,7 @@ class PublicPagesTest(FixturesMixin, TestCase):
             self.assertEqual(self.client.get(path).status_code, 404, path)
 
     def test_static_files_are_served(self):
-        response = self.client.get('/static/mainapp/js/jquery.base64.min.js')
+        response = self.client.get('/static/mainapp/img/new.png')
         self.assertEqual(response.status_code, 200)
 
 
@@ -122,20 +137,24 @@ class StudentPagesTest(FixturesMixin, TestCase):
         self.assertContains(response, 'Reverse')
         self.assertNotContains(response, 'Hidden task')
 
-    def test_task_page_lists_asserts(self):
+    def test_task_page_props(self):
         response = self.client.get('/zadania/%d.html' % self.task.id)
-        self.assertContains(response, "assert &#x27;cba&#x27; == reverse_chars(&#x27;abc&#x27;)")
+        self.assertContains(response, 'data-island="TaskWorkspace" data-props-id="task-props"')
+        self.assertEqual(response.context['task_props'], {
+            'taskId': self.task.id, 'code': STARTER_CODE, 'tests': TESTS_CODE,
+            'asserts': ["assert 'cba' == reverse_chars('abc')"]})
 
-    def test_header_shows_user_menu(self):
+    def test_frontend_context_of_logged_in_user(self):
         response = self.client.get('/')
-        self.assertContains(response, 'Zalogowany <b>student</b>')
-        self.assertContains(response, 'name="logged-user-id" value="%d"' % self.student.id)
+        context = response.context['frontend_context']
+        self.assertEqual((context['isAuthenticated'], context['userId'], context['username']),
+                         (True, self.student.id, 'student'))
+        self.assertTrue(context['csrfToken'])
+        self.assertEqual(context['staticUrl'], '/static/')
 
-    def test_logout_is_a_post_form(self):
-        response = self.client.get('/')
-        self.assertContains(response, '<form id="logout-form" method="post" action="/admin/logout/"')
+    def test_logout_via_post(self):
         self.assertEqual(self.client.post('/admin/logout/').status_code, 200)
-        self.assertContains(self.client.get('/'), 'Zaloguj się')
+        self.assertFalse(self.client.get('/').context['frontend_context']['isAuthenticated'])
 
     def test_achievements_and_opinions_pages(self):
         TaskSolution.objects.create(task=self.task, user=self.student, is_finished=True, suggestions_count=2)
@@ -300,6 +319,11 @@ class AdminTest(FixturesMixin, TestCase):
         response = self.client.get('/admin/mainapp/contentstatus/')
         self.assertContains(response, '<a href="/admin/mainapp/content/%d/?_to_field=id&amp;_popup=1" '
                                       'target="_blank">A text</a>' % self.text.id, html=True)
+
+    def test_content_status_admin_loads_the_chart_bundle(self):
+        response = self.client.get('/admin/mainapp/contentstatus/')
+        self.assertContains(response, '<script src="/static/mainapp/dist/admin.js" type="module"></script>')
+        self.assertNotContains(response, 'gstatic.com/charts')
 
     def test_author_admin_sets_owner(self):
         response = self.client.post('/admin/mainapp/author/add/', {
