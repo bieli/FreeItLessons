@@ -1,5 +1,7 @@
 ![CI status](https://github.com/bieli/FreeItLessons/actions/workflows/ci-checks.yaml/badge.svg)
 
+🇬🇧 **English** | 🇵🇱 [Wersja polska](README.pl.md)
+
 # FreeItLessons - mini e-Learning platform for IT & basic programming in Python
 
 **In short:** a small website for learning programming. Mentors write courses and
