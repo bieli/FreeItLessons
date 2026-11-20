@@ -253,7 +253,7 @@ lokalnego. Na publicznym serwerze ustaw własne `DJANGO_SECRET_KEY`,
 ### Uwagi o aktualizacji (Python 3.12 + Django 6.1)
 
 Projekt przeniesiono z Django 1.11 w dwóch krokach; każdy z nich sprawdzono
-narzędziem do testów charakteryzacyjnych z katalogu [`regression/`](regression/README.md)
+narzędziem do testów charakteryzacyjnych z katalogu [`regression/`](regression/README.pl.md)
 (stara i nowa aplikacja przechodzą te same scenariusze na identycznych bazach
 danych, a odpowiedzi i powstałe dane są porównywane):
 
@@ -288,7 +288,7 @@ nadawaj im żadnych uprawnień do modeli w panelu.
 ### Interfejs (React)
 
 Interaktywne części stron to komponenty Reacta („wyspy”), budowane przez Vite
-z katalogu [`frontend/`](frontend/) do `mainapp/static/mainapp/dist/`
+z katalogu [`frontend/`](frontend/README.pl.md) do `mainapp/static/mainapp/dist/`
 (obraz Dockera buduje je w etapie z Node). Strony, adresy URL i treści nadal
 generuje Django; element taki jak `<div data-island="FaqAccordion"
 data-props-id="faq-props">` przejmuje komponent o tej nazwie, który dostaje dane

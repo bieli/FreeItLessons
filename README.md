@@ -277,7 +277,7 @@ give them no model permissions in the admin.
 ### Frontend (React)
 
 The interactive parts of the pages are React components ("islands") built with
-Vite from [`frontend/`](frontend/) into `mainapp/static/mainapp/dist/`
+Vite from [`frontend/`](frontend/README.md) into `mainapp/static/mainapp/dist/`
 (the Docker image builds it in a Node stage). Django still renders the pages,
 URLs and contents; an element like `<div data-island="FaqAccordion"
 data-props-id="faq-props">` is taken over by the component of that name, which
