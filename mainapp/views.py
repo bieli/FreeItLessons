@@ -21,8 +21,18 @@ if __name__ == '__main__':
     __run_tests()
 # main
         """
-# legacy contract: the browser sends base64 of the code, decoded as latin-1
-CODE_BLOCK_ENCODING = 'latin-1'
+# The browser sends base64 of the UTF-8 encoded program. Payloads that are not
+# valid UTF-8 come from the former jQuery page (jquery.base64 sent latin-1 bytes)
+# and are decoded the old way, so a page cached in a browser keeps working.
+CODE_BLOCK_ENCODING = 'utf-8'
+LEGACY_CODE_BLOCK_ENCODING = 'latin-1'
+
+
+def decode_code_block(raw):
+    try:
+        return raw.decode(CODE_BLOCK_ENCODING)
+    except UnicodeDecodeError:
+        return raw.decode(LEGACY_CODE_BLOCK_ENCODING)
 
 
 def is_ajax(request):
@@ -182,10 +192,10 @@ class TaskCodeRunView(AjaxUserView):
     def run_python_code(self, code, task, user_id):
         """``code`` are the bytes sent by the browser; the tests ALWAYS come
         from the database - client supplied tests are never executed."""
-        if not TaskCodeRun.is_code_block_secure(code):
+        code_text = decode_code_block(code)
+        if not TaskCodeRun.is_code_block_secure(code_text):
             return "Unexpected instructions !\nPlease rewrite your code and run again !", -1
 
-        code_text = code.decode(CODE_BLOCK_ENCODING)
         source = code_text + "\n\n" + task.tests + "\n\n" + MAIN_BLOCK + "\n\n"
         run = run_program(source)
         if run.timed_out:

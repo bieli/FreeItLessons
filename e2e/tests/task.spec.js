@@ -1,5 +1,5 @@
 const { test, expect } = require('./fixtures');
-const { login, setEditorCode, GREEN, DARKRED } = require('./helpers');
+const { login, setEditorCode, knownJqueryBug, GREEN, DARKRED } = require('./helpers');
 
 const SOLUTION = `# unit
 def reverse_chars(chars):
@@ -39,6 +39,17 @@ test('task page: hints unlock one by one', async ({ page }) => {
   await expect(page.locator('#source_task_hint_content')).toContainText('Spróbuj napisać warunek');
   await expect(page.locator('#hint-2')).not.toHaveClass(/disabled/);
   await expect(page.locator('#hint-3')).toHaveClass(/disabled/);
+});
+
+test('task page: Polish letters in the program are accepted (UTF-8)', async ({ page }, testInfo) => {
+  knownJqueryBug(test, testInfo, 'jquery.base64 throws on characters above U+00FF - "run" silently does nothing');
+  await login(page);
+  await page.goto('/zadania/1.html');
+  await expect(page.locator('#program_output')).toContainText('AssertionError');
+  await setEditorCode(page, `${SOLUTION}print('zażółć gęślą jaźń')\n`);
+  await page.locator('#program_run').click();
+  await expect(page.locator('#program_output')).toContainText('zażółć gęślą jaźń');
+  await expect(page.locator('#program_output')).toContainText('ASSERTS TESTS - OK.');
 });
 
 test('task page: a correct solution passes all tests', async ({ page }) => {

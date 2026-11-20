@@ -48,15 +48,18 @@ it('a correct solution turns all asserts green', async () => {
   document.querySelectorAll('#asserts_list blockquote').forEach((block) => expect(block.style.background).toBe('green'));
 });
 
-it('characters the server cannot accept are reported, not sent', async () => {
+it('Polish letters are sent as UTF-8', async () => {
   const calls = mockFetch({ 'POST /zadania/task/code/run/': [200, 'x'] });
   const user = userEvent.setup();
   render(<TaskWorkspace {...PROPS} />);
   await waitFor(() => expect(calls).toHaveLength(1));
-  await user.type(screen.getByLabelText('code'), '# żółw');
+  const editor = screen.getByLabelText('code');
+  await user.clear(editor);
+  await user.type(editor, '# żółw');
   await user.click(screen.getByRole('button', { name: /Uruchom program/ }));
-  expect(document.getElementById('program_output')).toHaveTextContent('Program zawiera znak "ż"');
-  expect(calls).toHaveLength(1);
+  await waitFor(() => expect(calls).toHaveLength(2));
+  const bytes = Uint8Array.from(atob(calls[1].body.get('code')), (c) => c.charCodeAt(0));
+  expect(new TextDecoder().decode(bytes)).toBe('# żółw');
 });
 
 it('server errors are shown in the output', async () => {

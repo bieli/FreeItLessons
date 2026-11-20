@@ -1,18 +1,17 @@
 import { describe, expect, it } from 'vitest';
-import { encodeLatin1Base64, UnsupportedCharacterError } from '../src/lib/latin1Base64';
+import { encodeUtf8Base64 } from '../src/lib/utf8Base64';
 import { assertColors } from '../src/lib/asserts';
 import { formatDuration } from '../src/lib/useStopwatch';
 import { ajax, HttpError } from '../src/lib/api';
 import { readProps } from '../src/lib/islands';
 import { mockFetch, setContext } from './utils';
 
-describe('encodeLatin1Base64 (wire compatible with jquery.base64)', () => {
-  it('encodes like the legacy plugin', () => {
-    expect(encodeLatin1Base64('abc')).toBe('YWJj');
-    expect(encodeLatin1Base64('SWÓJ KOD')).toBe('U1fTSiBLT0Q='); // value produced by jquery.base64
-  });
-  it('rejects characters the server cannot decode', () => {
-    expect(() => encodeLatin1Base64('zażółć')).toThrow(UnsupportedCharacterError);
+describe('encodeUtf8Base64', () => {
+  it('encodes the UTF-8 bytes of the program', () => {
+    expect(encodeUtf8Base64('abc')).toBe('YWJj');
+    expect(encodeUtf8Base64('zażółć')).toBe('emHFvMOzxYLEhw==');
+    expect(new TextDecoder().decode(Uint8Array.from(atob(encodeUtf8Base64('# żółw 🐢')), (c) => c.charCodeAt(0))))
+      .toBe('# żółw 🐢');
   });
 });
 

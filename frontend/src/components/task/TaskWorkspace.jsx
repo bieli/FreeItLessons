@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { ajax, HttpError } from '../../lib/api';
 import { assertColors, FAILED, PASSED } from '../../lib/asserts';
 import { getContext } from '../../lib/context';
-import { encodeLatin1Base64, UnsupportedCharacterError } from '../../lib/latin1Base64';
+import { encodeUtf8Base64 } from '../../lib/utf8Base64';
 import { formatDuration, useStopwatch } from '../../lib/useStopwatch';
 import CodeEditor from './CodeEditor';
 import HighlightedCode from './HighlightedCode';
@@ -11,14 +11,6 @@ export const MAX_HINT_NO = 5;
 const MAIN_BLOCK = "\n# main\nif __name__ == '__main__':\n    __run_tests()\n# main\n                ";
 const HINT_LABELS = ['Poproszę o podpowiedź 1', 'Poproszę o podpowiedź 2', 'Poproszę o podpowiedź 3',
   'Poproszę o podpowiedź 4', 'Poddaje się !!!'];
-
-function safeBase64(text) {
-  try {
-    return encodeLatin1Base64(text);
-  } catch {
-    return ''; // tests are only informative for the server (it uses the stored ones)
-  }
-}
 
 /**
  * Online exercise: code editor, run (server side tests), output, assert list,
@@ -38,24 +30,13 @@ export default function TaskWorkspace({ taskId, code = '', tests = '', asserts =
   const [hint, setHint] = useState(null); // {html} | {text}
 
   const run = useCallback(async () => {
-    let program;
-    try {
-      program = encodeLatin1Base64(editor.current?.getValue() ?? code);
-    } catch (error) {
-      if (!(error instanceof UnsupportedCharacterError)) throw error;
-      setOutput({
-        error: true,
-        text: `Program zawiera znak "${error.char}", którego nie można wysłać do sprawdzenia `
-          + '(np. polskie litery ą, ę, ł, ś, ź, ż, ć, ń).\nUsuń go (także z komentarzy) i uruchom ponownie !',
-      });
-      return;
-    }
+    const program = encodeUtf8Base64(editor.current?.getValue() ?? code);
     try {
       const result = await ajax('/zadania/task/code/run/', {
         method: 'POST',
         data: {
           user_id: userId, task_id: taskId, code: program, hint_id: hintIdRef.current,
-          tests: safeBase64(tests), timer: formatDuration(secondsRef.current),
+          tests: encodeUtf8Base64(tests), timer: formatDuration(secondsRef.current),
         },
       });
       setOutput({ text: result, error: false });

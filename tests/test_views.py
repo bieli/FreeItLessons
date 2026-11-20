@@ -227,8 +227,11 @@ class TaskAjaxTest(FixturesMixin, TestCase):
         self.client.force_login(self.student)
 
     def run_code(self, code, **kw):
+        return self.run_raw(b64(code), **kw)
+
+    def run_raw(self, code_b64, **kw):
         data = {'user_id': self.student.id, 'task_id': self.task.id, 'hint_id': 0, 'timer': '00:01:05',
-                'code': b64(code), 'tests': b64(TESTS_CODE)}
+                'code': code_b64, 'tests': b64(TESTS_CODE)}
         data.update(kw)
         # posted exactly like jQuery.ajax() in task.html does
         return self.client.post(self.run_url, urlencode(data), **XHR,
@@ -241,6 +244,23 @@ class TaskAjaxTest(FixturesMixin, TestCase):
         self.assertTrue(solution.is_finished)
         self.assertEqual(solution.time_spent_seconds, 65)
         self.assertEqual(solution.solution_code_block, SOLUTION_CODE)
+
+    def test_utf8_code_with_polish_letters(self):
+        code = ("# unit\n# mój żółw\ndef reverse_chars(chars):\n    return chars[::-1]\n# unit\n"
+                "print('zażółć gęślą jaźń')\n")
+        output = self.run_code(code).content.decode()
+        self.assertIn('zażółć gęślą jaźń', output)
+        self.assertIn('ASSERTS TESTS - OK.', output)
+        solution = TaskSolution.objects.get(task=self.task, user=self.student)
+        self.assertTrue(solution.is_finished)
+        self.assertEqual(solution.solution_code_block, code)
+
+    def test_legacy_latin1_payload_is_still_accepted(self):
+        code = "# unit\n# SWÓJ KOD\ndef reverse_chars(chars):\n    return chars[::-1]\n# unit\n"
+        legacy = base64.b64encode(code.encode('latin-1')).decode('ascii')  # what jquery.base64 sent
+        response = self.run_raw(legacy)
+        self.assertEqual(response.content.decode().strip(), 'ASSERTS TESTS - OK.')
+        self.assertEqual(TaskSolution.objects.get(task=self.task, user=self.student).solution_code_block, code)
 
     def test_failing_solution_returns_traceback(self):
         response = self.run_code(STARTER_CODE)
