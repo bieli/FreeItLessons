@@ -47,7 +47,7 @@ Ostatni wynik (stara wersja vs gałąź z interfejsem React): 178 elementów,
 | `"<aktor>: <krok> [<ścieżka>]"` | ten krok może się różnić; wartość to powód |
 | `"db:<tabela>"` | ta tabela biznesowa może się różnić po scenariuszach |
 | `"_line_replacements"` | sekwencje linii `from` → `to` zamieniane najpierw w nagraniu starej wersji (sprawdzona zmiana kodu HTML na wielu stronach, np. przycisk wylogowania) |
-| `"_compare_page_markup": false` | strony HTML są porównywane tylko po statusie i przekierowaniu; odpowiedzi AJAX, pliki, dane panelu i baza danych nadal są porównywane w całości (od przepisania interfejsu na React - kod stron sprawdzają testy w prawdziwej przeglądarce w [`../e2e/`](../e2e/)) |
+| `"_compare_page_markup": false` | strony HTML są porównywane tylko po statusie i przekierowaniu; odpowiedzi AJAX, pliki, dane panelu i baza danych nadal są porównywane w całości (od przepisania interfejsu na React - kod stron sprawdzają testy w prawdziwej przeglądarce w [`../e2e/`](../e2e/README.pl.md)) |
 
 Wpisy, które się nie wydarzyły, są zgłaszane jako *nieaktualne* (*stale*),
 więc lista nie zawiera martwych wyjątków.

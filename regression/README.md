@@ -45,7 +45,7 @@ Last result (legacy vs. React UI branch): 178 items, 140 identical, 38 expected,
 | `"<actor>: <step> [<path>]"` | this step may differ; the value is the reason |
 | `"db:<table>"` | this business table may differ after the journeys |
 | `"_line_replacements"` | `from` → `to` line sequences applied to the legacy recording first (a reviewed markup change on many pages, e.g. the logout control) |
-| `"_compare_page_markup": false` | HTML pages are compared by status/redirect only; AJAX responses, files, admin data and the database are still compared fully (used since the React UI rewrite - page markup is checked in a real browser by [`../e2e/`](../e2e/)) |
+| `"_compare_page_markup": false` | HTML pages are compared by status/redirect only; AJAX responses, files, admin data and the database are still compared fully (used since the React UI rewrite - page markup is checked in a real browser by [`../e2e/`](../e2e/README.md)) |
 
 Entries that did not occur are reported as *stale*, so the list stays honest.
 

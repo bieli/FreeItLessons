@@ -292,7 +292,7 @@ receives its data via `json_script`.
 | `TaskWorkspace` (lazy loaded) | task | edit_area, highlight.js, jquery.base64, easytimer, jQuery AJAX |
 | `StatusPieChart` (`admin.js`) | admin: content statuses | jQuery + Google Charts script |
 
-The same Playwright spec ([`e2e/`](e2e/)) runs against the former jQuery UI and the
+The same Playwright spec ([`e2e/`](e2e/README.md)) runs against the former jQuery UI and the
 React UI, so feature parity is checked in a real browser (`make e2e`);
 known defects of the jQuery UI are declared there as expected failures.
 

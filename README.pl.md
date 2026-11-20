@@ -303,7 +303,7 @@ przez `json_script`.
 | `TaskWorkspace` (ładowany na żądanie) | zadanie | edit_area, highlight.js, jquery.base64, easytimer, AJAX w jQuery |
 | `StatusPieChart` (`admin.js`) | panel: statusy treści | skrypt z jQuery + Google Charts |
 
-Ten sam zestaw testów Playwright ([`e2e/`](e2e/)) działa na dawnym interfejsie
+Ten sam zestaw testów Playwright ([`e2e/`](e2e/README.pl.md)) działa na dawnym interfejsie
 jQuery i na interfejsie React, więc zgodność funkcji jest sprawdzana
 w prawdziwej przeglądarce (`make e2e`); znane błędy interfejsu jQuery są tam
 oznaczone jako oczekiwane niepowodzenia.

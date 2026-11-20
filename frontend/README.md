@@ -121,7 +121,7 @@ make frontend-dev   # rebuild the bundle on every change
   text typed by students.
 * **Programs** are sent as base64 of their UTF-8 bytes (Polish letters are fine);
   the tests always come from the server's database.
-* **Browser tests:** the same Playwright spec ([`../e2e/`](../e2e/)) runs against the
+* **Browser tests:** the same Playwright spec ([`../e2e/`](../e2e/README.md)) runs against the
   former jQuery UI and this React UI (`make e2e`). Keep the element ids they use
   (`program_run`, `program_output`, `asserts_list`, `hint-1` ... `hint-5`,
   `timerHtml`, `content_id__<id>`, the radio name `dialog-send-status-select`).

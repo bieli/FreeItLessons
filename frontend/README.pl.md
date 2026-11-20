@@ -121,7 +121,7 @@ make frontend-dev   # przebudowuje interfejs po każdej zmianie
   `dangerouslySetInnerHTML`; nigdy nie rób tego z tekstem wpisanym przez uczniów.
 * **Programy** są wysyłane jako base64 z ich bajtów UTF-8 (polskie litery są w porządku);
   testy zawsze pochodzą z bazy danych serwera.
-* **Testy w przeglądarce:** ten sam zestaw testów Playwright ([`../e2e/`](../e2e/))
+* **Testy w przeglądarce:** ten sam zestaw testów Playwright ([`../e2e/`](../e2e/README.pl.md))
   działa na dawnym interfejsie jQuery i na tym interfejsie React (`make e2e`).
   Zachowaj identyfikatory elementów, z których korzystają (`program_run`,
   `program_output`, `asserts_list`, `hint-1` ... `hint-5`, `timerHtml`,
