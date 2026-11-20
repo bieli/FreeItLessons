@@ -33,6 +33,7 @@ RUN DJANGO_SECRET_KEY=collectstatic python manage.py collectstatic --noinput \
     && useradd --uid 1000 --create-home app \
     && mkdir -p /data \
     && chown -R app:app /data \
+    && sed -i "s/\r$//" docker/entrypoint.sh \
     && chmod +x docker/entrypoint.sh
 
 USER app

@@ -1,0 +1,4 @@
+# Shell scripts run inside Linux containers: keep LF line endings even on
+# Windows (git's core.autocrlf would otherwise break docker/entrypoint.sh).
+*.sh text eol=lf
+Dockerfile text eol=lf

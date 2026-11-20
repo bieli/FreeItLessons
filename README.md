@@ -2,6 +2,12 @@
 
 # FreeItLessons - mini e-Learning platform for IT & basic programming in Python
 
+**In short:** a small website for learning programming. Mentors write courses and
+programming exercises; students read the lessons, rate them, and solve
+[Python](https://python.org) tasks right in the browser - the website checks the
+solution automatically and gives hints. You can run the whole thing on your own
+computer in a few minutes - see [Run it on your computer](#run-it-on-your-computer-step-by-step).
+
 The mini e-Learning platform, equipped with a content management system (CMS) and remote working features, serves as an innovative solution for connecting educators with their students. Developed in response to increasing demand from students during volunteer meetings focused on programming education in schools, this project provides a dynamic and flexible environment for learning.
 
 The platform acts as an online interface, bridging the gap between monthly in-person meetings, making education accessible beyond the confines of the traditional classroom setting. The emphasis on home working options ensures that students can engage with educational content at their own pace and convenience.
@@ -13,12 +19,159 @@ One of the project's key strengths lies in its commitment to fostering great edu
 - Welcome page
 - FAQ page (with administrator CRUD)
 - Courses pages - simple CMS inside (with administrator CRUD)
-- Excercies tasks with auto checking mechanism on-line in system - online course module (with administrator CRUD)
+- Exercise tasks with an automatic, on-line solution check - online course module (with administrator CRUD)
 - About mentors subpage
 - Students can grade/vote in course modules contents (modal window showing after click on course article - feedback loop for teachers)
 
+The website itself is in Polish (e.g. *Kursy* = courses, *Zadania* = tasks,
+*Zaloguj się* = log in). [Screenshots](#screenshots) are at the bottom of this page.
 
-### Screen shots with ready features
+
+## Run it on your computer (step by step)
+
+You do **not** need to install Python, a database or anything else from this
+project. You only need one program: **Docker Desktop**. It runs the whole
+website in a ready-made "box" (a *container*) on your computer.
+
+**You need:** Windows 10/11 (64-bit), macOS (Intel or Apple M1/M2/M3/M4) or Linux,
+about 4 GB of RAM, 3 GB of free disk space and an internet connection
+(only for the first start).
+
+> 💡 Ask a parent or teacher for help if installing programs on your computer
+> needs an administrator password.
+
+### Step 1 - install Docker Desktop
+
+1. Go to <https://www.docker.com/products/docker-desktop/> and download Docker Desktop
+   for your system:
+   * **Windows:** run the installer and keep the default options (it uses
+     *WSL 2*; if Windows asks to install or update WSL, say yes and restart the computer).
+   * **macOS:** choose *Apple Silicon* (M1/M2/M3/M4) or *Intel chip* - you can check
+     which one you have in the Apple menu → *About This Mac*. Drag Docker to *Applications*.
+   * **Linux:** install *Docker Desktop for Linux* or *Docker Engine* with the
+     *Compose plugin* (<https://docs.docker.com/engine/install/>).
+2. Start Docker Desktop and wait until it says it is **running**
+   (the whale icon 🐳 in the taskbar / menu bar stops moving).
+   You can skip creating a Docker account.
+
+### Step 2 - download the project
+
+Choose **one** way:
+
+* **Easiest:** on the project's GitHub page click the green **Code** button →
+  **Download ZIP**, then unpack (extract) the ZIP file, e.g. into your *Documents* folder.
+* **With git** (if you know it): `git clone https://github.com/bieli/FreeItLessons.git`
+
+You now have a folder called `FreeItLessons` (or `FreeItLessons-master` from the ZIP).
+
+### Step 3 - open a terminal in that folder
+
+A *terminal* is a window where you type commands.
+
+* **Windows:** open the project folder in File Explorer, right-click an empty
+  space in it → **Open in Terminal** (on older Windows: type `powershell`
+  in the address bar of the folder window and press Enter).
+* **macOS:** open the **Terminal** app (⌘ + Space, type *Terminal*), type `cd `
+  (with a space at the end), drag the project folder into the window and press Enter.
+* **Linux:** right-click in the folder → **Open in Terminal**.
+
+Check that you are in the right place: type `ls` (macOS/Linux) or `dir` (Windows)
+and press Enter - you should see files like `README.md` and `docker-compose.yml`.
+
+### Step 4 - start the website
+
+Type this command and press Enter:
+
+```bash
+docker compose up --build
+```
+
+The first start downloads and prepares everything - it can take **5-15 minutes**.
+Lots of text will scroll by; that's normal. It's ready when you see a line ending with:
+
+```
+[INFO] Listening at: http://0.0.0.0:8000 (1)
+```
+
+Keep this terminal window open - closing it stops the website.
+Next starts take only a few seconds.
+
+### Step 5 - open it in the browser
+
+Open **<http://127.0.0.1:8000>** in your web browser (Chrome, Firefox, Edge, Safari).
+🎉 You should see the FreeItLessons home page with example courses and tasks.
+
+The website runs only on **your** computer - other people in your network or on
+the Internet cannot open it.
+
+### Step 6 - create your account
+
+To solve tasks and to manage the website you need to log in. Open a **second**
+terminal window in the same folder (see step 3) and run:
+
+```bash
+docker compose exec web python manage.py createsuperuser
+```
+
+It asks for a *Username*, an *Email address* (you can just press Enter) and a
+*Password* twice (the letters are not shown while you type - that's normal).
+If the password is too simple you'll be asked *"Bypass password validation and
+create user anyway?"* - for practising at home you may answer `y`.
+
+Now click **Zaloguj się** (log in) on the website and use your new account.
+
+### Step 7 - stop the website
+
+* In the terminal from step 4 press **Ctrl + C** (also on macOS: **Control + C**), or
+* run `docker compose down` in any terminal in the project folder.
+
+Everything you did (accounts, solved tasks, ratings) is kept and will be there
+next time you run `docker compose up`. To start again with the fresh example
+data, run `docker compose down -v` (⚠️ this deletes your accounts and progress).
+
+
+## First steps in the platform
+
+| What to try | Where |
+|---|---|
+| Read a course and rate a lesson: click on a lesson text and choose an icon | **Kursy** → a chapter |
+| Solve a Python task: write code in the editor, click **Uruchom program** (run), use the yellow hint buttons if you get stuck | **Zadania** (after logging in) |
+| See your points | your name in the top menu → **Osiągnięcia** |
+| Add or edit courses, tasks, FAQ, mentors (as administrator) | <http://127.0.0.1:8000/admin/> |
+
+**Accounts for students:** an administrator can add more accounts at
+<http://127.0.0.1:8000/admin/auth/user/add/>. After saving, tick
+**"W zespole"** (*staff status*) and click **Zapisz** (save) - students log in
+through the same login page as administrators, so they need this box ticked.
+Don't tick *"Status superużytkownika"* for students.
+
+**The example database** already contains accounts (e.g. `admin`). Their
+passwords are not published - set a new one if you want to use them:
+
+```bash
+docker compose exec web python manage.py changepassword admin
+```
+
+
+## Troubleshooting
+
+| Problem | What to do |
+|---|---|
+| `docker: command not found` / *'docker' is not recognized* | Docker Desktop is not installed or not started. Start it, wait until it's running, open a **new** terminal. |
+| *Cannot connect to the Docker daemon* / *error during connect* | Docker Desktop is not running yet - start it and wait for the whale icon to stop moving. |
+| *no configuration file provided: not found* | The terminal is not in the project folder - repeat step 3. |
+| *port is already allocated* / *address already in use* | Another program uses port 8000. Stop it, or in `docker-compose.yml` change `"127.0.0.1:8000:8000"` to `"127.0.0.1:8001:8000"` and open <http://127.0.0.1:8001>. |
+| The page says *This site can't be reached* | Wait until you see `Listening at` in the terminal (step 4), then refresh the page. |
+| *the input device is not a TTY* (Windows, Git Bash) | Use PowerShell or Windows Terminal for the `docker compose exec ...` commands. |
+| The first start is very slow or fails while downloading | Check your internet connection and run `docker compose up --build` again - it continues where it stopped. |
+| You changed files of the project and don't see the change | Stop the website and start it with `docker compose up --build`. |
+| On Linux: *permission denied ... docker.sock* | Run the commands with `sudo`, or add yourself to the `docker` group (`sudo usermod -aG docker $USER`, then log out and in). |
+
+To get a newer version of the project: download it again (or `git pull`) and
+run `docker compose up --build`.
+
+
+## Screenshots
 
 ---
 ![](https://raw.githubusercontent.com/bieli/FreeItLessons/master/docs/img/FreeItLessons.1.png)
@@ -39,36 +192,37 @@ One of the project's key strengths lies in its commitment to fostering great edu
 ![](https://raw.githubusercontent.com/bieli/FreeItLessons/master/docs/img/FreeItLessons.6.png)
 ---
 
-## How to run
 
-Requirements: **Python 3.12+** (Django 6.1) or **Docker** with Docker Compose.
+## For developers
 
-### Docker Compose (recommended)
+Stack: **Python 3.12+**, **Django 6.1**, SQLite, a **React 19** UI built with Vite
+(`frontend/`), Docker / Docker Compose.
 
-```bash
-docker compose up --build              # http://127.0.0.1:8000  (demo DB seeded into a volume)
-docker compose run --build --rm tests  # lint + Django checks + test suite
-docker compose run --rm frontend-tests # React unit tests + production build
-make regression                        # legacy (Py3.7/Django 1.11) vs current: characterization check (HTTP)
-make e2e                               # browser tests: jQuery UI (baseline branch) vs React UI
-```
-
-Create or reset an account inside the container:
+### Docker Compose
 
 ```bash
-docker compose exec web python manage.py changepassword admin
-docker compose exec web python manage.py createsuperuser
+docker compose up --build                # http://127.0.0.1:8000 (demo DB seeded into a volume)
+docker compose run --build --rm tests    # lint + Django checks + Django test suite
+docker compose run --rm frontend-tests   # React unit tests + production build
+make regression                          # legacy (Py3.7/Django 1.11) vs current: characterization check (HTTP)
+make regression-ui                       # jQuery UI branch vs current: server contract (HTTP)
+make e2e                                 # browser tests: jQuery UI (baseline branch) vs React UI
 ```
 
-### Development fast track (virtualenv)
+### Without Docker (virtualenv + Node)
+
+Requires Python 3.12+ and Node.js 22+ (`make` is available on Linux/macOS;
+on Windows run the commands from the [`Makefile`](Makefile) by hand).
 
 ```bash
 make install-dev          # python3.12 -m venv .venv + dev requirements
 . .venv/bin/activate
+make frontend-install     # React UI dependencies (frontend/)
 make chpwd                # optional: change "admin" user password
-make frontend-install     # Node >= 22: React UI dependencies (frontend/)
 make run                  # builds the React bundle, DJANGO_DEBUG=1 runserver on http://127.0.0.1:8000
-make ci                   # pycodestyle + tests
+make frontend-dev         # (second terminal) rebuild the React bundle on every change
+make ci                   # pycodestyle + Django tests
+make frontend-test        # React unit tests
 ```
 
 ### Configuration (environment variables)
@@ -82,6 +236,10 @@ make ci                   # pycodestyle + tests
 | `DJANGO_DB_PATH` | `./db.sqlite3` (`/data/db.sqlite3` in Docker) | SQLite database file |
 | `DJANGO_SECURE_COOKIES`, `DJANGO_SECURE_SSL_REDIRECT`, `DJANGO_SECURE_HSTS_SECONDS`, `DJANGO_BEHIND_TLS_PROXY` | off | HTTPS hardening - enable when served over TLS |
 | `CODE_RUN_TIMEOUT_SECONDS` / `CODE_RUN_MEMORY_MB` / `CODE_RUN_OUTPUT_KB` | `5` / `256` / `256` | limits of one run of a student's program |
+
+The `docker-compose.yml` defaults are meant for a local computer only. For a
+public server set your own `DJANGO_SECRET_KEY`, `DJANGO_ALLOWED_HOSTS` and the
+HTTPS variables.
 
 ### Upgrade notes (Python 3.12 + Django 6.1)
 
@@ -104,6 +262,9 @@ responses + resulting data are diffed):
    * no committed secret key, `DEBUG` off by default, HTTPS settings via env,
    * input validation (no more HTTP 500 on malformed requests), parameterized SQL,
    * scripts loaded over https only, unused third-party scripts removed.
+
+Submitted programs are decoded as UTF-8 (Polish letters are allowed); payloads
+that are not valid UTF-8 (the former jQuery page) fall back to latin-1.
 
 Known limitations / recommendations: the code runner is defence in depth, not a
 hardened jail - for untrusted users on the public Internet also run it in an OS
@@ -129,39 +290,17 @@ receives its data via `json_script`.
 | `TaskWorkspace` (lazy loaded) | task | edit_area, highlight.js, jquery.base64, easytimer, jQuery AJAX |
 | `StatusPieChart` (`admin.js`) | admin: content statuses | jQuery + Google Charts script |
 
-`make frontend-dev` rebuilds the bundle on every change (refresh the page).
 The same Playwright spec ([`e2e/`](e2e/)) runs against the former jQuery UI and the
 React UI, so feature parity is checked in a real browser (`make e2e`);
 known defects of the jQuery UI are declared there as expected failures.
 
-### How to start developing using Vagrant with Docker
+### Vagrant (legacy, not maintained)
 
-1. vagrant up
-2. vagrant ssh
-3. vagrant > $ cd FreeItLessons
-4. vagrant > $ git checkout -tb new-futer-branch origin/master
-5. vagrant > $ docker build -t free-it-lessons:1.0 -f ./Dockerfile .
-6. vagrant > $ docker run -p 8000:8000 -it free-it-lessons:1.0 python3 manage.py runserver 0.0.0.0:8000
-7. vagrant > $ git add change-or-add-file && git commit -m "commit comment" && git push origin HEAD:new-futer-branch
-
-
-### Alternative method to run Docker container from your host machine for Vagrant
-
-```bash
-ssh -o 'RequestTTY force' vagrant@127.0.0.1 -p 2222 'docker run -p 8000:8000 -it free-it-lessons:1.1 python3 manage.py runserver 0.0.0.0:8000'
-
-...or in ~/.ssh/config:
-
-Host vagrant
-    HostName 127.0.0.1
-    Port 2222
-    User vagrant
-    RequestTTY force
-...used as:
-
-ssh vagrant 'docker run -ti ubuntu:xenial echo hi'
-```
-  
+The [`vagrant/`](vagrant/) scripts create an Ubuntu 16.04 VM with Docker and were
+written for the old Django 1.11 version; they are not tested with the current
+stack. Docker Desktop (see [Run it on your computer](#run-it-on-your-computer-step-by-step))
+is the recommended way. Inside any Linux VM with Docker and the Compose plugin,
+`docker compose up --build` in the project folder works the same way.
 
 
 ## TODO:
@@ -181,4 +320,3 @@ ssh vagrant 'docker run -ti ubuntu:xenial echo hi'
 - [ ] more information about features (maybe youtube video !)
 - [ ] refactoring tasks in dedicated modules with unit tests
 - [x] add unit tests and CI (GitHub Actions)
-
