@@ -31,10 +31,10 @@ class CodeBlock:
         return self.code_sections[self.UNIT_SEPARATOR], self.code_sections[self.TESTS_SEPARATOR], self.code_sections[
             self.MAIN_SEPARATOR]
 
-    def findall(self, string):
+    def findall(self, sub, string):
         """
         >>> text = "Allowed Hello Hollow"
-        >>> tuple(findall('ll', text))
+        >>> tuple(CodeBlock('', '', '').findall('ll', text))
         (1, 10, 16)
         """
         index = 0 - len(sub)
