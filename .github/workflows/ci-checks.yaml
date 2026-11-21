@@ -59,7 +59,7 @@ jobs:
           fetch-depth: 0
       - name: Playwright - jQuery UI vs React UI
         env:
-          BASE_REF: origin/upgrade/python312-django61
+          BASE_REF: f88c010dc8699525694a17bd793ee35c00409b4a  # last commit with the jQuery UI (part of main's history)
         run: make e2e
       - name: Upload Playwright report
         if: always()

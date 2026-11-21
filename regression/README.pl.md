@@ -65,7 +65,7 @@ Kontrakt serwera interfejsu React vs gałąź z interfejsem jQuery:
 
 ```bash
 make regression-ui
-# = BASELINE_MODE=modern LEGACY_REF=upgrade/python312-django61 \
+# = BASELINE_MODE=modern LEGACY_REF=f88c010 \
 #   EXPECTED_FILE=expected_differences.react-ui.json regression/run.sh
 ```
 

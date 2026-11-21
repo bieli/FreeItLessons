@@ -9,7 +9,7 @@ na obu interfejsach** i na obu musi przejść.
 
 | Projekt | Co testuje | Źródło |
 |---|---|---|
-| `jquery` | dawny interfejs jQuery | gałąź `BASE_REF` (domyślnie `upgrade/python312-django61`) |
+| `jquery` | dawny interfejs jQuery | rewizja `BASE_REF` (domyślnie `f88c010`, ostatni commit z interfejsem jQuery) |
 | `react` | interfejs React | bieżący kod w folderze projektu |
 
 Obie aplikacje startują z identycznych kopii przykładowej bazy danych
@@ -36,7 +36,7 @@ Ostatni wynik: **34 zaliczone** - React 17/17, jQuery 13/17 + 4 znane błędy
 
 | Zmienna | Domyślnie | Znaczenie |
 |---|---|---|
-| `BASE_REF` | `upgrade/python312-django61` | rewizja gita z interfejsem jQuery (wersja bazowa) |
+| `BASE_REF` | `f88c010` | rewizja gita z interfejsem jQuery (wersja bazowa) |
 | `E2E_TARGETS` | `jquery=http://baseline:8000,react=http://candidate:8000` | projekty Playwrighta w postaci `nazwa=adres,...` |
 
 Resztę `run.sh` ustawia sam: nazwy kont ucznia i administratora (konta nr 2 i 1

@@ -39,7 +39,7 @@ regression:
 
 # server contract of the React UI branch vs the jQuery UI branch (AJAX, files, admin, DB)
 regression-ui:
-	BASELINE_MODE=modern LEGACY_REF=$${BASE_REF:-upgrade/python312-django61} \
+	BASELINE_MODE=modern LEGACY_REF=$${BASE_REF:-f88c010dc8699525694a17bd793ee35c00409b4a} \
 	EXPECTED_FILE=expected_differences.react-ui.json regression/run.sh
 
 # React UI (needs Node >= 22; or use: docker compose run --rm frontend-tests)

@@ -8,7 +8,7 @@ exactly what the old one did?* The answer is checked in a real browser
 
 | Project | What it tests | Source |
 |---|---|---|
-| `jquery` | the former jQuery UI | branch `BASE_REF` (default `upgrade/python312-django61`) |
+| `jquery` | the former jQuery UI | revision `BASE_REF` (default `f88c010`, the last commit with the jQuery UI) |
 | `react` | the React UI | the current working tree |
 
 Both apps start from identical copies of the example database (`db.sqlite3` at
@@ -34,7 +34,7 @@ Last result: **34 passed** - React 17/17, jQuery 13/17 + 4 known defects
 
 | Variable | Default | Meaning |
 |---|---|---|
-| `BASE_REF` | `upgrade/python312-django61` | git revision with the jQuery UI (the baseline) |
+| `BASE_REF` | `f88c010` | git revision with the jQuery UI (the baseline) |
 | `E2E_TARGETS` | `jquery=http://baseline:8000,react=http://candidate:8000` | Playwright projects as `name=url,...` |
 
 `run.sh` sets the rest automatically: the student and admin usernames (accounts 2

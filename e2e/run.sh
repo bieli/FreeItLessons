@@ -1,11 +1,12 @@
 #!/bin/sh
 # Browser level characterization: the same Playwright spec runs against
-#   jquery   - BASE_REF (default: upgrade/python312-django61, the jQuery UI)
+#   jquery   - BASE_REF (default: f88c010 = last commit with the jQuery UI,
+#              branch upgrade/python312-django61; part of main's history)
 #   react    - the current working tree (React UI)
 # Both start from identical copies of the seed database (db.sqlite3 at BASE_REF).
 set -eu
 cd "$(dirname "$0")/.."
-BASE_REF=${BASE_REF:-upgrade/python312-django61}
+BASE_REF=${BASE_REF:-f88c010dc8699525694a17bd793ee35c00409b4a}
 WORK=.e2e
 
 rm -rf "$WORK"
