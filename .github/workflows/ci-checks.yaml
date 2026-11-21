@@ -16,7 +16,8 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies (pinned, hash-verified wheels)
-        run: pip install --require-hashes --only-binary :all: -r requirements.dev.lock
+        run: |
+          pip install --require-hashes --only-binary :all: -r requirements.dev.lock
       - name: Lint with pycodestyle
         run: pycodestyle mainapp/ tests/ FreeItLessons/
       - name: Django checks
