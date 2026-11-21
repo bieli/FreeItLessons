@@ -99,8 +99,9 @@ class PublicPagesTest(FixturesMixin, TestCase):
 
     def test_chapter_page_renders_contents(self):
         response = self.client.get('/kursy/%d/rozdzial/%d.html' % (self.module.id, self.chapter.id))
-        self.assertContains(response, '<div data-island="ContentBlock" data-content-id="%d">'
-                                      '<template><p>Lesson body</p></template></div>' % self.text.id)
+        # mentor HTML is passed in an auto-escaped attribute (no |safe in the template)
+        self.assertContains(response, '<div data-island="ContentBlock" data-content-id="%d" '
+                                      'data-html="&lt;p&gt;Lesson body&lt;/p&gt;"></div>' % self.text.id)
         self.assertContains(response, 'href="https://python.org"')
 
     def test_mentors_lists_public_mentors_only(self):

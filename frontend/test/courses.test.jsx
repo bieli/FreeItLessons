@@ -57,3 +57,25 @@ it('cancel and Escape close the dialog without saving', async () => {
   expect(screen.queryByRole('dialog')).toBeNull();
   expect(calls.filter((call) => call.method === 'POST')).toHaveLength(0);
 });
+
+it('a content block can be rated with the keyboard', async () => {
+  setContext(STUDENT);
+  mockFetch({ 'GET /content/user/': [400, 'content NOT EXISTS'] });
+  const user = userEvent.setup();
+  const { container } = render(<ContentBlock contentId="5" html="<p>Lesson text</p>" />);
+  const block = container.querySelector('#content_id__5');
+  await user.tab();
+  expect(block).toHaveFocus();
+  await user.keyboard('{Enter}');
+  expect(screen.getByRole('dialog', { name: 'Ocena wskazanego konspektu' })).toBeInTheDocument();
+});
+
+it('mentor HTML survives the auto-escaped data-html attribute unchanged', async () => {
+  setContext({});
+  const { readProps } = await import('../src/lib/islands');
+  // what Django renders for the mentor HTML  <p class="x">Tom &amp; Jerry</p>
+  document.body.innerHTML = '<div data-island="ContentBlock" data-content-id="7" '
+    + 'data-html="&lt;p class=&quot;x&quot;&gt;Tom &amp;amp; Jerry&lt;/p&gt;"></div>';
+  const props = readProps(document.querySelector('[data-island]'));
+  expect(props).toEqual({ contentId: '7', html: '<p class="x">Tom &amp; Jerry</p>' });
+});

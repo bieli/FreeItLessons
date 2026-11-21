@@ -217,7 +217,8 @@ Requires Python 3.12+ and Node.js 22+ (`make` is available on Linux/macOS;
 on Windows run the commands from the [`Makefile`](Makefile) by hand).
 
 ```bash
-make install-dev          # python3.12 -m venv .venv + dev requirements
+make install-dev          # python3.12 -m venv .venv + dev requirements (requirements.dev.lock)
+make lock                 # after editing requirements*.txt: regenerate the hash-locked *.lock files (needs uv)
 . .venv/bin/activate
 make frontend-install     # React UI dependencies (frontend/)
 make chpwd                # optional: change "admin" user password

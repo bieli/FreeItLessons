@@ -41,7 +41,7 @@ services:
       npm_config_update_notifier: "false"
     volumes:
       - .:/repo
-    command: ["sh", "-c", "npm ci --no-audit --no-fund && npm test && npm run build"]
+    command: ["sh", "-c", "npm ci --ignore-scripts --no-audit --no-fund && npm test && npm run build"]
 
 volumes:
   app-data:

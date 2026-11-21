@@ -3,10 +3,15 @@
 
 install-dev:
 	python3.12 -m venv .venv
-	.venv/bin/pip install -r requirements.dev.txt
+	.venv/bin/pip install --require-hashes --only-binary :all: -r requirements.dev.lock
 
 install:
-	pip3 install -r requirements.txt
+	pip3 install --require-hashes --only-binary :all: -r requirements.lock
+
+# regenerate the hash-locked files after changing requirements*.txt
+lock:
+	uv pip compile --generate-hashes --python-version 3.12 --custom-compile-command 'make lock' requirements.txt -o requirements.lock
+	uv pip compile --generate-hashes --python-version 3.12 --custom-compile-command 'make lock' requirements.dev.txt -o requirements.dev.lock
 
 lint:
 	pycodestyle mainapp/ tests/ FreeItLessons/
@@ -44,7 +49,7 @@ regression-ui:
 
 # React UI (needs Node >= 22; or use: docker compose run --rm frontend-tests)
 frontend-install:
-	cd frontend && npm ci
+	cd frontend && npm ci --ignore-scripts
 
 frontend-build:
 	cd frontend && npm run build

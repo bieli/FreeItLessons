@@ -12,6 +12,7 @@ import sys
 from pathlib import Path
 
 from django.core.exceptions import ImproperlyConfigured
+from django.core.management.utils import get_random_secret_key
 
 
 def env_bool(name, default):
@@ -31,6 +32,24 @@ def env_list(name, default):
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+
+def _local_development_secret_key():
+    """Random key for DJANGO_DEBUG=1 without DJANGO_SECRET_KEY: generated once and
+    kept in .django-dev-secret-key (git ignored), so sessions survive restarts and
+    all processes agree; in memory only when the project folder is read-only."""
+    path = BASE_DIR / '.django-dev-secret-key'
+    try:
+        return path.read_text().strip()
+    except FileNotFoundError:
+        key = get_random_secret_key()
+        try:
+            path.write_text(key)
+            path.chmod(0o600)
+        except OSError:
+            pass
+        return key
+
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env_bool('DJANGO_DEBUG', False)
 
@@ -41,7 +60,7 @@ if not SECRET_KEY:
     if not DEBUG:
         raise ImproperlyConfigured('Set the DJANGO_SECRET_KEY environment variable '
                                    '(or DJANGO_DEBUG=1 for local development).')
-    SECRET_KEY = 'django-insecure-local-development-only'
+    SECRET_KEY = _local_development_secret_key()
 
 ALLOWED_HOSTS = env_list('DJANGO_ALLOWED_HOSTS', ['127.0.0.1', 'localhost'])
 CSRF_TRUSTED_ORIGINS = env_list('DJANGO_CSRF_TRUSTED_ORIGINS', [])
@@ -231,7 +250,8 @@ EMAIL_HOST_PASSWORD = os.environ.get('DJANGO_EMAIL_HOST_PASSWORD', '')
 # Interpreter used to run students' solutions (defaults to the one running Django).
 PYTHON_EXEC = os.environ.get('PYTHON_EXEC', sys.executable)
 
-TEMP_SOLUTION_CODE_BLOCK = os.environ.get('TEMP_SOLUTION_CODE_BLOCK', '/tmp/')
+# Parent directory of the private per-run directories (None = the system default).
+TEMP_SOLUTION_CODE_BLOCK = os.environ.get('TEMP_SOLUTION_CODE_BLOCK') or None
 
 # Limits of a single run of a student's program (mainapp/sandbox.py)
 CODE_RUN_TIMEOUT_SECONDS = int(os.environ.get('CODE_RUN_TIMEOUT_SECONDS', '5'))

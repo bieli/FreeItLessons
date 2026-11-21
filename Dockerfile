@@ -2,7 +2,7 @@
 FROM node:22-slim AS frontend
 WORKDIR /build/frontend
 COPY frontend/package.json frontend/package-lock.json ./
-RUN npm ci --no-audit --no-fund
+RUN npm ci --ignore-scripts --no-audit --no-fund
 COPY frontend/ ./
 RUN npm run build
 
@@ -21,10 +21,11 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
-COPY requirements.txt requirements.dev.txt ./
+COPY requirements.lock requirements.dev.lock ./
 ARG INSTALL_DEV=0
-RUN if [ "$INSTALL_DEV" = "1" ]; then pip install -r requirements.dev.txt; \
-    else pip install -r requirements.txt; fi
+# only pinned, hash-verified wheels (no setup scripts are executed)
+RUN if [ "$INSTALL_DEV" = "1" ]; then LOCK=requirements.dev.lock; else LOCK=requirements.lock; fi \
+    && pip install --require-hashes --only-binary :all: -r "$LOCK"
 
 COPY . .
 COPY --from=frontend /build/mainapp/static/mainapp/dist /app/mainapp/static/mainapp/dist

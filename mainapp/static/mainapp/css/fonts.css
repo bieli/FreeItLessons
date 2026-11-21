@@ -1,0 +1,9 @@
+/* "Share Tech" (c) The Share Tech Project Authors - SIL Open Font License 1.1,
+   see ../fonts/OFL.txt. Self-hosted: no request to fonts.googleapis.com. */
+@font-face {
+  font-family: 'Share Tech';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../fonts/ShareTech-Regular.woff2') format('woff2');
+}

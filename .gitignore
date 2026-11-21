@@ -135,3 +135,4 @@ node_modules/
 mainapp/static/mainapp/dist/
 frontend/coverage/
 !frontend/src/lib/
+.django-dev-secret-key

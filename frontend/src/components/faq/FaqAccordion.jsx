@@ -9,8 +9,21 @@ export default function FaqAccordion({ faqs = [] }) {
     <dl>
       {faqs.map((faq, index) => {
         const open = openIndex === index;
+        const toggle = () => setOpenIndex(open ? null : index);
         return [
-          <dt key={`q${faq.id}`} onClick={() => setOpenIndex(open ? null : index)} aria-expanded={open}>
+          <dt
+            key={`q${faq.id}`}
+            role="button"
+            tabIndex={0}
+            aria-expanded={open}
+            onClick={toggle}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                toggle();
+              }
+            }}
+          >
             <h3 className="list-group-item">
               <i className={`glyphicon glyphiconRight ${open ? 'glyphicon-chevron-down' : 'glyphicon-chevron-right'}`} />
               {' '}{faq.question} ?

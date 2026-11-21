@@ -145,7 +145,7 @@
                         </small><br />
                         <br />
                         {% if content.status == 1 %}
-                            <div data-island="ContentBlock" data-content-id="{{ content.id }}"><template>{{ content.value|safe }}</template></div>
+                            <div data-island="ContentBlock" data-content-id="{{ content.id }}" data-html="{{ content.value }}"></div>
                         {% elif content.status == 3 %}
 {% comment %}
 <!--                            <iframe width="640" height="360" src="{{ content.value }}" frameborder="1" allowfullscreen></iframe> -->

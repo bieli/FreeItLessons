@@ -67,7 +67,7 @@ def run_program(source):
         out_path, err_path = os.path.join(workdir, 'stdout'), os.path.join(workdir, 'stderr')
         with open(out_path, 'wb') as out, open(err_path, 'wb') as err:
             proc = subprocess.Popen(
-                [settings.PYTHON_EXEC, '-I', '-S', BOOTSTRAP, program],
+                [settings.PYTHON_EXEC, '-I', '-S', BOOTSTRAP],
                 stdin=subprocess.DEVNULL, stdout=out, stderr=err, cwd=workdir,
                 env={'PYTHONIOENCODING': 'utf-8', 'LANG': 'C.UTF-8', 'NO_COLOR': '1'},
                 preexec_fn=preexec, start_new_session=True, close_fds=True)

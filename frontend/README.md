@@ -77,7 +77,7 @@ You need **Node.js 22+** - or no Node at all if you use Docker.
 
 | Command (in `frontend/`) | What it does |
 |---|---|
-| `npm ci` | installs the exact dependency versions from `package-lock.json` |
+| `npm ci --ignore-scripts` | installs the exact dependency versions from `package-lock.json` (without running package install scripts) |
 | `npm run build` | production build into `mainapp/static/mainapp/dist/` |
 | `npm run dev` | rebuilds on every change (development mode) - refresh the page to see it |
 | `npm test` | runs the unit tests once |

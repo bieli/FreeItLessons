@@ -1,6 +1,6 @@
 """Bootstrap executed in the CHILD interpreter that runs a student's program.
 
-    python -I -S sandbox_bootstrap.py /tmp/solution-xxxx/program.py
+    cd /tmp/solution-xxxx && python -I -S sandbox_bootstrap.py
 
 It installs a Python audit hook (PEP 578, cannot be removed once installed)
 that denies the dangerous capabilities a teaching exercise never needs:
@@ -31,6 +31,7 @@ BLOCKED_MODULES = {
     'winreg', '_winapi', 'msvcrt', 'mmap', 'signal',
 }
 BOOTSTRAP_FILE = os.path.realpath(__file__)
+PROGRAM_NAME = 'program.py'
 WRITE_FLAGS = os.O_WRONLY | os.O_RDWR | os.O_APPEND | os.O_CREAT | os.O_TRUNC
 
 
@@ -58,7 +59,9 @@ def install_restrictions(workdir):
 
 
 def main():
-    program = os.path.realpath(sys.argv[1])
+    # the program is always ./program.py of the private working directory
+    # (the parent process creates it and starts this interpreter there)
+    program = os.path.realpath(PROGRAM_NAME)
     with open(program, encoding='utf-8') as fd:
         source = fd.read()
     try:

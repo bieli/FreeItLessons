@@ -224,7 +224,8 @@ Wymaga Pythona 3.12+ i Node.js 22+ (`make` jest dostępny na Linuksie i macOS;
 na Windowsie uruchom ręcznie polecenia z pliku [`Makefile`](Makefile)).
 
 ```bash
-make install-dev          # python3.12 -m venv .venv + zależności deweloperskie
+make install-dev          # python3.12 -m venv .venv + zależności deweloperskie (requirements.dev.lock)
+make lock                 # po zmianie requirements*.txt: odtwarza pliki *.lock z hashami (wymaga uv)
 . .venv/bin/activate
 make frontend-install     # zależności interfejsu React (frontend/)
 make chpwd                # opcjonalnie: zmiana hasła użytkownika "admin"

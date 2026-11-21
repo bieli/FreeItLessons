@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block bootstrap3_title %}{% block title %}{% endblock %}{% endblock %}</title>
     {% bootstrap_css %}
+    <link rel="stylesheet" href="{% static 'mainapp/css/fonts.css' %}">
     <link rel="stylesheet" href="{% static 'mainapp/dist/app.css' %}">
     {{ frontend_context|json_script:"frontend-context" }}
     <script type="module" src="{% static 'mainapp/dist/app.js' %}"></script>

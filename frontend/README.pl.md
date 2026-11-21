@@ -77,7 +77,7 @@ Potrzebujesz **Node.js 22+** - albo wcale go nie potrzebujesz, jeśli używasz D
 
 | Polecenie (w `frontend/`) | Co robi |
 |---|---|
-| `npm ci` | instaluje dokładnie te wersje zależności, które są w `package-lock.json` |
+| `npm ci --ignore-scripts` | instaluje dokładnie te wersje zależności, które są w `package-lock.json` (bez uruchamiania skryptów instalacyjnych pakietów) |
 | `npm run build` | build produkcyjny do `mainapp/static/mainapp/dist/` |
 | `npm run dev` | przebudowuje po każdej zmianie (tryb deweloperski) - odśwież stronę, żeby zobaczyć efekt |
 | `npm test` | uruchamia testy jednostkowe raz |

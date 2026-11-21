@@ -25,11 +25,22 @@ export default function ContentBlock({ contentId, html = '' }) {
 
   const onClick = (event) => {
     if (['A', 'IMG'].includes(event.target.tagName)) return; // links/images inside the content
+    openRating();
+  };
+
+  const openRating = () => {
     if (!isAuthenticated) {
       window.alert('W celu wystawienia oceny kontekstu musisz być zalogowany !');
       return;
     }
     setDialogOpen(true);
+  };
+
+  // keyboard: Enter / Space on the focused block itself (not on a link inside it)
+  const onKeyDown = (event) => {
+    if (event.target !== event.currentTarget || (event.key !== 'Enter' && event.key !== ' ')) return;
+    event.preventDefault();
+    openRating();
   };
 
   const submit = (selected) => {
@@ -49,7 +60,10 @@ export default function ContentBlock({ contentId, html = '' }) {
         id={`content_id__${contentId}`}
         data-id={contentId}
         style={status ? { backgroundImage: `url("${staticUrl(`mainapp/img/${status}.png`)}")` } : undefined}
+        tabIndex={0}
+        title="Kliknij lub naciśnij Enter, aby ocenić ten fragment"
         onClick={onClick}
+        onKeyDown={onKeyDown}
         dangerouslySetInnerHTML={{ __html: html }}
       />
       {dialogOpen && <OpinionDialog onSubmit={submit} onClose={() => setDialogOpen(false)} />}

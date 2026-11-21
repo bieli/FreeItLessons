@@ -72,10 +72,12 @@ class FaqPageView(TemplateView):
     template_name = 'mainapp/faq.html'
 
     def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
         faqs_list = Faq.objects.all()
-        return {'faqs': faqs_list,
-                'faqs_props': {'faqs': [{'id': faq.id, 'question': faq.question, 'answer': faq.answer}
-                                        for faq in faqs_list]}}
+        context.update({'faqs': faqs_list,
+                        'faqs_props': {'faqs': [{'id': faq.id, 'question': faq.question, 'answer': faq.answer}
+                                                for faq in faqs_list]}})
+        return context
 
 
 class CoursesListPageView(TemplateView):
@@ -102,17 +104,21 @@ class CoursesListPageView(TemplateView):
             module.prepare_icons_list_from_comment()
             if module_id is None or int(module.id) == int(module_id):
                 modules.append(module)
-        return {'modules': modules,
-                'module_id': module_id,
-                'chapter_id': chapter_id,
-                'contents_list': contents_list}
+        context = super().get_context_data(**kwargs)
+        context.update({'modules': modules,
+                        'module_id': module_id,
+                        'chapter_id': chapter_id,
+                        'contents_list': contents_list})
+        return context
 
 
 class MentorsListPageView(TemplateView):
     template_name = 'mainapp/mentors_list.html'
 
     def get_context_data(self, **kwargs):
-        return {'mentors': Author.objects.filter(is_public_mentor=True)}
+        context = super().get_context_data(**kwargs)
+        context['mentors'] = Author.objects.filter(is_public_mentor=True)
+        return context
 
 
 class TasksPageView(LoginRequiredMixin, TemplateView):
@@ -133,7 +139,9 @@ class TasksPageView(LoginRequiredMixin, TemplateView):
                 'name': task.name,
                 'task_solution': task_solution,
             })
-        return {'tasks': tasks}
+        context = super().get_context_data(**kwargs)
+        context['tasks'] = tasks
+        return context
 
 
 class TaskPageView(TemplateView):
@@ -147,13 +155,14 @@ class TaskPageView(TemplateView):
         return asserts
 
     def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
         task_instance = get_object_or_404(Task, id=kwargs['task_id'])
         asserts = self._get_asserts_from_tests_code(task_instance.tests)
-        return {'task': task_instance,
-                'asserts': asserts,
-                'task_props': {'taskId': task_instance.id, 'code': task_instance.code,
-                               'tests': task_instance.tests, 'asserts': asserts},
-                }
+        context.update({'task': task_instance,
+                        'asserts': asserts,
+                        'task_props': {'taskId': task_instance.id, 'code': task_instance.code,
+                                       'tests': task_instance.tests, 'asserts': asserts}})
+        return context
 
 
 class ContetUserStatusView(AjaxUserView):
@@ -274,8 +283,9 @@ class OpinionsView(TemplateView):
     template_name = 'mainapp/opinions_list.html'
 
     def get_context_data(self, **kwargs):
-        opinions = ContentStatus.get_opinions_by_user_id(self.request.user.id)
-        return {'opinions': opinions}
+        context = super().get_context_data(**kwargs)
+        context['opinions'] = ContentStatus.get_opinions_by_user_id(self.request.user.id)
+        return context
 
 
 ACHIEVEMENT_QUERY = """
@@ -319,10 +329,12 @@ class AchievementsView(LoginRequiredMixin, TemplateView):
             points_summary += summary
             if achievements[0].max_points is not None:
                 max_points_summary += achievements[0].max_points
-        return {'tasks_achievements': tasks_achievements,
-                "points_summary": points_summary,
-                "max_points_summary": max_points_summary,
-                "points_percents": "%d" % (self._calc_summary(points_summary, max_points_summary))}
+        context = super().get_context_data(**kwargs)
+        context.update({'tasks_achievements': tasks_achievements,
+                        "points_summary": points_summary,
+                        "max_points_summary": max_points_summary,
+                        "points_percents": "%d" % (self._calc_summary(points_summary, max_points_summary))})
+        return context
 
     def _calc_summary(self, points_summary, max_points_summary):
         try:
@@ -335,4 +347,6 @@ class LearnerSupportView(TemplateView):
     template_name = 'mainapp/learner_support_list.html'
 
     def get_context_data(self, **kwargs):
-        return {'items': {}}
+        context = super().get_context_data(**kwargs)
+        context['items'] = {}
+        return context

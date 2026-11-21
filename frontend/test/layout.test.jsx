@@ -65,4 +65,18 @@ describe('FaqAccordion', () => {
     expect(dd2).not.toHaveStyle({ display: 'none' });
     vi.useRealTimers();
   });
+
+  it('questions are keyboard accessible (Tab + Enter / Space)', async () => {
+    const faqs = [{ id: 1, question: 'Q1', answer: 'A1' }];
+    const user = userEvent.setup();
+    const { container } = render(<FaqAccordion faqs={faqs} />);
+    const question = screen.getByRole('button', { name: /Q1/ });
+    await user.tab();
+    expect(question).toHaveFocus();
+    await user.keyboard('{Enter}');
+    expect(question).toHaveAttribute('aria-expanded', 'true');
+    expect(container.querySelector('.glyphiconRight')).toHaveClass('glyphicon-chevron-down');
+    await user.keyboard(' ');
+    expect(question).toHaveAttribute('aria-expanded', 'false');
+  });
 });
