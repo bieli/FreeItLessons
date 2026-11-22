@@ -4,6 +4,7 @@ import { assertColors } from '../src/lib/asserts';
 import { formatDuration } from '../src/lib/useStopwatch';
 import { ajax, HttpError } from '../src/lib/api';
 import { readProps } from '../src/lib/islands';
+import { staticUrl } from '../src/lib/context';
 import { mockFetch, setContext } from './utils';
 
 describe('encodeUtf8Base64', () => {
@@ -58,4 +59,23 @@ it('readProps merges data attributes, json_script and <template> html', () => {
     <script type="application/json" id="p">{"faqs": [1, 2]}</script>
     <div data-island="X" data-props-id="p" data-content-id="7"><template><b>hi</b></template></div>`;
   expect(readProps(document.querySelector('[data-island]'))).toEqual({ faqs: [1, 2], contentId: '7', html: '<b>hi</b>' });
+});
+
+describe('staticUrl', () => {
+  it('uses the STATIC_URL of the server', () => {
+    setContext({ staticUrl: '/static/' });
+    expect(staticUrl('mainapp/img/new.png')).toBe('/static/mainapp/img/new.png');
+    setContext({ staticUrl: '/assets/v2/' });
+    expect(staticUrl('a.png')).toBe('/assets/v2/a.png');
+    setContext({ staticUrl: 'https://cdn.example.com/static/' });
+    expect(staticUrl('a.png')).toBe('https://cdn.example.com/static/a.png');
+  });
+
+  it('falls back to /static/ for anything that is not a plain path or https address', () => {
+    for (const bad of ['javascript:alert(1)//', '"><img src=x onerror=alert(1)>/', '/static/")', 'http://x/',
+      '//evil.example/', '/static', '']) {
+      setContext({ staticUrl: bad });
+      expect(staticUrl('a.png'), bad).toBe('/static/a.png');
+    }
+  });
 });

@@ -10,6 +10,12 @@ export function getContext() {
   return { ...DEFAULTS, ...(readJsonScript('frontend-context') || {}) };
 }
 
+// STATIC_URL of Django: a path ("/static/") or an https address of a CDN, ending with "/".
+// Anything else (quotes, "<", "javascript:" ...) is ignored, the value ends up in
+// src attributes and CSS url("...").
+const SAFE_STATIC_URL = /^(\/|https:\/\/[A-Za-z0-9.-]+(:\d+)?\/)([A-Za-z0-9_.~-]+\/)*$/;
+
 export function staticUrl(path) {
-  return getContext().staticUrl + path;
+  const base = getContext().staticUrl;
+  return (SAFE_STATIC_URL.test(base) ? base : DEFAULTS.staticUrl) + path;
 }
