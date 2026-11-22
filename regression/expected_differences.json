@@ -128,5 +128,7 @@
   "student: hint 2 [/zadania/task/code/hint/]": "SECURITY: AJAX answers are text/plain (program output and hints are never rendered as an HTML page); same body except the hint HTML is cleaned by an allowlist (nh3): '>' in text becomes '&gt;' - renders the same",
   "student: hint too high [/zadania/task/code/hint/]": "SECURITY: AJAX answers are text/plain (program output and hints are never rendered as an HTML page); same body",
   "student: run correct solution [/zadania/task/code/run/]": "SECURITY: AJAX answers are text/plain (program output and hints are never rendered as an HTML page); same body",
-  "student: hint 5 (surrender) [/zadania/task/code/hint/]": "SECURITY: AJAX answers are text/plain (program output and hints are never rendered as an HTML page); same body"
+  "student: hint 5 (surrender) [/zadania/task/code/hint/]": "SECURITY: AJAX answers are text/plain (program output and hints are never rendered as an HTML page); same body",
+  "anonymous: SECURITY probe: brute force login, wrong password #5 [/admin/login/]": "SECURITY: login throttling (django-axes) - after 5 wrong passwords for one username from one IP address the login is locked out for 15 minutes (HTTP 429, Polish explanation page); legacy accepted unlimited guesses",
+  "anonymous: SECURITY probe: brute force login, wrong password #6 [/admin/login/]": "SECURITY: login throttling (django-axes) - after 5 wrong passwords for one username from one IP address the login is locked out for 15 minutes (HTTP 429, Polish explanation page); legacy accepted unlimited guesses"
 }

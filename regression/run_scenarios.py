@@ -344,6 +344,15 @@ def anonymous_journey(base_url, rec, seed):
     c.get('content read (anonymous)', '/content/user/?user_id=%d&content_id=%d'
           % (STUDENT_ID, seed.content_a), ajax=True)
     c.get('admin index (anonymous)', '/admin/')
+    # password guessing: the login must stop accepting attempts (unknown username,
+    # so the students' and the admin's logins of the next journeys stay unaffected)
+    for attempt in range(1, 7):
+        resp = c.get('brute force: login form #%d' % attempt, '/admin/login/?next=/', record='status')
+        form = BeautifulSoup(resp.text, 'html.parser').find('input', attrs={'name': 'csrfmiddlewaretoken'})
+        c.post('SECURITY probe: brute force login, wrong password #%d' % attempt, '/admin/login/?next=/',
+               record='status', data={'csrfmiddlewaretoken': form['value'] if form else c.csrf_token(),
+                                      'username': 'brute-force-probe', 'password': 'guess-%d' % attempt,
+                                      'next': '/'})
 
 
 def student_journey(base_url, rec, seed):

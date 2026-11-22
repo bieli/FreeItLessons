@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/stable/ref/settings/
 """
 import os
 import sys
+from datetime import timedelta
 from pathlib import Path
 
 from django.core.exceptions import ImproperlyConfigured
@@ -72,7 +73,8 @@ SESSION_COOKIE_SECURE = env_bool('DJANGO_SECURE_COOKIES', False)
 CSRF_COOKIE_SECURE = SESSION_COOKIE_SECURE
 SECURE_HSTS_SECONDS = int(os.environ.get('DJANGO_SECURE_HSTS_SECONDS', '0'))
 SECURE_HSTS_INCLUDE_SUBDOMAINS = env_bool('DJANGO_SECURE_HSTS_INCLUDE_SUBDOMAINS', False)
-if env_bool('DJANGO_BEHIND_TLS_PROXY', False):
+BEHIND_TLS_PROXY = env_bool('DJANGO_BEHIND_TLS_PROXY', False)
+if BEHIND_TLS_PROXY:
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SESSION_COOKIE_HTTPONLY = True
 X_FRAME_OPTIONS = 'DENY'
@@ -112,6 +114,7 @@ INSTALLED_APPS = [
     'bootstrap3',
     'mainapp',
     'adminsortable2',
+    'axes',
 ]
 
 MIDDLEWARE = [
@@ -124,7 +127,27 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.csp.ContentSecurityPolicyMiddleware',
+    # login throttling - keep it last (django-axes)
+    'axes.middleware.AxesMiddleware',
 ]
+
+AUTHENTICATION_BACKENDS = [
+    # django-axes first: refuses the login while the (username, IP) pair is locked out
+    'axes.backends.AxesStandaloneBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+# Login throttling (mainapp/login_throttling.py): after AXES_FAILURE_LIMIT wrong
+# passwords for one username from one IP address that pair is locked out for
+# AXES_COOLOFF_TIME; a correct login resets the counter.
+AXES_FAILURE_LIMIT = int(os.environ.get('DJANGO_LOGIN_FAILURE_LIMIT', '5'))
+AXES_COOLOFF_TIME = timedelta(minutes=int(os.environ.get('DJANGO_LOGIN_COOLOFF_MINUTES', '15')))
+AXES_LOCKOUT_PARAMETERS = [['username', 'ip_address']]
+AXES_RESET_ON_SUCCESS = True
+AXES_CLIENT_IP_CALLABLE = 'mainapp.login_throttling.client_ip'
+AXES_LOCKOUT_CALLABLE = 'mainapp.login_throttling.lockout_response'
+# no log of successful logins (IP address + browser of every student)
+AXES_DISABLE_ACCESS_LOG = True
 
 ROOT_URLCONF = 'FreeItLessons.urls'
 

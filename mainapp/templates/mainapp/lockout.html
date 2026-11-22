@@ -1,0 +1,24 @@
+{% extends 'mainapp/base.html' %}
+
+{% load bootstrap3 %}
+
+{% block title %}Logowanie zablokowane{% endblock %}
+
+{% block bootstrap3_content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 col-md-offset-2">
+            <h2 class="text-danger">Logowanie chwilowo zablokowane</h2>
+            <p class="lead">
+                Wpisano złe hasło {{ failure_limit }} razy z rzędu, więc logowanie na to konto
+                z tego komputera jest wstrzymane na {{ cooloff_minutes }} min.
+            </p>
+            <p>
+                Odczekaj chwilę i spróbuj ponownie. Jeśli nie pamiętasz hasła, poproś
+                nauczyciela lub mentora o jego zmianę.
+            </p>
+            <p><a class="btn btn-default" href="/">Strona główna</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

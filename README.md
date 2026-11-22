@@ -166,6 +166,7 @@ docker compose exec web python manage.py changepassword admin
 | The page says *This site can't be reached* | Wait until you see `Listening at` in the terminal (step 4), then refresh the page. |
 | *the input device is not a TTY* (Windows, Git Bash) | Use PowerShell or Windows Terminal for the `docker compose exec ...` commands. |
 | The first start is very slow or fails while downloading | Check your internet connection and run `docker compose up --build` again - it continues where it stopped. |
+| *Logowanie chwilowo zablokowane* (login locked) after typing a wrong password many times | Wait 15 minutes, or unlock all logins at once: `docker compose exec web python manage.py axes_reset` |
 | You changed files of the project and don't see the change | Stop the website and start it with `docker compose up --build`. |
 | On Linux: *permission denied ... docker.sock* | Run the commands with `sudo`, or add yourself to the `docker` group (`sudo usermod -aG docker $USER`, then log out and in). |
 
@@ -240,6 +241,7 @@ make frontend-test        # React unit tests
 | `DJANGO_SECURE_COOKIES`, `DJANGO_SECURE_SSL_REDIRECT`, `DJANGO_SECURE_HSTS_SECONDS`, `DJANGO_BEHIND_TLS_PROXY` | off | HTTPS hardening - enable when served over TLS |
 | `CODE_RUN_TIMEOUT_SECONDS` / `CODE_RUN_MEMORY_MB` / `CODE_RUN_OUTPUT_KB` | `5` / `256` / `256` | limits of one run of a student's program |
 | `CODE_RUN_MAX_CODE_KB` | `64` | largest program a student can send |
+| `DJANGO_LOGIN_FAILURE_LIMIT` / `DJANGO_LOGIN_COOLOFF_MINUTES` | `5` / `15` | login throttling: wrong passwords before the lockout, its length |
 
 The `docker-compose.yml` defaults are meant for a local computer only. For a
 public server set your own `DJANGO_SECRET_KEY`, `DJANGO_ALLOWED_HOSTS` and the
@@ -278,7 +280,14 @@ responses + resulting data are diffed):
    * a Content Security Policy (scripts only from this site, no plugins or framing),
    * AJAX answers are `text/plain`, one running program per student (HTTP 429
      otherwise), limits for the size of a program, the timer and the hint number,
-   * every Docker installation gets its own random secret key.
+   * every Docker installation gets its own random secret key,
+   * login throttling ([django-axes](https://pypi.org/project/django-axes/)):
+     after 5 wrong passwords for one username from one IP address that pair is
+     locked out for 15 minutes (a classmate behind the same school IP address can
+     still log in). The attempts are listed in the admin under *Axes*; unlock
+     early with `python manage.py axes_reset` (or `axes_reset_username <name>`).
+     Behind a reverse proxy set `DJANGO_BEHIND_TLS_PROXY=1`, so the visitor's
+     address is read from `X-Forwarded-For`. Successful logins are not logged.
 
 Submitted programs are decoded as UTF-8 (Polish letters are allowed); payloads
 that are not valid UTF-8 (the former jQuery page) fall back to latin-1.

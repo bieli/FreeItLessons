@@ -173,6 +173,7 @@ docker compose exec web python manage.py changepassword admin
 | Przeglądarka pokazuje *Nie można uzyskać dostępu do tej witryny* | Poczekaj, aż w terminalu pojawi się `Listening at` (krok 4), i odśwież stronę. |
 | *the input device is not a TTY* (Windows, Git Bash) | Polecenia `docker compose exec ...` uruchamiaj w PowerShellu albo w Terminalu Windows. |
 | Pierwsze uruchomienie trwa bardzo długo albo przerywa się przy pobieraniu | Sprawdź połączenie z internetem i uruchom ponownie `docker compose up --build` - pobieranie będzie kontynuowane. |
+| *Logowanie chwilowo zablokowane* po kilku próbach ze złym hasłem | Poczekaj 15 minut albo odblokuj od razu wszystkie logowania: `docker compose exec web python manage.py axes_reset` |
 | Zmieniłeś pliki projektu i nie widzisz zmian | Wyłącz stronę i uruchom ją poleceniem `docker compose up --build`. |
 | Na Linuksie: *permission denied ... docker.sock* | Uruchamiaj polecenia z `sudo` albo dodaj się do grupy `docker` (`sudo usermod -aG docker $USER`, potem wyloguj się i zaloguj ponownie). |
 
@@ -247,6 +248,7 @@ make frontend-test        # testy jednostkowe Reacta
 | `DJANGO_SECURE_COOKIES`, `DJANGO_SECURE_SSL_REDIRECT`, `DJANGO_SECURE_HSTS_SECONDS`, `DJANGO_BEHIND_TLS_PROXY` | wyłączone | zabezpieczenia HTTPS - włącz, gdy strona działa przez TLS |
 | `CODE_RUN_TIMEOUT_SECONDS` / `CODE_RUN_MEMORY_MB` / `CODE_RUN_OUTPUT_KB` | `5` / `256` / `256` | limity jednego uruchomienia programu ucznia |
 | `CODE_RUN_MAX_CODE_KB` | `64` | największy program, jaki uczeń może wysłać |
+| `DJANGO_LOGIN_FAILURE_LIMIT` / `DJANGO_LOGIN_COOLOFF_MINUTES` | `5` / `15` | ograniczenie logowania: liczba złych haseł przed blokadą i czas blokady |
 
 Ustawienia domyślne w `docker-compose.yml` są przeznaczone tylko dla komputera
 lokalnego. Na publicznym serwerze ustaw własne `DJANGO_SECRET_KEY`,
@@ -289,7 +291,15 @@ danych, a odpowiedzi i powstałe dane są porównywane):
      i osadzania w ramkach),
    * odpowiedzi AJAX mają typ `text/plain`, jeden uruchomiony program na ucznia
      (w przeciwnym razie HTTP 429), limity rozmiaru programu, stopera i numeru podpowiedzi,
-   * każda instalacja w Dockerze dostaje własny, losowy tajny klucz.
+   * każda instalacja w Dockerze dostaje własny, losowy tajny klucz,
+   * ograniczenie prób logowania ([django-axes](https://pypi.org/project/django-axes/)):
+     po 5 złych hasłach dla jednej nazwy użytkownika z jednego adresu IP ta para
+     jest blokowana na 15 minut (kolega z klasy za tym samym szkolnym adresem IP
+     nadal może się zalogować). Próby są widoczne w panelu administracyjnym
+     w sekcji *Axes*; wcześniejsze odblokowanie: `python manage.py axes_reset`
+     (albo `axes_reset_username <nazwa>`). Za serwerem pośredniczącym (reverse
+     proxy) ustaw `DJANGO_BEHIND_TLS_PROXY=1`, aby adres odwiedzającego był
+     odczytywany z `X-Forwarded-For`. Udane logowania nie są zapisywane.
 
 Wysyłane programy są dekodowane jako UTF-8 (polskie litery są dozwolone);
 dane, które nie są poprawnym UTF-8 (dawna strona z jQuery), są odczytywane jako latin-1.

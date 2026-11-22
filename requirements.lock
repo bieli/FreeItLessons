@@ -3,17 +3,24 @@
 asgiref==3.13.0 \
     --hash=sha256:034cc8cbf72d00553b4be256703ac545120b4e50af13b49dec99da899aeeecb4 \
     --hash=sha256:f9596a2434512686473d50f96ff6207fbba49ae1a785dfac614df4aeb085674d
-    # via django
+    # via
+    #   django
+    #   django-axes
 django==6.1.3 \
     --hash=sha256:a0530e3fdac55d34ccc5893c36f6c57d7a7083064f3d414537e51473648b3290 \
     --hash=sha256:b5d2d9e35295065d13b1927b3f19a59bd119f737aa6299def14ccca1ae3c8c0d
     # via
     #   -r requirements.txt
     #   django-admin-sortable2
+    #   django-axes
     #   django-bootstrap3
 django-admin-sortable2==2.4 \
     --hash=sha256:358cbd8257cba0c03923bb50b357ef4be57c3b62ae7d0f79542a405f97d13e4b \
     --hash=sha256:f3c1e28ee1f70f34b6ef0c592aaaa5b5e5a449d0a5fc808167b6af575e3d8772
+    # via -r requirements.txt
+django-axes==9.0.0 \
+    --hash=sha256:863aef4563673c1e77bb3d21be1ba1d2612b0cf9d5365c27c9af9ae1c614c3c0 \
+    --hash=sha256:fb7b0322a09d8f090d5a980690cb5468dc1903d3d950f1968c4e067348d58059
     # via -r requirements.txt
 django-bootstrap3==26.3 \
     --hash=sha256:3420be4c2a13c0673b7153353684349d3229114f4379c2eb6c5358300d59405f \
