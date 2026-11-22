@@ -23,7 +23,9 @@ def client_ip(request):
     return request.META.get('REMOTE_ADDR')
 
 
-def lockout_response(request, original_response=None, credentials=None):
+def lockout_response(request, *_axes_arguments):
+    """AXES_LOCKOUT_CALLABLE - axes also passes the original response and the
+    credentials, the page needs neither."""
     minutes = max(1, int(settings.AXES_COOLOFF_TIME.total_seconds() // 60))
     return render(request, 'mainapp/lockout.html', {
         'failure_limit': settings.AXES_FAILURE_LIMIT,
