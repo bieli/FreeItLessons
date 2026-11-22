@@ -202,38 +202,8 @@ ADMINS = (
     ('Pomoc mentorska', 'contact@yourdomain.com'),
 )
 
-COMPANY = {
-    'NAME': "my company",
-    'ADDRESS': "26 streets from here th there",
-    'ZIP': "1234",
-    'CITY': "Paris",
-    'LAT': 48.81484460000001,
-    'LNG': 2.0523723999999675,
-    'PHONE': "+336 1234 5678",
-    'EMAIL': 'contact@yourdomain.com',
-    'FACEBOOK': "https://www.facebook.com/highfeature",
-    'LINKEDIN': "http://www.linkedin.com/in/ivarsalain",
-    'TWITTER': "https://twitter.com/HighFeature",
-    'GOOGLEPLUS': "https://twitter.com/HighFeature",
-}
-
 CONTACT_FORM_SUBJECT_TEMPLATE_NAME = 'email_subject.txt'
 CONTACT_FORM_MESSAGE_TEMPLATE_NAME = 'email_message.txt'
-
-COMPANY_INFOS = {
-    'NAME': "my company",
-    'ADDRESS': "26 streets from here th there",
-    'ZIP': "1234",
-    'CITY': "Maybe-there",
-    'LAT': 48.81484460000001,
-    'LNG': 2.0523723999999675,
-    'PHONE': "+336 1234 5678",
-    'EMAIL': 'contact@mycompany.com',
-    'FACEBOOK': "http://fr-fr.facebook.com/people/Maybe-there",
-    'LINKEDIN': "http://www.linkedin.com/in/Maybe-there",
-    'TWITTER': "http://twitter.com/Maybe-there",
-    'GOOGLEPLUS': "https://plus.google.com/Maybe-there/posts",
-}
 
 
 CRISPY_TEMPLATE_PACK = 'bootstrap3'
