@@ -32,6 +32,8 @@ BLOCKED_MODULES = {
 }
 BOOTSTRAP_FILE = os.path.realpath(__file__)
 PROGRAM_NAME = 'program.py'
+EXIT_MESSAGE = ('SystemExit: the program was stopped before the tests ran '
+                '(SystemExit and sys.exit() are not allowed in exercises)\n')
 WRITE_FLAGS = os.O_WRONLY | os.O_RDWR | os.O_APPEND | os.O_CREAT | os.O_TRUNC
 
 
@@ -77,7 +79,10 @@ def main():
     try:
         exec(code, namespace)
     except SystemExit:
-        raise
+        # raise SystemExit / sys.exit() would stop the program before the tests
+        # run - with status 0 that looked like a solved task
+        sys.stderr.write(EXIT_MESSAGE)
+        sys.exit(1)
     except BaseException as exc:  # print like the interpreter would, minus bootstrap frames
         print_student_traceback(exc)
         sys.exit(1)

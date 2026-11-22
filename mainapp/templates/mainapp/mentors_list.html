@@ -1,6 +1,7 @@
 {% extends 'mainapp/base.html' %}
 
 {% load bootstrap3 %}
+{% load safe_content %}
 
 {% block title %}Mentorzy{% endblock %}
 
@@ -31,7 +32,7 @@
                 {% for mentor in mentors %}
                     <div class="col-md-4">
                         <div class="thumbnail">
-                            <img style="height: 100px;" alt="{{ mentor.name }}" src="{{ mentor.image_link }}" />
+                            <img style="height: 100px;" alt="{{ mentor.name }}" src="{{ mentor.image_link|safe_url }}" />
                             <div class="caption">
                                 <h3>
                                     {{ mentor.name }} {{ mentor.surname }}
@@ -40,7 +41,7 @@
                                     {{ mentor.additional_info }}
                                 </p>
                                 <p>
-                                    <a class="btn btn-primary" href="#">więcej...</a> <a class="btn" href="{{ mentor.blog_link }}" target="_blank">blog</a> <a class="btn" href="#">homepage</a>
+                                    <a class="btn btn-primary" href="#">więcej...</a> <a class="btn" href="{{ mentor.blog_link|safe_url }}" target="_blank" rel="noopener noreferrer">blog</a> <a class="btn" href="#">homepage</a>
                                 </p>
                             </div>
                         </div>

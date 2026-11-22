@@ -2,6 +2,7 @@
 
 {% load bootstrap3 %}
 {% load static %}
+{% load safe_content %}
 
 
 {% block title %}Kursy{% endblock %}
@@ -144,14 +145,14 @@
                         </small><br />
                         <br />
                         {% if content.status == 1 %}
-                            <div data-island="ContentBlock" data-content-id="{{ content.id }}" data-html="{{ content.value }}"></div>
+                            <div data-island="ContentBlock" data-content-id="{{ content.id }}" data-html="{{ content.value|clean_html }}"></div>
                         {% elif content.status == 3 %}
 {% comment %}
 <!--                            <iframe width="640" height="360" src="{{ content.value }}" frameborder="1" allowfullscreen></iframe> -->
 {% endcomment %}
-                            <a class="btn btn-default" href="{{ content.value }}" target="_blank">{{ content.additional_text }}</a>
+                            <a class="btn btn-default" href="{{ content.value|safe_url }}" target="_blank" rel="noopener noreferrer">{{ content.additional_text }}</a>
                         {% elif content.status == 4 %}
-                            <a class="btn btn-default" href="{{ content.value }}" target="_blank">{{ content.additional_text }}</a>
+                            <a class="btn btn-default" href="{{ content.value|safe_url }}" target="_blank" rel="noopener noreferrer">{{ content.additional_text }}</a>
                         {% endif %}
                     </p>
                 </div>

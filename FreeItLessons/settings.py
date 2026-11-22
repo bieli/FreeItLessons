@@ -13,6 +13,7 @@ from pathlib import Path
 
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.utils import get_random_secret_key
+from django.utils.csp import CSP
 
 
 def env_bool(name, default):
@@ -78,6 +79,24 @@ X_FRAME_OPTIONS = 'DENY'
 SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_REFERRER_POLICY = 'same-origin'
 
+# Content Security Policy: scripts only from this site (the React bundle, the
+# admin), no inline scripts, plugins or framing. Styles may be inline (style
+# attributes of the course contents, CodeMirror) and come from the two CDNs the
+# pages use; images may come from any web address (course material).
+BOOTSTRAP_CDN = 'https://stackpath.bootstrapcdn.com'
+SECURE_CSP = {
+    'default-src': [CSP.SELF],
+    'script-src': [CSP.SELF],
+    'style-src': [CSP.SELF, CSP.UNSAFE_INLINE, BOOTSTRAP_CDN, 'https://cdnjs.cloudflare.com'],
+    'font-src': [CSP.SELF, BOOTSTRAP_CDN],
+    'img-src': [CSP.SELF, 'data:', 'https:', 'http:'],
+    'connect-src': [CSP.SELF],
+    'object-src': [CSP.NONE],
+    'base-uri': [CSP.SELF],
+    'form-action': [CSP.SELF],
+    'frame-ancestors': [CSP.NONE],
+}
+
 # The only login page of the site is the admin one (students log in there too).
 LOGIN_URL = '/admin/login/'
 
@@ -104,6 +123,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.csp.ContentSecurityPolicyMiddleware',
 ]
 
 ROOT_URLCONF = 'FreeItLessons.urls'
@@ -227,6 +247,7 @@ TEMP_SOLUTION_CODE_BLOCK = os.environ.get('TEMP_SOLUTION_CODE_BLOCK') or None
 CODE_RUN_TIMEOUT_SECONDS = int(os.environ.get('CODE_RUN_TIMEOUT_SECONDS', '5'))
 CODE_RUN_MEMORY_MB = int(os.environ.get('CODE_RUN_MEMORY_MB', '256'))
 CODE_RUN_OUTPUT_KB = int(os.environ.get('CODE_RUN_OUTPUT_KB', '256'))
+CODE_RUN_MAX_CODE_KB = int(os.environ.get('CODE_RUN_MAX_CODE_KB', '64'))
 
 LOGGING = {
     'version': 1,

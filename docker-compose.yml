@@ -14,7 +14,8 @@ services:
       - "127.0.0.1:8000:8000"
     environment:
       DJANGO_DEBUG: ${DJANGO_DEBUG:-0}
-      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:-local-docker-compose-secret-change-me}
+      # empty = a random key generated on first start and kept in the app-data volume
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:-}
       DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS:-127.0.0.1,localhost}
     volumes:
       - app-data:/data

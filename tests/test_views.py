@@ -51,7 +51,8 @@ class FixturesMixin:
         cls.module.contents.add(cls.chapter)
         Module.objects.create(title='Disabled module', is_enabled=False)
 
-        Faq.objects.create(question='What is Python', answer='<b>A language</b>', my_order=1)
+        Faq.objects.create(question='What is Python', answer='<b>A language</b>', my_order=1, is_visible=True)
+        Faq.objects.create(question='Draft question', answer='not published yet', my_order=2)
 
         cls.task = Task.objects.create(name='Reverse', desc='Reverse a string', code=STARTER_CODE,
                                        tests=TESTS_CODE, points=10, is_visible=True, my_order=1,

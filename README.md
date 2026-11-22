@@ -232,13 +232,14 @@ make frontend-test        # React unit tests
 
 | Variable | Default | Meaning |
 |---|---|---|
-| `DJANGO_SECRET_KEY` | — (**required** unless `DJANGO_DEBUG=1`) | secret key |
+| `DJANGO_SECRET_KEY` | — (**required** unless `DJANGO_DEBUG=1`; Docker generates a random one on first start and keeps it in the data volume) | secret key |
 | `DJANGO_DEBUG` | `0` | debug mode, never enable in production |
 | `DJANGO_ALLOWED_HOSTS` | `127.0.0.1,localhost` | comma separated host names |
 | `DJANGO_CSRF_TRUSTED_ORIGINS` | — | e.g. `https://elearning.example.com` |
 | `DJANGO_DB_PATH` | `./db.sqlite3` (`/data/db.sqlite3` in Docker) | SQLite database file |
 | `DJANGO_SECURE_COOKIES`, `DJANGO_SECURE_SSL_REDIRECT`, `DJANGO_SECURE_HSTS_SECONDS`, `DJANGO_BEHIND_TLS_PROXY` | off | HTTPS hardening - enable when served over TLS |
 | `CODE_RUN_TIMEOUT_SECONDS` / `CODE_RUN_MEMORY_MB` / `CODE_RUN_OUTPUT_KB` | `5` / `256` / `256` | limits of one run of a student's program |
+| `CODE_RUN_MAX_CODE_KB` | `64` | largest program a student can send |
 
 The `docker-compose.yml` defaults are meant for a local computer only. For a
 public server set your own `DJANGO_SECRET_KEY`, `DJANGO_ALLOWED_HOSTS` and the
@@ -265,6 +266,19 @@ responses + resulting data are diffed):
    * no committed secret key, `DEBUG` off by default, HTTPS settings via env,
    * input validation (no more HTTP 500 on malformed requests), parameterized SQL,
    * scripts loaded over https only, unused third-party scripts removed.
+3. **Security fixes after the upgrade** (tests in [`tests/test_security.py`](tests/test_security.py)):
+   * a task is solved only when its tests ran - `raise SystemExit` / `sys.exit()`
+     before the tests no longer counts as a pass,
+   * unpublished tasks and FAQ entries (`is_visible` off) are not shown; authors
+     with the "change task" permission can still preview a task,
+   * HTML of course contents, FAQ answers and hints is cleaned with an allowlist
+     ([nh3](https://pypi.org/project/nh3/)): no scripts, event handlers,
+     `javascript:` links, forms or frames; links in contents and mentor profiles
+     must be web, e-mail or relative addresses,
+   * a Content Security Policy (scripts only from this site, no plugins or framing),
+   * AJAX answers are `text/plain`, one running program per student (HTTP 429
+     otherwise), limits for the size of a program, the timer and the hint number,
+   * every Docker installation gets its own random secret key.
 
 Submitted programs are decoded as UTF-8 (Polish letters are allowed); payloads
 that are not valid UTF-8 (the former jQuery page) fall back to latin-1.

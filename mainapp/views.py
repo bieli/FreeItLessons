@@ -2,15 +2,17 @@ import base64
 import binascii
 import logging
 
+from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponse, HttpResponseBadRequest
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.views.generic.base import View, TemplateView
 
 from mainapp.models import User, Author, Module, Chapter, Content, \
     ContentStatusType, ContentStatus, Faq, Task, TaskSolution
-from mainapp.sandbox import run_program
+from mainapp.sandbox import run_program, user_run_slot
+from mainapp.sanitize import clean_html
 from mainapp.utils import TaskCodeRun
 
 logger = logging.getLogger(__name__)
@@ -35,6 +37,38 @@ def decode_code_block(raw):
         return raw.decode(LEGACY_CODE_BLOCK_ENCODING)
 
 
+# Answers of the AJAX endpoints are plain text (program output, hints, statuses);
+# the React UI reads them as text - a browser never renders them as a page.
+TEXT_PLAIN = 'text/plain; charset=utf-8'
+
+
+def text_response(body='', status=200):
+    return HttpResponse(body, content_type=TEXT_PLAIN, status=status)
+
+
+def bad_request(message=''):
+    return text_response(message, status=400)
+
+
+def tasks_visible_to(user):
+    """Published tasks; unpublished ones only for the authors who may edit them."""
+    tasks = Task.objects.all()
+    if not user.has_perm('mainapp.change_task'):
+        tasks = tasks.filter(is_visible=True)
+    return tasks
+
+
+def parse_timer(value):
+    """``HH:MM:SS`` of the task stopwatch -> seconds (None when malformed)."""
+    try:
+        hours, minutes, seconds = (int(part) for part in str(value).split(':'))
+    except ValueError:
+        return None
+    if not 0 <= hours <= 9999 or not 0 <= minutes < 60 or not 0 <= seconds < 60:
+        return None
+    return hours * 3600 + minutes * 60 + seconds
+
+
 def is_ajax(request):
     """Replacement of ``HttpRequest.is_ajax()`` removed in Django 4.0."""
     return request.headers.get('x-requested-with') == 'XMLHttpRequest'
@@ -53,14 +87,14 @@ class AjaxUserView(View):
 
     def check_request(self, request, params):
         if not request.user.is_authenticated:
-            return HttpResponse(status=401)
+            return text_response(status=401)
         if not is_ajax(request):
-            return HttpResponseBadRequest()
+            return bad_request()
         user_id = to_int(params.get('user_id'))
         if user_id is None or not User.objects.filter(id=user_id).exists():
-            return HttpResponseBadRequest('user NOT EXISTS')
+            return bad_request('user NOT EXISTS')
         if request.user.id != user_id:
-            return HttpResponseBadRequest('wrong auth user in request')
+            return bad_request('wrong auth user in request')
         return None
 
 
@@ -73,9 +107,10 @@ class FaqPageView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        faqs_list = Faq.objects.all()
+        faqs_list = Faq.objects.filter(is_visible=True)
         context.update({'faqs': faqs_list,
-                        'faqs_props': {'faqs': [{'id': faq.id, 'question': faq.question, 'answer': faq.answer}
+                        'faqs_props': {'faqs': [{'id': faq.id, 'question': faq.question,
+                                                 'answer': clean_html(faq.answer)}
                                                 for faq in faqs_list]}})
         return context
 
@@ -156,7 +191,7 @@ class TaskPageView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        task_instance = get_object_or_404(Task, id=kwargs['task_id'])
+        task_instance = get_object_or_404(tasks_visible_to(self.request.user), id=kwargs['task_id'])
         asserts = self._get_asserts_from_tests_code(task_instance.tests)
         context.update({'task': task_instance,
                         'asserts': asserts,
@@ -178,9 +213,9 @@ class ContetUserStatusView(AjaxUserView):
 
         content_instance = Content.objects.filter(id=content_id).first() if content_id else None
         if content_instance is None:
-            return HttpResponseBadRequest('content NOT EXISTS')
+            return bad_request('content NOT EXISTS')
         if not ContentStatusType.exists(status):
-            return HttpResponseBadRequest('status NOT EXISTS')
+            return bad_request('status NOT EXISTS')
 
         status = str(status).lower()
         obj = ContentStatus.objects.filter(user=request.user, content=content_instance)
@@ -188,11 +223,12 @@ class ContetUserStatusView(AjaxUserView):
             obj.update(status=status, updated_at=timezone.now())
         else:
             ContentStatus.objects.create(user=request.user, content=content_instance, status=status)
-        return HttpResponse('OK')
+        return text_response('OK')
 
 
 class TaskCodeRunView(AjaxUserView):
     TIMEOUT_MESSAGE = "Time limit exceeded !\nPlease check your code (infinite loop ?) and run again !"
+    BUSY_MESSAGE = "Your previous program is still running !\nPlease wait for its result and run again !"
 
     def _prepare_result(self, result, tmp_filename, replaced_filename='program.py'):
         result = result.decode("utf-8", errors="replace")
@@ -223,27 +259,33 @@ class TaskCodeRunView(AjaxUserView):
         if error:
             return error
 
-        task = Task.objects.filter(id=to_int(request.POST.get('task_id')) or 0).first()
+        task = tasks_visible_to(request.user).filter(id=to_int(request.POST.get('task_id')) or 0).first()
         if task is None:
-            return HttpResponseBadRequest('task NOT EXISTS')
+            return bad_request('task NOT EXISTS')
         hint_id = to_int(request.POST.get('hint_id', 0))
-        if hint_id is None:
-            return HttpResponseBadRequest('wrong hint_id')
+        if hint_id is None or not 0 <= hint_id <= TaskSolution.MAX_HINT_NO:
+            return bad_request('wrong hint_id')
+        encoded = request.POST.get('code', '')
+        if len(encoded) > (settings.CODE_RUN_MAX_CODE_KB * 1024 + 2) // 3 * 4:
+            return bad_request('code too long')
         try:
-            code = base64.b64decode(request.POST.get('code', '').encode('ascii'), validate=False)
+            code = base64.b64decode(encoded.encode('ascii'), validate=False)
         except (binascii.Error, UnicodeEncodeError):
-            return HttpResponseBadRequest('wrong code')
-        try:
-            hours, minutes, seconds = (int(part) for part in request.POST.get('timer', '').split(':'))
-        except ValueError:
-            return HttpResponseBadRequest('wrong timer')
-        time_spent_seconds = hours * 3600 + minutes * 60 + seconds
+            return bad_request('wrong code')
+        time_spent_seconds = parse_timer(request.POST.get('timer', ''))
+        if time_spent_seconds is None:
+            return bad_request('wrong timer')
 
-        result, returncode = self.run_python_code(code, task, request.user.id)
+        # one program per student at a time: the runs of a single account
+        # cannot occupy all the server workers
+        with user_run_slot(request.user.id) as acquired:
+            if not acquired:
+                return text_response(self.BUSY_MESSAGE, status=429)
+            result, returncode = self.run_python_code(code, task, request.user.id)
         is_finished = returncode == 0
         TaskSolution.save_or_update(task.id, request.user.id, is_finished, hint_id,
                                     time_spent_seconds=time_spent_seconds)
-        return HttpResponse(result)
+        return text_response(result)
 
 
 class TaskCodeHintView(AjaxUserView):
@@ -252,18 +294,18 @@ class TaskCodeHintView(AjaxUserView):
         if error:
             return error
 
-        task = Task.objects.filter(id=to_int(request.POST.get('task_id')) or 0).first()
+        task = tasks_visible_to(request.user).filter(id=to_int(request.POST.get('task_id')) or 0).first()
         if task is None:
-            return HttpResponseBadRequest('task NOT EXISTS')
+            return bad_request('task NOT EXISTS')
         hint_id = to_int(request.POST.get('hint_id', 0))
         if hint_id is None or hint_id < 1:
-            return HttpResponseBadRequest('Unexpected hint_id !')
+            return bad_request('Unexpected hint_id !')
         if hint_id > TaskSolution.MAX_HINT_NO:
-            return HttpResponseBadRequest('Unexpected (too high) hint_id !')
+            return bad_request('Unexpected (too high) hint_id !')
 
-        result = getattr(task, 'suggestion_%d' % hint_id)
+        result = clean_html(getattr(task, 'suggestion_%d' % hint_id))
         TaskSolution.save_or_update(task.id, request.user.id, False, hint_id)
-        return HttpResponse(result)
+        return text_response(result)
 
 
 class ContetUserView(AjaxUserView):
@@ -275,8 +317,8 @@ class ContetUserView(AjaxUserView):
         content_id = to_int(request.GET.get('content_id'))
         cs = ContentStatus.objects.filter(user=request.user, content_id=content_id).first()
         if cs is None:
-            return HttpResponseBadRequest('content NOT EXISTS')
-        return HttpResponse(cs.status)
+            return bad_request('content NOT EXISTS')
+        return text_response(cs.status)
 
 
 class OpinionsView(TemplateView):

@@ -239,13 +239,14 @@ make frontend-test        # testy jednostkowe Reacta
 
 | Zmienna | Domyślnie | Znaczenie |
 |---|---|---|
-| `DJANGO_SECRET_KEY` | — (**wymagana**, chyba że `DJANGO_DEBUG=1`) | tajny klucz |
+| `DJANGO_SECRET_KEY` | — (**wymagana**, chyba że `DJANGO_DEBUG=1`; Docker przy pierwszym uruchomieniu generuje losowy klucz i zapisuje go w wolumenie z danymi) | tajny klucz |
 | `DJANGO_DEBUG` | `0` | tryb debugowania, nigdy nie włączaj go na produkcji |
 | `DJANGO_ALLOWED_HOSTS` | `127.0.0.1,localhost` | nazwy hostów oddzielone przecinkami |
 | `DJANGO_CSRF_TRUSTED_ORIGINS` | — | np. `https://elearning.example.com` |
 | `DJANGO_DB_PATH` | `./db.sqlite3` (`/data/db.sqlite3` w Dockerze) | plik bazy SQLite |
 | `DJANGO_SECURE_COOKIES`, `DJANGO_SECURE_SSL_REDIRECT`, `DJANGO_SECURE_HSTS_SECONDS`, `DJANGO_BEHIND_TLS_PROXY` | wyłączone | zabezpieczenia HTTPS - włącz, gdy strona działa przez TLS |
 | `CODE_RUN_TIMEOUT_SECONDS` / `CODE_RUN_MEMORY_MB` / `CODE_RUN_OUTPUT_KB` | `5` / `256` / `256` | limity jednego uruchomienia programu ucznia |
+| `CODE_RUN_MAX_CODE_KB` | `64` | największy program, jaki uczeń może wysłać |
 
 Ustawienia domyślne w `docker-compose.yml` są przeznaczone tylko dla komputera
 lokalnego. Na publicznym serwerze ustaw własne `DJANGO_SECRET_KEY`,
@@ -275,6 +276,20 @@ danych, a odpowiedzi i powstałe dane są porównywane):
    * walidacja danych wejściowych (koniec z błędami HTTP 500 przy niepoprawnych
      żądaniach), zapytania SQL z parametrami,
    * skrypty ładowane tylko przez https, nieużywane skrypty zewnętrzne usunięte.
+3. **Poprawki bezpieczeństwa po aktualizacji** (testy w [`tests/test_security.py`](tests/test_security.py)):
+   * zadanie jest rozwiązane tylko wtedy, gdy jego testy się wykonały -
+     `raise SystemExit` / `sys.exit()` przed testami nie liczy się już jako sukces,
+   * nieopublikowane zadania i pytania FAQ (wyłączone `is_visible`) nie są
+     pokazywane; autorzy z uprawnieniem „change task” nadal mogą podejrzeć zadanie,
+   * HTML treści kursów, odpowiedzi FAQ i podpowiedzi jest czyszczony według listy
+     dozwolonych elementów ([nh3](https://pypi.org/project/nh3/)): bez skryptów,
+     atrybutów zdarzeń, linków `javascript:`, formularzy i ramek; linki w treściach
+     i profilach mentorów muszą być adresami www, e-mail lub względnymi,
+   * nagłówek Content Security Policy (skrypty tylko z tej strony, bez wtyczek
+     i osadzania w ramkach),
+   * odpowiedzi AJAX mają typ `text/plain`, jeden uruchomiony program na ucznia
+     (w przeciwnym razie HTTP 429), limity rozmiaru programu, stopera i numeru podpowiedzi,
+   * każda instalacja w Dockerze dostaje własny, losowy tajny klucz.
 
 Wysyłane programy są dekodowane jako UTF-8 (polskie litery są dozwolone);
 dane, które nie są poprawnym UTF-8 (dawna strona z jQuery), są odczytywane jako latin-1.

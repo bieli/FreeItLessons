@@ -111,5 +111,22 @@
   "anonymous: static file [/static/mainapp/js/jquery.base64.min.js]": "removed legacy JS (replaced by lib/latin1Base64.js in the React bundle)",
   "anonymous: static file [/static/mainapp/js/easytimer/easytimer.js]": "removed legacy JS (replaced by useStopwatch)",
   "anonymous: static file [/static/mainapp/js/edit_area/edit_area_full.js]": "removed legacy JS (replaced by CodeMirror 6)",
-  "anonymous: static file [/static/admin/js/content_status_stats.js]": "removed legacy JS (replaced by the React StatusPieChart)"
+  "anonymous: static file [/static/admin/js/content_status_stats.js]": "removed legacy JS (replaced by the React StatusPieChart)",
+  "anonymous: content read (anonymous) [/content/user/]": "SECURITY: AJAX answers are text/plain (program output and hints are never rendered as an HTML page); same body",
+  "student: task page [/zadania/7.html]": "SECURITY: unpublished task (is_visible off) -> 404 for students; authors with the 'change task' permission can still preview it",
+  "student: task page [/zadania/8.html]": "SECURITY: unpublished task (is_visible off) -> 404 for students; authors with the 'change task' permission can still preview it",
+  "student: read existing opinion [/content/user/]": "SECURITY: AJAX answers are text/plain (program output and hints are never rendered as an HTML page); same body",
+  "student: read missing opinion [/content/user/]": "SECURITY: AJAX answers are text/plain (program output and hints are never rendered as an HTML page); same body",
+  "student: read created opinion [/content/user/]": "SECURITY: AJAX answers are text/plain (program output and hints are never rendered as an HTML page); same body",
+  "student: read updated opinion [/content/user/]": "SECURITY: AJAX answers are text/plain (program output and hints are never rendered as an HTML page); same body",
+  "student: read opinion of other user [/content/user/]": "SECURITY: AJAX answers are text/plain (program output and hints are never rendered as an HTML page); same body",
+  "student: run starter code (tests fail) [/zadania/task/code/run/]": "SECURITY: AJAX answers are text/plain (program output and hints are never rendered as an HTML page); same body",
+  "student: run forbidden code [/zadania/task/code/run/]": "SECURITY: AJAX answers are text/plain (program output and hints are never rendered as an HTML page); same body",
+  "student: run without XHR header [/zadania/task/code/run/]": "SECURITY: AJAX answers are text/plain (program output and hints are never rendered as an HTML page); same body",
+  "student: run as other user [/zadania/task/code/run/]": "SECURITY: AJAX answers are text/plain (program output and hints are never rendered as an HTML page); same body",
+  "student: hint 1 [/zadania/task/code/hint/]": "SECURITY: AJAX answers are text/plain (program output and hints are never rendered as an HTML page); same body except the hint HTML is cleaned by an allowlist (nh3): the unclosed <p> gets closed - renders the same",
+  "student: hint 2 [/zadania/task/code/hint/]": "SECURITY: AJAX answers are text/plain (program output and hints are never rendered as an HTML page); same body except the hint HTML is cleaned by an allowlist (nh3): '>' in text becomes '&gt;' - renders the same",
+  "student: hint too high [/zadania/task/code/hint/]": "SECURITY: AJAX answers are text/plain (program output and hints are never rendered as an HTML page); same body",
+  "student: run correct solution [/zadania/task/code/run/]": "SECURITY: AJAX answers are text/plain (program output and hints are never rendered as an HTML page); same body",
+  "student: hint 5 (surrender) [/zadania/task/code/hint/]": "SECURITY: AJAX answers are text/plain (program output and hints are never rendered as an HTML page); same body"
 }

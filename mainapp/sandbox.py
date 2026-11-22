@@ -17,14 +17,16 @@ import os
 import signal
 import subprocess
 import tempfile
+from contextlib import contextmanager
 from dataclasses import dataclass
 
 from django.conf import settings
 
 try:
+    import fcntl
     import resource
 except ImportError:  # pragma: no cover - not POSIX
-    resource = None
+    fcntl = resource = None
 
 BOOTSTRAP = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'sandbox_bootstrap.py')
 PROGRAM_NAME = 'program.py'
@@ -54,6 +56,28 @@ def _limits():
         if hasattr(resource, 'RLIMIT_NPROC') and os.getuid() != 0:
             resource.setrlimit(resource.RLIMIT_NPROC, (0, 0))
     return timeout, output, apply
+
+
+@contextmanager
+def user_run_slot(user_id):
+    """Yield True when no other program of ``user_id`` is running (all the
+    server processes share the lock file), otherwise False."""
+    if fcntl is None:  # pragma: no cover - not POSIX
+        yield True
+        return
+    lock_dir = os.path.join(settings.TEMP_SOLUTION_CODE_BLOCK or tempfile.gettempdir(),
+                            'freeitlessons-run-locks')
+    os.makedirs(lock_dir, mode=0o700, exist_ok=True)
+    with open(os.path.join(lock_dir, 'user-%d.lock' % int(user_id)), 'a') as lock:
+        try:
+            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError:
+            yield False
+            return
+        try:
+            yield True
+        finally:
+            fcntl.flock(lock, fcntl.LOCK_UN)
 
 
 def run_program(source):
